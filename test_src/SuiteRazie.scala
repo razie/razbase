@@ -9,7 +9,7 @@ import org.scalatest.SuperSuite
 /** main test suite */
 class SuiteRazieIWishItWorked extends SuperSuite (
   List (
-    new razie.xp.test.TestXp,
+    new razie.xp.test.TestXpString,
     new razie.xp.test.TestXpScalaXml
   )
 )
@@ -18,12 +18,12 @@ class SuiteRazieIWishItWorked extends SuperSuite (
 class SuiteRazie () extends junit.framework.TestSuite(classOf[XNada]) {
   
   // this is where you list the tests...
-   addTestSuite(classOf[razie.xp.test.TestXp])
+   addTestSuite(classOf[razie.xp.test.TestXpString])
    addTestSuite(classOf[razie.xp.test.TestXpScalaXml])
    
    def test1() = 
      // don't touch this line
-     addTest(new junit.framework.TestSuite(classOf[razie.xp.test.TestXp]))
+     addTest(new junit.framework.TestSuite(classOf[razie.xp.test.TestXpString]))
      
 }
 
