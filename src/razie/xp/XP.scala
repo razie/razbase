@@ -4,10 +4,23 @@
  */
 package razie.xp
 
+/** 
+ * XP resolution from a given node
+ */
+trait XPFrom[T] {
+   /** find one element */
+   def xpe (root:T) : T
+   /** find a list of elements */
+   def xpl (root:T) : List[T]
+   /** find one attribute */
+   def xpa (root:T) : String
+   /** find a list of attributes */
+   def xpla (root:T) : List[String]
+}
+
 /** Example of creating a dedicated solver */
 object XP {
-   def forScala (xpath:String) = 
-      new XPSolved[scala.xml.Elem] (new XP[scala.xml.Elem] (xpath), new ScalaDomXqSolver) 
+   def forScala (xpath:String) = XP[scala.xml.Elem] (xpath) using new ScalaDomXpSolver
 }
 
 /** 
@@ -15,7 +28,7 @@ object XP {
  * 
  * So you can just use it after creation and not worry about carrying both arround. 
  */
-class XPSolved [T] (val xp : XP[T], val ctx:XqSolver[T,Any]) {
+class XPSolved [T] (val xp : XP[T], val ctx:XpSolver[T,Any]) {
    /** find one element */
    def xpe (root:T) : T = xp.xpe (ctx, root)
    /** find a list of elements */
@@ -45,53 +58,56 @@ class XPSolved [T] (val xp : XP[T], val ctx:XqSolver[T,Any]) {
 * 
 * Example usage: 
 * <ul>
-* <li> on Strings: new XP("/root").xpl(new StringXqSolver, "/root")
-* <li> on scala xml: new XP[scala.xml.Elem] ("/root").xpl(new ScalaDomXqSolver, root) 
+* <li> on Strings: XP("/root").xpl(new StringXpSolver, "/root")
+* <li> on scala xml: XP[scala.xml.Elem] ("/root").xpl(new ScalaDomXpSolver, root) 
 * </ul>
 * 
 * NOTE - this is stateless with respect to the parsed object tree - it only keeps the pre-compiled xpath expression so you should reuse them as much as possible
 */
-class XP[T] (val expr:String){
+case class XP[T] (val expr:String) {
 
    // list of parsed elements
    val elements =  
       for (val e <- (expr split "/").filter(_!="")) 
-    	  yield new XqElement[T] (e)
+    	  yield new XpElement[T] (e)
    lazy val nonaelements = elements.filter(_.attr!="@")
 
    /** return the matching list solve this path starting with the root and the given solving strategy */
-   private def ixpl (ctx:XqSolver[T,Any], root:T) : List[T] = 
-      for (e <- nonaelements.foldLeft (List ((root,List(root).asInstanceOf[Any])) ) ( (x,y) => y.solve(ctx, x).asInstanceOf[List[(T,Any)]]) ) 
-        yield e._1
-
-   /** return the matching list solve this path starting with the root and the given solving strategy */
-      def xpl (ctx:XqSolver[T,Any], root:T) : List[T] = {
+      def xpl (ctx:XpSolver[T,Any], root:T) : List[T] = {
          requireNotAttr
          ixpl(ctx, root)
       }
 
       /** return the matching list solve this path starting with the root and the given solving strategy */
-      def xpe (ctx:XqSolver[T,Any], root:T) : T = xpl (ctx, root).head
+      def xpe (ctx:XpSolver[T,Any], root:T) : T = xpl (ctx, root).head
       
       /** return the matching attribute solve this path starting with the root and the given solving strategy */
-      def xpa (ctx:XqSolver[T,Any], root:T) : String = {
+      def xpa (ctx:XpSolver[T,Any], root:T) : String = {
          requireAttr
          ctx.getAttr(ixpl(ctx,root).head, elements.last.name)
       }
           
       /** return the list of matching attribute solve this path starting with the root and the given solving strategy */
-      def xpla (ctx:XqSolver[T,Any], root:T) : List[String] = {
+      def xpla (ctx:XpSolver[T,Any], root:T) : List[String] = {
          requireAttr
          ixpl(ctx,root).map (ctx.getAttr(_, elements.last.name))
       }
           
+   /** return the matching list solve this path starting with the root and the given solving strategy */
+   private def ixpl (ctx:XpSolver[T,Any], root:T) : List[T] = 
+      for (e <- nonaelements.foldLeft (List ((root,List(root).asInstanceOf[Any])) ) ( (x,y) => y.solve(ctx, x).asInstanceOf[List[(T,Any)]]) ) 
+        yield e._1
+
       def requireAttr = if (elements.last.attr != "@") throw new IllegalArgumentException ("ERR_XP result should be attribute but it's an entity...")
       def requireNotAttr = if (elements.last.attr == "@") throw new IllegalArgumentException ("ERR_XP result should be entity but it's an attribute...")
+  
+   /** if you'll keep using the same context there's no point dragging it around */
+   def using (ctx:XpSolver[T,Any]) = new XPSolved (this, ctx)
 }
 
 /** overwrite this if you want other scriptables for conditions...it's just a syntax marker */
-object XqCondFactory {
-   def make (s:String) = if (s == null) null else new XqCond(s)
+object XpCondFactory {
+   def make (s:String) = if (s == null) null else new XpCond(s)
 }
 
 /** the condition of an element in the path. 
@@ -100,7 +116,7 @@ object XqCondFactory {
  * 
  * this default implementation supports something like "[@attrname==15]"
  */
-class XqCond (val expr:String) {
+class XpCond (val expr:String) {
    // TODO 1-2 implement something better
    val parser = """\[[@]*(\w+)[ \t]*([=!~]+)[ \t]*[']*([^']*)[']*\]""".r
    val parser(a, eq, v) = expr
@@ -108,7 +124,7 @@ class XqCond (val expr:String) {
    /** returns all required attributes, in the AA format */
    def attributes : Iterable[String] = List(a)
    
-   def passes[T] (o:T, ctx:XqSolver[T,Any]) : Boolean = {
+   def passes[T] (o:T, ctx:XpSolver[T,Any]) : Boolean = {
       lazy val temp = ctx.getAttr(o, a)
       
       eq match {
@@ -123,7 +139,7 @@ class XqCond (val expr:String) {
 }
 
 /** the strategy to break down the input based on the current path element. The solving algorithm is: apply current sub-path to current sub-nodes, get the results and RESTs. Filter by conditions and recurse.  */
-trait XqSolver[+A,+B] {
+trait XpSolver[+A,+B] {
    /** get the next list of nodes at the current position in the path. For each, return a tuple with the respective value and the REST to continue solving */
    def getNext[T>:A,U>:B](o:(T,U),tag:String, assoc:String) : Iterable[(T,U)]
 
@@ -136,22 +152,22 @@ trait XqSolver[+A,+B] {
     * @param cond the condition to use for filtering - may be null if there's no condition at this point
     * @return
     */
-   def reduce[T>:A,U>:B](o:Iterable[(T,U)],cond:XqCond) : Iterable[(T,U)]
+   def reduce[T>:A,U>:B](o:Iterable[(T,U)],cond:XpCond) : Iterable[(T,U)]
 }
 
 /** an element in the path */
-protected class XqElement[T] (val expr:String){
+protected class XpElement[T] (val expr:String){
    val parser = """(\{.*\})*([@])*(\w+)(\[.*\])*""".r
    val parser(assoc_, attr, name, scond) = expr
-   val cond = XqCondFactory.make (scond)
+   val cond = XpCondFactory.make (scond)
 
    /** from res get the path and then reduce with condition looking for elements */
-   def solve (ctx:XqSolver[T,Any], res:List[(T,Any)]):List[(T,Any)] = 
+   def solve (ctx:XpSolver[T,Any], res:List[(T,Any)]):List[(T,Any)] = 
       for (e <- res; x <- ctx.reduce (ctx.getNext(e,name,assoc),cond)) 
          yield x
    
    /* looking for an attribute */
-   def solvea (ctx:XqSolver[Any,Any], res:Any) : String = 
+   def solvea (ctx:XpSolver[Any,Any], res:Any) : String = 
      ctx.getAttr(res,name)
      
    def assoc = assoc_ match {
@@ -162,7 +178,7 @@ protected class XqElement[T] (val expr:String){
 }
 
 /** this example resolves strings with the /x/y/z format */
-class StringXqSolver extends XqSolver[String,List[String]] {
+class StringXpSolver extends XpSolver[String,List[String]] {
   override def getNext[T>:String,U>:List[String]](o:(T,U),tag:String, assoc:String) : Iterable[(T,U)]={
     val pat = """/*(\w+)(/.*)*""".r
     val pat(result,next) = o._2.asInstanceOf[List[String]].head
@@ -175,23 +191,23 @@ class StringXqSolver extends XqSolver[String,List[String]] {
   }
 
   // there is no solver in a string, eh?
-  override def reduce[T>:String,U>:List[String]] (o:Iterable[(T,U)],cond:XqCond) : Iterable[(T,U)] = 
+  override def reduce[T>:String,U>:List[String]] (o:Iterable[(T,U)],cond:XpCond) : Iterable[(T,U)] = 
     o
 }
 
 /** this resolves dom trees*/
-//class DomXqSolver extends XqSolver[RazElement,List[RazElement]] {
+//class DomXpSolver extends XpSolver[RazElement,List[RazElement]] {
 //   override def getNext[T>:RazElement,U>:List[RazElement]] (o:(T,U),tag:String, assoc:String) : List[(T,U)]={
 //      val n = o._1.asInstanceOf[RazElement] xpl tag
 //      for (e <- n) yield (e,e.asInstanceOf[U])
 //   } 
 //
 //   override def getAttr[T>:RazElement] (o:T,attr:String) : String = o.asInstanceOf[RazElement] a attr
-//   override def reduce[T>:RazElement,U>:List[RazElement]] (o:List[(T,U)],cond:XqCond) : List[(T,U)] = o.asInstanceOf[List[(T,U)]]
+//   override def reduce[T>:RazElement,U>:List[RazElement]] (o:List[(T,U)],cond:XpCond) : List[(T,U)] = o.asInstanceOf[List[(T,U)]]
 //}
 
 /** this resolves dom trees*/
-class ScalaDomXqSolver extends XqSolver[scala.xml.Elem,List[scala.xml.Elem]] {
+class ScalaDomXpSolver extends XpSolver[scala.xml.Elem,List[scala.xml.Elem]] {
    override def getNext[T>:scala.xml.Elem,U>:List[scala.xml.Elem]] (o:(T,U),tag:String, assoc:String) : Iterable[(T,U)]=
       o._2.asInstanceOf[List[scala.xml.Elem]].filter(_.label==tag).map(x => { val t = (x.asInstanceOf[T],children(x).toList.asInstanceOf[U]); println ("t=" + t); t}).toList
 
@@ -202,7 +218,7 @@ class ScalaDomXqSolver extends XqSolver[scala.xml.Elem,List[scala.xml.Elem]] {
    override def getAttr[T>:scala.xml.Elem] (o:T,attr:String) : String = 
 	   (o.asInstanceOf[scala.xml.Elem] \ ("@"+attr)) text
 
-   override def reduce[T>:scala.xml.Elem,U>:List[scala.xml.Elem]] (o:Iterable[(T,U)],cond:XqCond) : Iterable[(T,U)] = 
+   override def reduce[T>:scala.xml.Elem,U>:List[scala.xml.Elem]] (o:Iterable[(T,U)],cond:XpCond) : Iterable[(T,U)] = 
       cond match {
          case null => o.asInstanceOf[List[(T,U)]]
          case _ => o.asInstanceOf[List[(T,U)]].filter(x => cond.passes(x._1, this))
@@ -210,7 +226,7 @@ class ScalaDomXqSolver extends XqSolver[scala.xml.Elem,List[scala.xml.Elem]] {
 }
 
 /** reflection resolved for java/scala objects */
-//class BeanXqSolver extends XqSolver[AnyRef,List[RazElement]] {
+//class BeanXpSolver extends XpSolver[AnyRef,List[RazElement]] {
 //   override def getNext[T>:AnyRef,U>:List[AnyRef]] (o:(T,U),tag:String, assoc:String) : List[(T,U)]={
 //      val n = o._1
 //      n.getClass
@@ -218,7 +234,7 @@ class ScalaDomXqSolver extends XqSolver[scala.xml.Elem,List[scala.xml.Elem]] {
 //   }
 //
 //   override def getAttr[T>:AnyRef] (o:T,attr:String) : String = o.asInstanceOf[RazElement] a attr
-//   override def reduce[T>:AnyRef,U>:List[AnyRef]] (o:List[(T,U)],cond:XqCond) : List[(T,U)] = o.asInstanceOf[List[(T,U)]]
+//   override def reduce[T>:AnyRef,U>:List[AnyRef]] (o:List[(T,U)],cond:XpCond) : List[(T,U)] = o.asInstanceOf[List[(T,U)]]
 //}
 
 // TODO 2-2 build a hierarchical context/solver structure - to rule the world. It would include registration

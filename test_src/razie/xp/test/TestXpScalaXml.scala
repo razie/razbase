@@ -14,15 +14,15 @@ import razie.xp._
  * @author razvanc99
  */
 class TestXpScalaXml extends JUnit3Suite {
-
+   
    def test41 = expect (List("a")) { xpl("/a").map(_.label) }
    def test42 = expect (List("a")) { xpl("a").map(_.label) }
    def test43 = expect (List("b1","b2")) { xpl("/a/b").map(_ \ "@ba") }
    def test44 = expect (List("b1","b2")) { xpla("/a/b/@ba") }
    def test45 = expect (List("c11","c12","c13")) { xpla("/a/b[@ba=='b1']/c/@ca") }
  
-   def xpl (path:String) = new XP[scala.xml.Elem] (path).xpl(new ScalaDomXqSolver, TXXmls.x) 
-   def xpla(path:String) = new XP[scala.xml.Elem] (path).xpla(new ScalaDomXqSolver, TXXmls.x) 
+   def xpl (path:String) = new XP[scala.xml.Elem] (path).xpl(new ScalaDomXpSolver, TXXmls.x) 
+   def xpla(path:String) = new XP[scala.xml.Elem] (path).xpla(new ScalaDomXpSolver, TXXmls.x) 
  
 // def test31 = expect (List("a")) { sx("/a").map(_.name) }
 // def test32 = expect (List("a")) { sx("a").map(_.name) }
