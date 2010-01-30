@@ -35,9 +35,7 @@ object Perf {
     var errors = List[Exception]()
 
     val graph = (for (i <- noThreads.toList) yield (i, try {
-        runmt(i, noLoops) { (thread:Int, loop:Int) => {
-            tfunc (thread,loop)
-        }} match {
+        runmt(i, noLoops) (tfunc) match {
             // don't print OK in the results
             case (count, resp, thr, "OK") => (resp, thr, "")
             case (count, resp, thr, s:String) => (resp, thr, "ERR "+s)
