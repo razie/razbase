@@ -56,9 +56,12 @@ object Threads {
          }).start();
       }
   
-   /** repeat the func on as many threads, but each has a result which is joined and then collected */
-   def repeatAndWait[A>:Null<:AnyRef] (i:Int) (f: => A)(implicit m:scala.reflect.Manifest[A]) : Iterable[A] = {
-      val threads = Array.tabulate (i)(_ => new FuncThread (f))       
+   /** repeat the func on as many threads, but each has a result which is joined and then collected 
+    * 
+    * @param f is passed the thread number, for no good reason :)
+    */
+   def repeatAndWait[A>:Null<:AnyRef] (i:Int) (f: Int => A)(implicit m:scala.reflect.Manifest[A]) : Iterable[A] = {
+      val threads = Array.tabulate (i) {x:Int => {new FuncThread (x, f) }}
       threads.foreach (_.start)
       threads.foreach (_.join)
       threads.map (_.res).toList  // use toList since the iterable may not be strict
@@ -70,9 +73,9 @@ object Threads {
       override def run() = res = f(a)
    }
 
-   class FuncThread[A>:Null<:AnyRef] (f: =>A) extends java.lang.Thread {
+   class FuncThread[A>:Null<:AnyRef] (thread:Int, f:Int =>A) extends java.lang.Thread {
       var res: A = null
 
-      override def run() = res = f 
+      override def run() = res = f (thread)
    }
 }
