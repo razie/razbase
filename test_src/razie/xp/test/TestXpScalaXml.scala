@@ -6,7 +6,7 @@ package razie.xp.test
 
 import org.scalatest.junit._
 import org.scalatest.SuperSuite
-import razie.xp._
+import razie.XP
 
 /**
  * junit tests for the XP stuff
@@ -21,8 +21,8 @@ class TestXpScalaXml extends JUnit3Suite {
    def test44 = expect (List("b1","b2")) { xpla("/a/b/@ba") }
    def test45 = expect (List("c11","c12","c13")) { xpla("/a/b[@ba=='b1']/c/@ca") }
  
-   def xpl (path:String) = new XP[scala.xml.Elem] (path).xpl(new ScalaDomXpSolver, TXXmls.x) 
-   def xpla(path:String) = new XP[scala.xml.Elem] (path).xpla(new ScalaDomXpSolver, TXXmls.x) 
+   def xpl (path:String) = XP forScala (path) xpl (TXXmls.x) 
+   def xpla(path:String) = XP forScala (path) xpla (TXXmls.x) 
  
 // def test31 = expect (List("a")) { sx("/a").map(_.name) }
 // def test32 = expect (List("a")) { sx("a").map(_.name) }

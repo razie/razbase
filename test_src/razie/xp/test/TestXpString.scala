@@ -6,7 +6,7 @@ package razie.xp.test
 
 import org.scalatest.junit._
 import org.scalatest.SuperSuite
-import razie.xp._
+import razie._
 
 /**
  * junit tests for the XP stuff
@@ -16,15 +16,15 @@ import razie.xp._
 class TestXpString extends JUnit3Suite {
 
  def test11a = expect (List("root")) {
-  new XP("/root").xpl(new StringXpSolver, "/root")
+  XP("/root").xpl(StringXpSolver, "/root")
   }
 
  def test11b = expect (List("root")) {
-  new XP("/root").xpl(new StringXpSolver, "root")
+  XP("/root").xpl(StringXpSolver, "root")
   }
 
  def test12 = expect (List("s1")) {
-  new XP("/root/s1").xpl(new StringXpSolver, "/root/s1")
+  XP("/root/s1").xpl(StringXpSolver, "/root/s1")
   }
 
  def test21 = expect (List(("a",List(null)))) { xp("/a","a") }
@@ -32,5 +32,5 @@ class TestXpString extends JUnit3Suite {
  def test23 = expect (List(("a",List("/b")))) { xp("/a/b","a") }
  def test24 = expect (List(("a",List("/b")))) { xp("a/b","a") }
 
- def xp(src:String,path:String) = new StringXpSolver().getNext((src,List(src)),path,null)
+ def xp(src:String,path:String) = StringXpSolver.getNext((src,List(src)),path,null)
 }

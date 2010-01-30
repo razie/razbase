@@ -6,7 +6,7 @@ package razie.xp.test
 
 import org.scalatest.junit._
 import org.scalatest.SuperSuite
-import razie.xp._
+import razie._
 
 // sample of how to implement a domain model for XP access
 
