@@ -18,8 +18,11 @@ class SuiteRazieIWishItWorked extends SuperSuite (
 class SuiteRazie () extends junit.framework.TestSuite(classOf[XNada]) {
   
   // this is where you list the tests...
+   addTestSuite(classOf[razie.test.MTest])
+   addTestSuite(classOf[razie.test.PerfTest])
    addTestSuite(classOf[razie.xp.test.TestXpString])
    addTestSuite(classOf[razie.xp.test.TestXpScalaXml])
+   addTestSuite(classOf[razie.xp.test.XpBeanTest])
    
    def test1() = 
      // don't touch this line
