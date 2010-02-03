@@ -18,6 +18,8 @@ class SuiteRazieIWishItWorked extends SuperSuite (
 class SuiteRazie () extends junit.framework.TestSuite(classOf[XNada]) {
   
   // this is where you list the tests...
+   addTestSuite(classOf[com.razie.pub.base.test.AttrAccessTest])
+   addTestSuite(classOf[com.razie.pub.base.test.ScalaAttrAccessTest])
    addTestSuite(classOf[razie.test.MTest])
    addTestSuite(classOf[razie.test.PerfTest])
    addTestSuite(classOf[razie.xp.test.TestXpString])
