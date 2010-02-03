@@ -23,13 +23,12 @@ trait M[+A] {
    def iterator: Iterator[A] 
    def toList: List[A] = M.toList (this)
   
-   override def equals (y:Any) = M.equals(this, y.asInstanceOf[M[A]])
+   override def equals (y:Any) : Boolean = y.asInstanceOf[M[A]] match {
+      case m : M[A] => M.equals(this, m) (_==_)
+      case _ => false
+   }
+   
    def sort (lt:(A,A) => Boolean) : List[A] = M.sort(this, lt)
-}
-
-/** use this to build a monad on the spot, instead of List or something */
-case class MM[A] (x:A*) extends M.MonaTravestita[A] (x) {
-   override def equals (y:Any) = M.equals(this, y.asInstanceOf[M[A]])
 }
 
 // special chars: a : 
@@ -79,23 +78,50 @@ object M {
    
   
    // ------------------- common monad stuff
-   
-   def equals[A] (x:M[A], y:M[A]) = {
+
+   /** apply f on each pair (A,B) and contain result 
+    * 
+    * TODO return a nice non-strict monad
+    */
+   def parmap[A,B,C] (x:M[A], y:M[B]) (f:(A,B)=>C) : M[C] = {
       // TODO optimize
     val i1 = x.iterator
     val i2 = y.iterator
     var b = false
+    val res = MList[C]()
 
     while (i1.hasNext && i2.hasNext && !b) {
       val x1 = i1.next
       val x2 = i2.next
+      res += f(x1, x2)
+    }
 
-      if (x1 != x2) {
-        b = true
+    // TODO see quals - what if the lists are not equals? get pissed?
+    M(res)
+   }
+
+   /** compare two monads, given a comparison function 
+    * 
+    * @param x - to compare
+    * @param y - to compare
+    * @param eeq - eq function 
+    */
+   def equals[A,B] (x:M[A], y:M[B]) (eeq:(A,B)=>Boolean) = {
+      // TODO optimize
+    val i1 = x.iterator
+    val i2 = y.iterator
+    var bad = false
+
+    while (i1.hasNext && i2.hasNext && !bad) {
+      val x1 = i1.next
+      val x2 = i2.next
+
+      if (! eeq(x1,x2)) {
+        bad = true
       }
     }
 
-    !(b || i1.hasNext || i2.hasNext)
+    !(bad || i1.hasNext || i2.hasNext)
    }
    
    def first[A] (x:M[A]) : M[A] = {

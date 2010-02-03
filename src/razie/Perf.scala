@@ -8,19 +8,13 @@ case class Near (l:List[Double], percent:Int = 20) {
       case _ => false
    }
    
-   def cmp (s:Seq[Double]) = {
-         if (l.size != s.size) false
-         else {
-         val i2 = s.iterator
-         var cnt=0
-         for (l1 <- l) {
-            val s1 = i2.next
-            if (s1 > l1*(100-percent)/100 && s1 < l1*(100+percent)/100 ||
-                l1 > s1*(100-percent)/100 && l1 < s1*(100+percent)/100) cnt+=1
-         }
-         cnt == l.size
-      }
-   }
+   import razie.M._
+   
+   def cmp (s:Seq[Double]) = razie.M.equals(l, s) (
+         (s1,l1)=>{
+            (s1 > l1*(100-percent)/100 && s1 < l1*(100+percent)/100 ||
+            l1 > s1*(100-percent)/100 && l1 < s1*(100+percent)/100) 
+      })
 }
 
 /** MT performance testing tools */
