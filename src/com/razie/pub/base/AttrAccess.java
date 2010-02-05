@@ -28,7 +28,7 @@ public interface AttrAccess {
 
    /** these types MUST be supported by forms for capture, not necessarily by displays */
    public static enum AttrType {
-      STRING, MEMO, SCRIPT, INT, FLOAT, DATE
+      STRING, MEMO, SCRIPT, INT, FLOAT, DATE, DEFAULT
    };
 
    // TODO 3-2 protect this against idiot code
@@ -127,13 +127,13 @@ public interface AttrAccess {
 
       @Override
       public Object getAttr(String name) {
-         Object o = this.parms != null ? this.parms.get(name) : null;
+         Object o = this._attrs != null ? this._attrs.get(name) : null;
          return o != null ? o : (parent != null ? parent.getAttr(name) : null);
       }
 
       @Override
       public boolean isPopulated(String name) {
-         boolean b = this.parms != null && this.parms.containsKey(name);
+         boolean b = this._attrs != null && this._attrs.containsKey(name);
          return b ? true : (parent != null ? parent.isPopulated(name) : false);
       }
 

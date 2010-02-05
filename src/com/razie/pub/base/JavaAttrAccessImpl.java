@@ -16,10 +16,10 @@ import org.json.JSONObject;
 
     /** simple base implementation */
     public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAccess {
-        // lazy
-        protected Map<String, Object>   parms = null;
-        protected Map<String, AttrType> types = null;
-        protected List<String>          order = null;
+        // lazy - using underscore since many classes may derive from here...
+        protected Map<String, Object>   _attrs = null;
+        protected Map<String, AttrType> _types = null;
+        protected List<String>          _order = null;
 
         /** dummy */
         public JavaAttrAccessImpl() {
@@ -40,50 +40,75 @@ import org.json.JSONObject;
         public void set(String name, Object value) { setAttr(name,value); }
         public void set(String name, Object value, AttrAccess.AttrType t) { 
            setAttr(name,value); setAttrType (name, t);}
+
+
+        // TODO 3-2 implement nice scala pattern matching
+        /** parse "name:type=val" into a spec */
+        public static AttrSpec parseSpec (String spec) {
+           String[] ss = spec.split("=", 2);
+
+           String val = null;
+           if (ss.length > 1)
+               val = ss[1];
+
+           String name = ss[0];
+          
+           // - parse the rest
+           AttrType t = AttrType.DEFAULT;
+           
+           // check name for type definition
+           if (name.contains(":")) {
+               String n[];
+
+               // type defn can be escaped by a \
+               int idx = name.indexOf("\\:");
+               if (idx >= 0 && idx == name.indexOf(":") - 1) {
+                   n = new String[2];
+                   
+                   // let's see if it does have a type...
+                   String s2 = name.substring(idx + 2);
+                   int idx2 = s2.indexOf(":");
+                   if (idx2 >= 0) {
+                       n[0] = name.substring(0, idx+2+idx2);
+                       n[1] = name.substring(idx+2+idx2+1);
+                   } else {
+                       n[0] = name;
+                       n[1] = null;
+                   }
+                   
+                   name = n[0] = n[0].replaceAll("\\\\:", ":");
+               } else
+                   n = name.split(":", 2);
+
+               // basically, IF there's a ":" AND what's after is a recognied type...otherwise i'll
+               // assume the parm name is "a:b"
+               if (n.length > 1 && n[1] != null) {
+                   AttrType tt = AttrType.valueOf(n[1].toUpperCase());
+                   if (tt != null) {
+                       name = n[0];
+                       t = tt;
+                   }
+               }
+           }
+           
+           return AttrSpec$.MODULE$.factory1(name, t, val);
+        }
         
         /* TODO should setAttr(xx,null) remove it so it's not populated? */
         public void setAttr(String name, Object value) {
             checkMap();
-            // check name for type definition
-            if (name.contains(":")) {
-                String n[];
-
-                // type defn can be escaped by a \
-                int idx = name.indexOf("\\:");
-                if (idx >= 0 && idx == name.indexOf(":") - 1) {
-                    n = new String[2];
-                    
-                    // let's see if it does have a type...
-                    String s2 = name.substring(idx + 2);
-                    int idx2 = s2.indexOf(":");
-                    if (idx2 >= 0) {
-                        n[0] = name.substring(0, idx+2+idx2);
-                        n[1] = name.substring(idx+2+idx2+1);
-                    } else {
-                        n[0] = name;
-                        n[1] = null;
-                    }
-                    
-                    name = n[0] = n[0].replaceAll("\\\\:", ":");
-                } else
-                    n = name.split(":", 2);
-
-                // basically, IF there's a ":" AND what's after is a recognied type...otherwise i'll
-                // assume the parm name is "a:b"
-                if (n.length > 1 && n[1] != null) {
-                    if (AttrType.valueOf(n[1].toUpperCase()) != null) {
-                        name = n[0];
-                        this.setAttrType(name, n[1]);
-                    }
-                }
-            }
-            if (!this.parms.containsKey(name))
-                this.order.add(name);
-            this.parms.put(name, value);
+            AttrSpec s = parseSpec (name);
+            
+            if (s.t() != AttrType.DEFAULT)
+               this.setAttrType(name, s.t());
+            
+            if (!this._attrs.containsKey(s.n()))
+                this._order.add(s.n());
+            this._attrs.put(s.n(), value);
         }
 
         public Object getAttr(String name) {
-            return this.parms != null ? this.parms.get(name) : null;
+            return this._attrs != null ? this._attrs.get(name) : null;
         }
 
         public Object a(String name) {
@@ -124,6 +149,8 @@ import org.json.JSONObject;
                 String m = (String) pairs[0];
                 String[] n = m.split("[,&]");
                 for (String s : n) {
+                   // TODO 3-2 share with parseSpec above
+//                   AttrSpec as = parseSpec (s);
                     String[] ss = s.split("=", 2);
 
                     String val = null;
@@ -143,24 +170,24 @@ import org.json.JSONObject;
         }
 
         private void checkMap() {
-            if (this.parms == null) {
-                this.parms = new HashMap<String, Object>();
-                this.types = new HashMap<String, AttrType>();
-                this.order = new ArrayList<String>();
+            if (this._attrs == null) {
+                this._attrs = new HashMap<String, Object>();
+                this._types = new HashMap<String, AttrType>();
+                this._order = new ArrayList<String>();
             }
         }
 
         @SuppressWarnings("unchecked")
         public Iterable<String> getPopulatedAttr() {
-            return this.parms == null ? Collections.EMPTY_LIST : this.order;
+            return this._attrs == null ? Collections.EMPTY_LIST : this._order;
         }
 
         public int size() {
-            return this.parms == null ? 0 : this.parms.size();
+            return this._attrs == null ? 0 : this._attrs.size();
         }
 
         public boolean isPopulated(String name) {
-            return this.parms != null && this.parms.containsKey(name);
+            return this._attrs != null && this._attrs.containsKey(name);
         }
 
         public JSONObject toJson(JSONObject obj) {
@@ -178,7 +205,7 @@ import org.json.JSONObject;
 
         /** same pairs format name,value,name,value... */
         public Object[] toPairs() {
-            int size = this.parms == null ? 0 : this.parms.size();
+            int size = this._attrs == null ? 0 : this._attrs.size();
             Object[] ret = new Object[size * 2];
 
             int i = 0;
@@ -222,11 +249,11 @@ import org.json.JSONObject;
         }
 
         public boolean hasAttrType(String name) {
-            return this.types != null && types.get(name) != null;
+            return this._types != null && this._types.get(name) != null;
         }
 
         public AttrType getAttrType(String name) {
-            AttrType t = this.types != null ? types.get(name) : null;
+            AttrType t = this._types != null ? this._types.get(name) : null;
             return t == null ? AttrType.STRING : t;
         }
 
@@ -237,7 +264,7 @@ import org.json.JSONObject;
         public void setAttrType(String name, AttrType type) {
             checkMap();
             // TODO maybe it's too slow this toString?
-            this.types.put(name, type);
+            this._types.put(name, type);
         }
         
     }
