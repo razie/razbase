@@ -4,7 +4,7 @@
  */
 package razie
 
-import com.razie.pub.base._
+import razie.base._
 
 /** simplify usage of AttrAccess - attribute management
  * 
