@@ -5,7 +5,7 @@
 package com.razie.pub.base.test
 
 import org.scalatest.junit._
-import com.razie.pub.base._
+import razie.base._
 import org.scalatest.SuperSuite
 
 /**

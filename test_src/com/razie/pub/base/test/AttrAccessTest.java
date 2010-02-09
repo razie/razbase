@@ -4,10 +4,10 @@
  */
 package com.razie.pub.base.test;
 
+import razie.base.AttrAccess;
+import razie.base.AttrAccessImpl;
 import junit.framework.TestCase;
 
-import com.razie.pub.base.AttrAccess;
-import com.razie.pub.base.AttrAccessImpl;
 
 /**
  * test the attr implementation
