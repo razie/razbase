@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import razie.base.AttrAccess;
+//import razie.base.AttrAccess;
 import java.util.Properties;
 
 import org.json.JSONException;
