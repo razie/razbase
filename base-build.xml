@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="none">
+    <property file="../razie.properties"/>
+
+    <path id="scala.path">
+        <pathelement location="${scala.home}/lib/scala-library.jar"/>
+    </path>
+
+    <path id="eclipse.scala.path">
+        <pathelement location="${eclipse.bundle}/lib/scala-library.jar"/>
+    </path>
+
+    <path id="test.path">
+        <pathelement location="${scalatest.jar}"/>
+        <pathelement location="${junit3.jar}"/>
+    </path>
+
+    <path id="build.classpath">
+        <pathelement location="bin"/>
+        <path refid="scala.path"/>
+        <path refid="depy.path"/>
+    </path>
+
+    <path id="test.classpath">
+        <pathelement location="bin"/>
+        <path refid="scala.path"/>
+        <path refid="depy.path"/>
+        <path refid="test.path"/>
+    </path>
+
+    <target name="init">
+        <taskdef resource="scala/tools/ant/antlib.xml">
+            <classpath>
+                <pathelement location="${scala.home}/lib/scala-compiler.jar" />
+                <pathelement location="${scala.home}/lib/scala-library.jar" />
+            </classpath>
+        </taskdef>
+
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.scala"/>
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="test_src">
+                <exclude name="**/*.scala"/>
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <scalac srcdir="src" destdir="bin">
+            <classpath refid="build.classpath" />
+        </scalac>
+        <javac srcdir="src" destdir="bin">
+            <classpath refid="build.classpath" />
+        </javac>
+
+        <scalac srcdir="test_src" destdir="bin">
+            <classpath refid="test.classpath" />
+        </scalac>
+        <javac srcdir="test_src" destdir="bin">
+            <classpath refid="test.classpath" />
+        </javac>
+    </target>
+
+</project>

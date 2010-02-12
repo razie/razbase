@@ -1,89 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="razie">
-    <property environment="env"/>
-    <property name="eclipse.home" value="../../bin/packages/eclipse35new"/>
-    <property name="eclipse.bundle" value="../../bin/packages/eclipse35new/configuration/org.eclipse.osgi/bundles/889/1/.cp"/>
-    <property name="scala.home" value="/host/bin/scala"/>
+  <import file="../razie/base-build.xml"/>
 
-    <path id="lib.path">
-        <pathelement location="lib/json.jar"/>
+    <path id="depy.path">
+        <pathelement location="../razie/lib/json.jar"/>
     </path>
 
-    <path id="scala.path">
-        <pathelement location="${scala.home}/lib/scala-library.jar"/>
-        <pathelement location="${scala.home}/lib/scala-dbc.jar"/>
-        <pathelement location="${scala.home}/lib/scala-swing.jar"/>
-    </path>
-
-    <path id="eclipse.scala.path">
-        <pathelement location="${eclipse.bundle}/lib/scala-library.jar"/>
-        <pathelement location="${eclipse.bundle}/lib/scala-dbc.jar"/>
-        <pathelement location="${eclipse.bundle}/lib/scala-swing.jar"/>
-    </path>
-
-    <path id="scalatest.userclasspath">
-        <pathelement location="${scala.home}/scalatest/scalatest-1.0.1-for-scala-2.8.0.Beta1-RC1-SNAPSHOT.jar"/>
-    </path>
-
-    <path id="JUnit 3.libraryclasspath">
-        <pathelement location="${eclipse.home}/plugins/org.junit_3.8.2.v20090203-1005/junit.jar"/>
-    </path>
-
-    <path id="build.classpath">
-        <pathelement location="bin"/>
-        <path refid="scala.path"/>
-        <path refid="lib.path"/>
-    </path>
-
-    <path id="test.classpath">
-        <pathelement location="bin"/>
-        <path refid="scala.path"/>
-        <path refid="lib.path"/>
-        <path refid="scalatest.userclasspath"/>
-        <path refid="JUnit 3.libraryclasspath"/>
-    </path>
-
-    <target name="init">
-
-        <taskdef resource="scala/tools/ant/antlib.xml">
-            <classpath>
-                <pathelement location="${scala.home}/lib/scala-compiler.jar" />
-                <pathelement location="${scala.home}/lib/scala-library.jar" />
-            </classpath>
-        </taskdef>
-
-        <mkdir dir="bin"/>
-        <copy includeemptydirs="false" todir="bin">
-            <fileset dir="src">
-                <exclude name="**/*.scala"/>
-                <exclude name="**/*.launch"/>
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-        <copy includeemptydirs="false" todir="bin">
-            <fileset dir="test_src">
-                <exclude name="**/*.scala"/>
-                <exclude name="**/*.launch"/>
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-
-    <target name="clean">
-        <delete dir="bin"/>
-    </target>
-
-    <target depends="build-subprojects,build-project" name="build"/>
-    <target name="build-subprojects"/>
-
-    <target depends="init" name="build-project">
-        <echo message="${ant.project.name}: ${ant.file}"/>
-        <scalac scalacdebugging="true" srcdir="src" destdir="bin">
-            <classpath refid="build.classpath" />
-        </scalac>
-        <javac srcdir="src" destdir="bin">
-            <classpath refid="build.classpath" />
-        </javac>
+    <target name="all">
+        <antcall target="clean"/>
+        <antcall target="build"/>
     </target>
 
 </project>
