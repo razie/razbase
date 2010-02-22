@@ -6,8 +6,6 @@ package razie.base;
 
 import java.net.URL;
 
-import razie.base.AttrAccess;
-
 /**
  * basic interface for action items (menu items, buttons etc). It has built-in capability for i18n
  * 
