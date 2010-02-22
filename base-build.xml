@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="none">
-    <property file="../razie.properties"/>
+    <property file="../razie/razie.properties"/>
 
     <path id="scala.path">
         <pathelement location="${scala.home}/lib/scala-library.jar"/>
@@ -89,6 +89,12 @@
         <javac srcdir="test_src" destdir="bin">
             <classpath refid="test.classpath" />
         </javac>
+    </target>
+
+    <target depends="build" name="jar">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <jar basedir="bin" destfile="dist/${ant.project.name}.jar">
+        </jar>
     </target>
 
 </project>
