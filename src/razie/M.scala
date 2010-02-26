@@ -23,11 +23,23 @@ trait M[+A] {
    def iterator: Iterator[A] 
    def toList: List[A] = M.toList (this)
   
-   override def equals (y:Any) : Boolean = y.asInstanceOf[M[A]] match {
+   override def equals (y:Any) : Boolean = tryConvertingToM[A] (y) match {
       case m : M[A] => M.equals(this, m) (_==_)
       case _ => false
    }
-   
+
+   def tryConvertingToM[A] (y:Any) : M[A] = {
+      y match {
+         case l : java.util.List[A] => M.apply (l)
+         case i : java.util.Iterator[A] => M.apply(i)
+         case b : java.lang.Iterable[A] => M.apply(b)
+         case m : java.util.Map[_,A] => M.apply (m.values) 
+         case a : Array[A] => M.apply(a)
+         case s : scala.Seq[A] => M.apply(s)
+         case _ => y.asInstanceOf[M[A]]
+      }
+
+   }
    def sort (lt:(A,A) => Boolean) : List[A] = M.sort(this, lt)
 }
 
@@ -88,7 +100,7 @@ object M {
     val i1 = x.iterator
     val i2 = y.iterator
     var b = false
-    val res = MList[C]()
+    val res = razie.Listi[C]()
 
     while (i1.hasNext && i2.hasNext && !b) {
       val x1 = i1.next
@@ -142,6 +154,15 @@ object M {
       state.s
    }
 
+   def firstThat[A] (x:M[A])(cond:A=>Boolean) : Option[A] = {
+      // TODO optimize - how to stop filter ?
+      class State[A] {var s:Option[A] = None}
+      val state = new State[A]()
+      val f = (s:State[A], y:A) => {if (s.s.isDefined) false else {if (cond(y)) {s.s=Some(y); true} else false} }
+      val m = x.filter (f (state, _))
+      state.s
+   }
+
    def count[A] (x:M[A]) : Int = {
       // TODO optimize - how to stop foreach ?
       class State {var c:Int = 0}
@@ -160,7 +181,6 @@ object M {
    }
    
    def sort[A] (x:M[A], lt:(A,A) => Boolean) : List[A] = x.toList.sort(lt)
-   
 }
 
 /** my first ugly attempt - not type-safe */
@@ -185,12 +205,11 @@ object MOLD {
 
 
 /** it sucks to have to import the stupid long package name all the time... */
-
-object MMap {
+object Mapi {
    def apply [K,V] () = new scala.collection.mutable.HashMap [K, V] ()
 }
 
 /** it sucks to have to import the stupid long package name all the time...when retrofitting old code */
-object MList {
+object Listi {
    def apply [K] () = new scala.collection.mutable.ListBuffer [K] ()
 }

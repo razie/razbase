@@ -100,7 +100,7 @@ import org.json.JSONObject;
             AttrSpec s = parseSpec (name);
             
             if (s.t() != AttrType.DEFAULT)
-               this.setAttrType(name, s.t());
+               this.setAttrType(s.n(), s.t());
             
             if (!this._attrs.containsKey(s.n()))
                 this._order.add(s.n());

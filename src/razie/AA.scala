@@ -63,4 +63,10 @@ class AA extends AttrAccessImpl {
       s += "</>\n"
          s
    }
+   
+   override def equals (other:Any) : Boolean = {
+     other match {
+        case o:AA => { var b=true; this.foreach((n,v) => { if (v != o.a(n)) b=false }); b }
+     }
+   }
 }

@@ -21,10 +21,13 @@ class SuiteRazie () extends junit.framework.TestSuite(classOf[XNada]) {
    addTestSuite(classOf[com.razie.pub.base.test.AttrAccessTest])
    addTestSuite(classOf[com.razie.pub.base.test.ScalaAttrAccessTest])
    addTestSuite(classOf[razie.test.MTest])
+   addTestSuite(classOf[razie.test.SMTest])
    addTestSuite(classOf[razie.test.PerfTest])
    addTestSuite(classOf[razie.xp.test.TestXpString])
    addTestSuite(classOf[razie.xp.test.TestXpScalaXml])
    addTestSuite(classOf[razie.xp.test.XpBeanTest])
+   
+   addTestSuite(classOf[razie.g.GRefTest])
    
    def test1() = 
      // don't touch this line
