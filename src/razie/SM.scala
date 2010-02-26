@@ -4,7 +4,6 @@
  */
 package razie
 
-import razie.base._
 import scala.util.matching.Regex
 
 /** state machines have states, transitions and consume events */
@@ -160,10 +159,19 @@ object SM {
       implicit def pfr5 (t:Tuple2[Regex,Int]) = new Pair (REState(t._1), IEvent(t._2))
       implicit def pfr7 (t:Tuple2[Regex,Event]) = new Pair (REState(t._1), t._2)
 //      implicit def pfr1 (t:Tuple1[String]) = new  (state(t._1), NullEvent(t._2))
+
+   // ---------------- callbacks
       
     def echo  (s:String) (sm:StateMachine, t:Transition, e:Event) = 
        logger log "SM_LOG: event=" + e + " message=\""+s+"\""
     
+    val stack = razie.Listi[Event]()
+    def push (sm:StateMachine, t:Transition, e:Event) { e +=: stack }
+    def pop (sm:StateMachine, t:Transition, e:Event) { stack remove 0 }
+    def last = stack apply 0
+    def resetStack = stack clear
+    /** override to do something on reset */
+    def reset { this.currState = start }
    }
 
    class Pair (s:State, e:Event) {
