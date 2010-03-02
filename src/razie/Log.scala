@@ -13,8 +13,9 @@ import com.razie.pub.base.{log => pblog}
 trait Log {
    def trace (f : => Any) 
    def log   (msg:String, e:Throwable=null)
-   def alarm (msg:String, e:Throwable=null)
+   def alarm (msg:String, e:Throwable=null) // implicit audit
    def audit (msg:String, t:Throwable=null)
+   def error (msg:String, t:Throwable=null) // alarm and throw
    
    def apply (msg:String, e:Throwable=null) = log (msg, e)
 } 
@@ -28,6 +29,7 @@ object Log extends Log {
    override def log   (msg:String, t:Throwable=null) = logThis (msg, t)
    override def alarm   (msg:String, t:Throwable=null) = alarmThis (msg, t)
    override def audit   (msg:String, t:Throwable=null) = auditThis (msg, t)
+   override def error   (msg:String, t:Throwable=null) = pblog.Log.alarmThisAndThrow(msg, t)
 
    def auditThis   (msg:String, t:Throwable=null) =
       if (t == null)

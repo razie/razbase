@@ -59,10 +59,12 @@
 
     <target depends="init" name="build">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <scalac srcdir="src" destdir="bin" addparams="-g">
+        <!--scalac srcdir="src" destdir="bin" addparams="-g"-->
+        <scalac srcdir="src" destdir="bin" >
             <classpath refid="build.classpath" />
         </scalac>
-        <javac srcdir="src" destdir="bin" debug="yes">
+        <!--javac srcdir="src" destdir="bin" debug="yes"-->
+        <javac srcdir="src" destdir="bin" debug="no">
             <classpath refid="build.classpath" />
         </javac>
 
@@ -91,8 +93,12 @@
         </javac>
     </target>
 
-    <target depends="build" name="jar">
+    <target depends="build,jar-only" name="jar">
+    </target>
+
+    <target name="jar-only">
         <echo message="${ant.project.name}: ${ant.file}"/>
+        <mkdir dir="dist"/>
         <jar basedir="bin" destfile="dist/${ant.project.name}.jar">
         </jar>
     </target>

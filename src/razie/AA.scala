@@ -69,4 +69,10 @@ class AA extends AttrAccessImpl {
         case o:AA => { var b=true; this.foreach((n,v) => { if (v != o.a(n)) b=false }); b }
      }
    }
+   
+   def map [A,B] (f : (String, A) => B) : razie.AA = {
+      val aa = new razie.AA()
+      this.sgetPopulatedAttr.foreach (x => aa set (x, f(x, (this a x).asInstanceOf[A])))
+     aa 
+   }
 }

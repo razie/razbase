@@ -117,17 +117,17 @@ public class Log {
    public static void alarmThis(String m, Throwable... e) {
       logger.alarm(m, e);
    }
-//
-//   /** alarm this and throw a new RT exception with the message and the cause */
-//   public static void alarmThisAndThrow(String m, Throwable... e) {
-//      // TODO i don't think this should log again...since it throws it, eh?
-//      Factory.logger.alarm(m, e);
-//      if (e.length > 0)
-//         throw new RealtimeException(m, e[0]);
-//      else
-//         throw new RealtimeException(m);
-//   }
-//
+
+   /** alarm this and throw a new RT exception with the message and the cause */
+   public static void alarmThisAndThrow(String m, Throwable... e) {
+      // TODO i don't think this should log again...since it throws it, eh?
+      logger.alarm(m, e);
+      if (e.length > 0 && e[0] != null)
+         throw new RuntimeException(m, e[0]);
+      else
+         throw new RuntimeException(m);
+   }
+
 //   /**
 //    * helper to turn lists/arrays/maps into strings for nice logging
 //    * 
@@ -140,4 +140,14 @@ public class Log {
 //   }
 
    public static Log logger = Factory.create("?", "DFLTLOG");
+   
+   public static Log create(String component, String categoryName) {
+      return factory.create(component, categoryName);
+   }
+
+   public static Log create(String categoryName) {
+      return factory.create( categoryName);
+   }
+   
+   public static Factory factory = new Factory();
 }
