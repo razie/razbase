@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="razie">
-  <import file="../razie/base-build.xml"/>
+  <import file="../razbase/base-build.xml"/>
 
     <path id="depy.path">
-        <pathelement location="../razie/lib/json.jar"/>
+        <pathelement location="../razbase/lib/json.jar"/>
     </path>
 
     <target name="all">

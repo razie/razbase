@@ -139,7 +139,8 @@ public class Log {
 //      return Log4j.tryToString(indent, ret);
 //   }
 
-   public static Log logger = Factory.create("?", "DFLTLOG");
+   public static Factory factory = new Factory();
+   public static Log logger = factory.create("?", "DFLTLOG");
    
    public static Log create(String component, String categoryName) {
       return factory.create(component, categoryName);
@@ -148,6 +149,4 @@ public class Log {
    public static Log create(String categoryName) {
       return factory.create( categoryName);
    }
-   
-   public static Factory factory = new Factory();
 }
