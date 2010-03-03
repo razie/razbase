@@ -6,7 +6,13 @@ package razie
 
 import com.razie.pub.base.{log => pblog}
 
-/** some logging basics 
+/** 
+ * some logging basics 
+ * 
+ * You can customize the entire logging system by providing an implementation for 
+ * com.razie.pub.base.log.Factory and set that: com.razie.pub.base.log.Log.factory = new MyFactory().
+ * 
+ * See example in razpub:com.razie.pub.base.log.Log4j
  * 
  * @author razvanc
  */

@@ -4,7 +4,7 @@
  */
 package razie
 
-import razie.base._
+import razie.base.ActionItem
 
 /** simplified ActionItem 
  * 
@@ -21,7 +21,7 @@ object AI {
  * 
  *  i really should drop the stupid java base classes and move it all to scala 
  */
-class AI (
-      cmd:String, label:String, tooltip:String, iconP:String=razie.Icons.UNKNOWN.name) 
+//class AI (val name:String, val label:String, val tooltip:String, iconP:String=razie.Icons.UNKNOWN.name) 
+class AI (cmd:String, label:String, tooltip:String, iconP:String=razie.Icons.UNKNOWN.name) 
    extends ActionItem (cmd, iconP, (if (label==null)cmd else label), (if(tooltip==null)cmd else tooltip)) {
 }

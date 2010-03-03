@@ -12,6 +12,8 @@ case class GLoc (val url:String, val dir:String = null) {
    }
    
    def toXX = if (url != null) url else dir
+   
+   def localPath = dir
 }
 
 /** base ref - uniquely identifies one (or more?) entities */
