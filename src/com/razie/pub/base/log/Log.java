@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +32,9 @@ public class Log {
    private String         category;
    private String         component;
    public static String   program    = "dflt";
-//   public static int      MAXLOGS    = 1000;
-//   public static String[] lastLogs   = new String[MAXLOGS];
-//   public static int      curLogLine = 0;
+   public static int      MAXLOGS    = 1000;
+   public static String[] lastLogs   = new String[MAXLOGS];
+   public static int      curLogLine = 0;
    public static boolean  DEBUGGING  = true;
 
    public Log(String componentNm, String categoryNm) {
@@ -41,16 +42,54 @@ public class Log {
       this.component = componentNm;
    }
 
+   public static void addLogLine(String line) {
+      synchronized (lastLogs) {
+         lastLogs[curLogLine] = line;
+         curLogLine = (curLogLine + 1) % MAXLOGS;
+      }
+   }
+
+   public static String[] getLastLogs(int howMany) {
+      synchronized (lastLogs) {
+         int theseMany = howMany;
+         String[] ret;
+
+         // find out how many we have
+         if (lastLogs[MAXLOGS - 1] == null) {
+            theseMany = howMany > curLogLine ? curLogLine : howMany;
+            ret = new String[theseMany];
+            int k = 0;
+            for (int i = curLogLine - theseMany; k < theseMany; i++) {
+               ret[k++] = lastLogs[i];
+            }
+         } else {
+            // bounced
+            theseMany = howMany > MAXLOGS ? MAXLOGS : howMany;
+            ret = new String[theseMany];
+            int k = 0;
+            for (int i = theseMany - curLogLine; i >= 0 && i < MAXLOGS && k < theseMany; i++) {
+               ret[k++] = lastLogs[i];
+            }
+            for (int i = curLogLine - (theseMany - k); i < curLogLine && k < theseMany; i++) {
+               ret[k++] = lastLogs[i];
+            }
+         }
+         return ret;
+      }
+   }
+
    /** from http://www.javapractices.com/topic/TopicAction.do?Id=78 */
    public static String getStackTraceAsString(Throwable aThrowable) {
+      if (aThrowable != null) {
        final Writer result = new StringWriter();
        final PrintWriter printWriter = new PrintWriter(result);
        aThrowable.printStackTrace(printWriter);
        return result.toString();
+      } else return "";
      }
 
    public void log(String m, Throwable t) {
-      log(m + " Exception: " + getStackTraceAsString(t));
+      log(m + (t != null ? " Exception: " + getStackTraceAsString(t) : ""));
    }
 
    public void log(Object... o) {
@@ -101,17 +140,18 @@ public class Log {
    public static void traceThis(String m, Throwable t) { logger.trace(1, m, t); }
 
    public static void logThis(String m, Throwable t) {
-//      Factory.logger.log(m + " Exception: " + Exceptions.getStackTraceAsString(t));
-      logger.log(m + " Exception: " + t);
+      logger.log(m + (t != null ? " Exception: " + getStackTraceAsString(t) : ""));
    }
 
-//   /** alarm this only once in this run...*/
-//   public static void alarmOnce(String errorcode, String m, Throwable... e) {
-//      if (! alarmedOnce.containsKey(errorcode)) {
-//         Factory.logger.alarm(m, e);
-//         alarmedOnce.put(errorcode, errorcode);
-//      }
-//   }
+   /** alarm this only once in this run...*/
+   public static void alarmOnce(String errorcode, String m, Throwable... e) {
+      if (! alarmedOnce.containsKey(errorcode)) {
+         logger.alarm(m, e);
+         alarmedOnce.put(errorcode, errorcode);
+      }
+   }
+
+   protected static Map<String, String> alarmedOnce = Collections.synchronizedMap(new HashMap<String, String>());
 
    /** alarm this */
    public static void alarmThis(String m, Throwable... e) {
@@ -128,16 +168,65 @@ public class Log {
          throw new RuntimeException(m);
    }
 
-//   /**
-//    * helper to turn lists/arrays/maps into strings for nice logging
-//    * 
-//    * @param ret object to toString
-//    * @return either the new String or the original object if not recognized
-//    */
-//   @SuppressWarnings("unchecked")
-//   public static Object tryToString(String indent, Object ret) {
-//      return Log4j.tryToString(indent, ret);
-//   }
+   /**
+    * helper to turn lists/arrays/maps into strings for nice logging
+    * 
+    * @param ret object to toString
+    * @return either the new String or the original object if not recognized
+    */
+   @SuppressWarnings("unchecked")
+   public static Object tryToString(String indent, Object ret) {
+       if (ret != null && ret instanceof Collection) {
+           return toString("", (Collection) ret);
+       } else if (ret != null && ret instanceof Map) {
+           return "\n" + (ret).toString();
+       } else if (ret != null && ret instanceof Object[]) {
+           return toString("", (Object[]) ret);
+       } else {
+           return ret;
+       }
+   }
+
+   /**
+    * simple helper to log collections, each element toString()
+    * 
+    * @param indent is a prefix to be added to each line, useful if this is inside a structure.
+    *        Don't send null, but "".
+    * @param col is the collection to be logged
+    */
+   public static String toString(String indent, Collection<? extends Object> col) {
+       String msg = indent + "Collection is null!";
+       if (col != null) {
+           msg = indent + "Collection: {\n";
+           for (Object k : col) {
+               msg += indent + "   " + (k == null ? "null" : k.toString()) + "\n";
+           }
+           msg += indent + "}";
+       }
+       return msg;
+   }
+
+   /**
+    * simple helper to log collections, each element toString()
+    * 
+    * @param indent is a prefix to be added to each line, useful if this is inside a structure.
+    *        Don't send null, but "".
+    * @param col is the collection to be logged
+    */
+   public static String toString(String indent, Object[] map) {
+       String msg = indent + "Object[] is null!";
+       if (map != null) {
+           msg = indent + "Object[]: {\n";
+           for (int i = 0; i < map.length; i++) {
+               Object k = map[i];
+               msg += indent + "   " + (k == null ? "null" : k.toString()) + "\n";
+           }
+
+           msg += indent + "}";
+       }
+       return msg;
+   }
+
 
    public static Factory factory = new Factory();
    public static Log logger = factory.create("?", "DFLTLOG");

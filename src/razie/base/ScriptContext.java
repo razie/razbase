@@ -54,6 +54,9 @@ public interface ScriptContext extends ActionContext {
    /** make execution verbose or not */
    public void verbose(boolean v);
 
+   /** content assist options */
+   public java.util.List<String> options (String script);
+    
    /** a simple context - supports parents, function overrides and guards */
    public class Impl extends AttrAccess.TreeImpl implements ScriptContext {
       private static ScriptContext    main    = new ScriptContext.Impl();
@@ -145,6 +148,11 @@ public interface ScriptContext extends ActionContext {
       public void xscrewscala28(String name, Object v) {
          super.set(name, v);
       }
+      
+      /** content assist options */
+      public java.util.List<String> options (String script) {
+         return new java.util.ArrayList<String>();
+      }
    }
 
    /**
@@ -155,6 +163,11 @@ public interface ScriptContext extends ActionContext {
    public class SealedContext implements ScriptContext {
       private ScriptContext wrapped;
 
+      /** content assist options */
+      public java.util.List<String> options (String script) {
+         return this.wrapped.options(script);
+      }
+      
       public SealedContext(ScriptContext wraped) {
          this.wrapped = wraped;
       }
