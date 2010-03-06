@@ -1,3 +1,8 @@
+/**  ____    __    ____  ____  ____/___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___) __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__)\__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)___/   (__)  (______)(____/   LICENESE.txt
+ */
 package razie.test
 
 import org.scalatest.junit._
@@ -14,7 +19,7 @@ class PerfTest extends JUnit3Suite {
    def test1c = expect (Near (10.0::10.0::Nil)) { Near (11.9::8.1::Nil) }
 //   def test1d = expect (Near (10.0::10.0::Nil)) { 11.9::8.1::Nil }
    
-   def test2 = expect (Near (10.0::10.0::0.1::Nil)) {
+   def test2 = expect (Near (10.0::10.0::0.1::Nil, 50)) {
       val g1 = Perf.runmt(1, 10) { 
          (thread:Int, loop:Int) => {
                Thread.sleep(10)

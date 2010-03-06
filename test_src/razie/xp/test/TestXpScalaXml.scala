@@ -1,6 +1,7 @@
-/**
- * Razvan's public code. Copyright 2008 based on Apache license (share alike) see LICENSE.txt for
- * details.
+/**  ____    __    ____  ____  ____/___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___) __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__)\__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)___/   (__)  (______)(____/   LICENESE.txt
  */
 package razie.xp.test
 
@@ -14,10 +15,10 @@ import razie.XP
  * @author razvanc99
  */
 class TestXpScalaXml extends JUnit3Suite {
-   
+
    def test41 = expect (List("a")) { xpl("/a").map(_.label) }
    def test42 = expect (List("a")) { xpl("a").map(_.label) }
-   def test43 = expect (List("b1","b2")) { xpl("/a/b").map(_ \ "@ba") }
+   def test43 = expect (List("b1","b2")) { xpl("/a/b").map(x=>(x \ "@ba").toString) }
    def test44 = expect (List("b1","b2")) { xpla("/a/b/@ba") }
    def test45 = expect (List("c11","c12","c13")) { xpla("/a/b[@ba=='b1']/c/@ca") }
  

@@ -1,6 +1,7 @@
-/**
- * Razvan's public code. Copyright 2008 based on Apache license (share alike) see LICENSE.txt for
- * details. No warranty implied nor any liability assumed for this code.
+/**  ____    __    ____  ____  ____/___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___) __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__)\__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)___/   (__)  (______)(____/   LICENESE.txt
  */
 package razie
 
@@ -67,6 +68,7 @@ class AA extends AttrAccessImpl {
    override def equals (other:Any) : Boolean = {
      other match {
         case o:AA => { var b=true; this.foreach((n,v) => { if (v != o.a(n)) b=false }); b }
+        case _ => false
      }
    }
    

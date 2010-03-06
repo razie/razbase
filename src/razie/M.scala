@@ -1,6 +1,7 @@
-/**
- * Razvan's public code. Copyright 2008 based on Apache license (share alike) see LICENSE.txt for
- * details. No warranty implied nor any liability assumed for this code.
+/**  ____    __    ____  ____  ____/___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___) __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__)\__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)___/   (__)  (______)(____/   LICENESE.txt
  */
 package razie
 
@@ -41,6 +42,7 @@ trait M[+A] {
 
    }
    def sort (lt:(A,A) => Boolean) : List[A] = M.sort(this, lt)
+   override def toString = toList.toString
 }
 
 // special chars: a : 
@@ -58,6 +60,9 @@ object M {
      override def iterator: Iterator[A]  = l
      override def toList: List[A] = l.toList
    }
+  
+   // not implicit so you can build an M on the fly like a list razie.M (1,2,3)
+   def seq[A] (l:A*) : M[A] = new MonaTravestita[A] (l)
    
    implicit def apply[A] (l:Traversable[A]) : M[A] = new MonaTravestita[A] (l)
    class MonaTravestita[A] (val l:Traversable[A]) extends M[A] {

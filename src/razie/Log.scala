@@ -1,6 +1,7 @@
-/**
- * Razvan's public code. Copyright 2008 based on Apache license (share alike) see LICENSE.txt for
- * details. No warranty implied nor any liability assumed for this code.
+/**  ____    __    ____  ____  ____/___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___) __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__)\__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)___/   (__)  (______)(____/   LICENESE.txt
  */
 package razie
 
@@ -26,16 +27,35 @@ trait Log {
    def apply (msg:String, e:Throwable=null) = log (msg, e)
 } 
 
+class RaziepbLog extends Log {
+   override def trace (f : => Any) = pblog.Log.traceThis ({val x = f; x.toString}) 
+   override def log   (msg:String, t:Throwable=null) = pblog.Log.logThis (msg, t)
+   override def alarm   (msg:String, t:Throwable=null) = pblog.Log.alarmThis (msg, t)
+   override def audit   (msg:String, t:Throwable=null) = pblog.Log.logThis (msg, t)
+   override def error   (msg:String, t:Throwable=null) = pblog.Log.alarmThisAndThrow(msg, t)
+}
+
+class StupidLog extends Log {
+   override def trace (f : => Any) = println ("DEBUG" + f) 
+   override def log   (msg:String, t:Throwable=null) = println ("LOG: " + msg + t)
+   override def alarm   (msg:String, t:Throwable=null) = println ("ALARM: " + msg, t)
+   override def audit   (msg:String, t:Throwable=null) = println ("AUDIT: " + msg, t)
+   override def error   (msg:String, t:Throwable=null) = { println(msg, t); throw t }
+}
+
 /** some logging basics 
  * 
  * @author razvanc
  */
 object Log extends Log {
-   override def trace (f : => Any) = traceThis (f) 
-   override def log   (msg:String, t:Throwable=null) = logThis (msg, t)
-   override def alarm   (msg:String, t:Throwable=null) = alarmThis (msg, t)
-   override def audit   (msg:String, t:Throwable=null) = auditThis (msg, t)
-   override def error   (msg:String, t:Throwable=null) = pblog.Log.alarmThisAndThrow(msg, t)
+   // overwrite/change this to use different logging mechanism
+   var impl = new RaziepbLog()
+   
+   override def trace (f : => Any) = impl.trace(f)
+   override def log   (msg:String, t:Throwable=null) = impl.log(msg, t)
+   override def alarm   (msg:String, t:Throwable=null) = impl.alarm(msg, t)
+   override def audit   (msg:String, t:Throwable=null) = impl.audit(msg, t)
+   override def error   (msg:String, t:Throwable=null) = impl.error(msg, t)
 
    def auditThis   (msg:String, t:Throwable=null) =
       if (t == null)
@@ -43,19 +63,19 @@ object Log extends Log {
       else
          pblog.Log.audit (msg, t)
 
-   def logThis (msg:String) = pblog.Log.logThis (msg)
-   def apply   (msg:String) = pblog.Log.logThis (msg)
-   def logThis (msg:String, e:Throwable) = pblog.Log.logThis (msg, e)
+   def logThis (msg:String) = log (msg)
+   def apply   (msg:String) = log (msg)
+   def logThis (msg:String, e:Throwable) = log(msg, e)
    
    /** @return the same message, so you can return it */
    def alarmThis (msg:String) = {
-      pblog.Log.alarmThis (msg) 
+      impl.alarm(msg) 
       msg
 	   }
 	   
    /** @return the same message, so you can return it */
    def alarmThis (msg:String, e:Throwable) = {
-      pblog.Log.alarmThis (msg, e) 
+      impl.alarm (msg, e) 
       msg
 	   }
 
@@ -66,7 +86,7 @@ object Log extends Log {
          p match {
             case s:String => pblog.Log.traceThis (s) 
             case (s:String,e:Throwable) => pblog.Log.traceThis (s,e) 
-            case _ => pblog.Log.traceThis (p.toString)
+            case _ => impl.trace(p.toString)
          }
       }
    }

@@ -1,4 +1,10 @@
-This code is copyrighted by Razvan Cojocaru and presently shared under the Creative Commons license...see LICENSE.txt
+/**  ____    __    ____  ____  ____/___      ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___) __)    (  _ \(  )(  )(  _ \
+ *   )   / /(__)\  / /_  _)(_  )__)\__ \     )___/ )(__)(  ) _ <
+ *  (_)\_)(__)(__)(____)(____)(____)___/    (__)  (______)(____/
+ *                      
+ *  Copyright (c) Razvan Cojocaru, 2007+, Creative Commons Attribution 3.0
+ */
 
 What's this?
 ------------
