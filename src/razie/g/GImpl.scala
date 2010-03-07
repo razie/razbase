@@ -1,7 +1,12 @@
+/**  ____    __    ____  ____  ____/___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___) __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__)\__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)___/   (__)  (______)(____/   LICENESE.txt
+ */
 package razie.g
 
 import razie.{G}
-import razie.base.ScriptContext
+import razie.base.scripting.ScriptContext
 import razie.base.ActionItem
 
 /** it's either an url or a directory...or both */
