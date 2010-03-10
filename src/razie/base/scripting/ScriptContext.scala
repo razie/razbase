@@ -1,7 +1,7 @@
-/**  ____    __    ____  ____  ____/___     ____  __  __  ____
- *  (  _ \  /__\  (_   )(_  _)( ___) __)   (  _ \(  )(  )(  _ \           Read
- *   )   / /(__)\  / /_  _)(_  )__)\__ \    )___/ )(__)(  ) _ <     README.txt
- *  (_)\_)(__)(__)(____)(____)(____)___/   (__)  (______)(____/   LICENESE.txt
+/**  ____    __    ____  ____  ____,,___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___)/ __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__) \__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
  */
 package razie.base.scripting
 
@@ -28,9 +28,7 @@ trait ScriptContext extends ActionContext {
     * 
     * DO NOT forget to seal a context before passing it to untrusted plugins
     */
-   def define(fun:String , expr:String )
-
-   /** remove a function */
+   def define(fun:String , expr:String )    /** remove a function */
    def undefine(macro:String )
 
    /** TODO 3 FUNC use guards, document */
@@ -38,9 +36,6 @@ trait ScriptContext extends ActionContext {
 
    /** TODO 3 FUNC use guards, document */
    def unguard(name:String , condition:String , expr:String )
-
-   /** TODO remove */
-   def xscrewscala28(name:String , v:Object )
 
    /** make execution verbose or not */
    def verbose(v:Boolean )
@@ -50,4 +45,12 @@ trait ScriptContext extends ActionContext {
   
    /** the last error message - NOT reset after each...*/
    def lastError : String
+
+   /** 
+    * Reset this context. Normally a context would cache a parser/interpreter instance. 
+    * Reset will make sure this is in pristine condition .
+    * 
+    * NOTE that any state may be erased. Any variable/values defined in previous scripts may be erased.
+    */
+   def reset : Unit
 }

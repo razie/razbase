@@ -114,6 +114,8 @@ public interface AttrAccess {
          this.parent = parent;
       };
 
+      public AttrAccess getParent () {  return parent; }
+      
       /**
        * build from sequence of parm/value pairs or other stuff
        * 

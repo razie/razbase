@@ -1,7 +1,7 @@
-/**  ____    __    ____  ____  ____/___     ____  __  __  ____
- *  (  _ \  /__\  (_   )(_  _)( ___) __)   (  _ \(  )(  )(  _ \           Read
- *   )   / /(__)\  / /_  _)(_  )__)\__ \    )___/ )(__)(  ) _ <     README.txt
- *  (_)\_)(__)(__)(____)(____)(____)___/   (__)  (______)(____/   LICENESE.txt
+/**  ____    __    ____  ____  ____,,___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___)/ __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__) \__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
  */
 package razie.base.scripting;
 
@@ -13,7 +13,8 @@ package razie.base.scripting;
  * @author razvanc
  */
 public class ScriptFactory {
-    public static ScriptFactory singleton = new ScriptFactory();
+    public static ScriptFactory singleton = null;
+    public static ScriptContext EMPTY = new ScriptContextImpl();
 
     public static void init(ScriptFactory theOneToUse) {
         singleton = theOneToUse;
@@ -23,8 +24,18 @@ public class ScriptFactory {
         return singleton.makeImpl(lang, script);
     }
 
+    /** make a new context, using the global as parent - all contexts can mess with the global one */
+    public static ScriptContext mkContext (ScriptContext... parent) {
+        return singleton.mkContextImpl(parent.length > 0 ? parent[0] : ScriptContextImpl.global());
+    }
+
     // TODO make protected
     public RazScript makeImpl(String lang, String script) {
         throw new UnsupportedOperationException ("no default script maker...");
+    }
+    
+    // TODO make protected
+    public ScriptContext mkContextImpl(ScriptContext parent) {
+        return new ScriptContextImpl (parent);
     }
 }

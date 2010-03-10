@@ -8,14 +8,12 @@ package com.razie.pub.base;
  * ExecutionContext static object - ThreadLocal is easy to implement, not neccessarily to use
  * 
  * Use like
- * <code> public static NoStatic<MyClass> myStatic = new NoStatic<MyClass>("myStatic", new MyClass(...))</code>
+ * <code> 
+ * public static NoStatic<MyClass> myStatic = new NoStatic<MyClass>("myStatic", new MyClass(...))
+ * </code>
  * .
  * 
- * On a thread, reset the default value if needed:
- * <code>myStatic.setThreadValue (newValue)</code>
- * 
- * In code, access like a static, don't worry about thread:
- * <code>myStatic.get()</code>
+ * In code, access like a static, don't worry about thread: <code>myStatic.get()</code>
  * 
  * NOTE this is a fairly limited implementation - use NoStatics instead!
  * 

@@ -1,6 +1,7 @@
-/**
- * Razvan's public code. Copyright 2008 based on Apache license (share alike) see LICENSE.txt for
- * details.
+/**  ____    __    ____  ____  ____,,___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___)/ __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__) \__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
  */
 package com.razie.pub.base;
 
@@ -17,11 +18,11 @@ import razie.base.AttrAccessImpl;
  * it as a MiniVM as well, with its own statics etc - see NoStatics.
  * 
  * <p>
- * don't you hate not having thread context support? well, this is one way to do it. let's see if we
- * can find the optimal way. Note that these contexts need to be reset manually between threads.
+ * Basically, when you want to share the same execution context in a thread pool, just use 
+ * EC.enter() and EC.exit().
  * 
  * <p>
- * this is a way to setup a context that's specific to each thread. similar to a session in a
+ * It is similar to a session in a
  * servlet call or an EJB context during an EJB call, SOMEBODY is responsible for setting the right
  * context with enter() when the thread is started / reused from a pool AND also erasing it at the
  * end, with exit(), to be nice.
@@ -35,7 +36,7 @@ import razie.base.AttrAccessImpl;
  * the same JVM.
  * 
  * <p>
- * some other classes, most noticeably NoStatics, can use the context later to figure out who
+ * Some other classes, most noticeably NoStatics, can use the context later to figure out who
  * they're working for...
  * 
  * <p>USAGE: if you need one and don't know what you should do, just do .instance()
