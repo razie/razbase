@@ -36,7 +36,7 @@ class RaziepbLog extends Log {
 }
 
 class StupidLog extends Log {
-   override def trace (f : => Any) = println ("DEBUG" + f) 
+   override def trace (f : => Any) = println ("DEBUG: " + f) 
    override def log   (msg:String, t:Throwable=null) = println ("LOG: " + msg + t)
    override def alarm   (msg:String, t:Throwable=null) = println ("ALARM: " + msg, t)
    override def audit   (msg:String, t:Throwable=null) = println ("AUDIT: " + msg, t)
