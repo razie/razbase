@@ -16,17 +16,22 @@ public class ScriptFactory {
     public static ScriptFactory singleton = null;
     public static ScriptContext EMPTY = new ScriptContextImpl();
 
+    private static ScriptFactory auto () {
+       if (singleton == null)
+          singleton = new ScriptFactory();
+       return singleton;
+    }
     public static void init(ScriptFactory theOneToUse) {
         singleton = theOneToUse;
     }
 
     public static RazScript make(String lang, String script) {
-        return singleton.makeImpl(lang, script);
+        return auto().makeImpl(lang, script);
     }
 
     /** make a new context, using the global as parent - all contexts can mess with the global one */
     public static ScriptContext mkContext (ScriptContext... parent) {
-        return singleton.mkContextImpl(parent.length > 0 ? parent[0] : ScriptContextImpl.global());
+        return auto().mkContextImpl(parent.length > 0 ? parent[0] : ScriptContextImpl.global());
     }
 
     // TODO make protected

@@ -15,6 +15,7 @@ object RazScript {
   class RSResult { 
      def map (f:Any=>RSResult) : RSResult = RSUnsupported 
      def getOrElse (f: => Any) :Any = f
+     def jgetOrElse (f:Any) :Any = getOrElse(f)
      }
 
   case class RSSucc (res:Any) extends RSResult { 
