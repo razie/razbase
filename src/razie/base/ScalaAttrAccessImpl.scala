@@ -70,9 +70,28 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
    def getOrElse(name:String, dflt:AnyRef) : AnyRef = if (isPopulated (name)) getAttr(name) else dflt
    def sgetOrElse(name:String, dflt:String) : String = getOrElse (name, dflt).toString
 
+   override def foreach (f : (String, AnyRef) => Unit) : Unit =
+      this.sgetPopulatedAttr.foreach (x => f(x, this a x))
+      
+   override def filter (f : (String, AnyRef) => Boolean) : Iterable[String] = 
+      this.sgetPopulatedAttr.filter (x => f(x, this a x))
+
+   override def map [A,B] (f : (String, A) => B) : ScalaAttrAccess = {
+      val aa = new AttrAccessImpl()
+      this.sgetPopulatedAttr.foreach (x => aa set (x, f(x, (this a x).asInstanceOf[A])))
+     aa 
+   }
+
+   override def mapValues [A,B] (f : (A) => B) : Seq[B] = {
+      val aa = razie.Listi[B]()
+      this.sgetPopulatedAttr.foreach (x => aa append (f((this a x).asInstanceOf[A])))
+     aa 
+   }
 
 }
 
+
+   
 
 
 

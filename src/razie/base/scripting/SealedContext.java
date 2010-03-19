@@ -7,13 +7,14 @@ package razie.base.scripting;
 
 import org.json.JSONObject;
 
-import razie.base.AttrAccess;
+import razie.base.AttrType;
+import razie.base.ScalaAttrAccessImpl;
 
 /**
  * seal a context before passing it on - security issue. Others may override the meaning of objects in here.
  * When sealed, a context will not allow overriding symbols or changing their value - may only define new ones
  */
-public class SealedContext implements ScriptContext {
+public class SealedContext extends ScalaAttrAccessImpl implements ScriptContext {
    private ScriptContext wrapped;
 
    public String lastError() {
@@ -76,13 +77,18 @@ public class SealedContext implements ScriptContext {
    }
 
    @Override
-   public AttrAccess.AttrType getAttrType(String name) {
+   public AttrType getAttrType(String name) {
       return wrapped.getAttrType(name);
    }
 
    @Override
    public Iterable<String> getPopulatedAttr() {
       return wrapped.getPopulatedAttr();
+   }
+
+   @Override
+   public boolean hasAttrType(String name) {
+      return wrapped.hasAttrType(name);
    }
 
    @Override
@@ -101,7 +107,7 @@ public class SealedContext implements ScriptContext {
    }
 
    @Override
-   public void set(String name, Object value, AttrAccess.AttrType t) {
+   public void set(String name, Object value, AttrType t) {
       throw new IllegalStateException("This context is sealed - you can't override stuff.");
    }
 
@@ -116,7 +122,7 @@ public class SealedContext implements ScriptContext {
    }
 
    @Override
-   public void setAttrType(String name, AttrAccess.AttrType type) {
+   public void setAttrType(String name, AttrType type) {
       throw new IllegalStateException("This context is sealed - you can't override stuff.");
    }
 

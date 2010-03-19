@@ -31,7 +31,7 @@ class RaziepbLog extends Log {
    override def trace (f : => Any) = pblog.Log.traceThis ({val x = f; x.toString}) 
    override def log   (msg:String, t:Throwable=null) = pblog.Log.logThis (msg, t)
    override def alarm   (msg:String, t:Throwable=null) = pblog.Log.alarmThis (msg, t)
-   override def audit   (msg:String, t:Throwable=null) = pblog.Log.logThis (msg, t)
+   override def audit   (msg:String, t:Throwable=null) = pblog.Log.logThis ("AUDIT:"+msg, t)
    override def error   (msg:String, t:Throwable=null) = pblog.Log.alarmThisAndThrow(msg, t)
 }
 
@@ -94,4 +94,8 @@ object Log extends Log {
 
 object Debug {
    def apply (f : => Any) = Log.traceThis (f)
+}
+
+object Audit {
+   def apply (f : => Any) = Log.audit (f.toString)
 }

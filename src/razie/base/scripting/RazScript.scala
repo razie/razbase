@@ -12,21 +12,21 @@ package razie.base.scripting
  */
 object RazScript {
    // the result of running a smart script
-  class RSResult { 
-     def map (f:Any=>RSResult) : RSResult = RSUnsupported 
-     def getOrElse (f: => Any) :Any = f
-     def jgetOrElse (f:Any) :Any = getOrElse(f)
-     }
+  class RSResult[+A] { 
+    def map[B>:A] (f:A=>B) : RSResult[B] = RSUnsupported 
+    def getOrElse[B >: A] (f: => B) : B = f
+    def jgetOrElse (f:Any) : Any = getOrElse(f)
+  }
 
-  case class RSSucc (res:Any) extends RSResult { 
-     override def map (f:Any=>RSResult): RSResult = f(res)
-     override def getOrElse (f: => Any) : Any = res
-     }
+  case class RSSucc[A] (res:A) extends RSResult[A] { 
+    override def map[B] (f:A=>B) : RSResult[B] = RSSucc(f(res))
+    override def getOrElse[B >: A] (f: => B) : B = res
+  }
 
-  case class RSError (err:String) extends RSResult
-      object RSIncomplete  extends RSResult   // expression is incomplete...
-      object RSUnsupported extends RSResult // interactive mode unsupported
-      object RSSuccNoValue extends RSResult // successful, but no value returned
+  case class RSError (err:String) extends RSResult[String]
+      object RSIncomplete  extends RSResult[Any]   // expression is incomplete...
+      object RSUnsupported extends RSResult[Nothing] // interactive mode unsupported
+      object RSSuccNoValue extends RSResult[Any] // successful, but no value returned
   
   def err (msg:String) = RSError(msg)
   def succ (res:AnyRef) = RSSucc(res)
@@ -35,7 +35,7 @@ object RazScript {
 /**
  * minimal script interface
  * 
- * TODO use JSR 264 or whatever the thing is and ditch custom code...
+ * TODO use JSR 223 or whatever the thing is and ditch custom code...
  * 
  * @author razvanc
  */
@@ -46,11 +46,11 @@ trait RazScript {
    * 
    * @return SError or SSuccNoValue...or others
    */
-  def compile (ctx:ScriptContext) : RSResult
+  def compile (ctx:ScriptContext) : RSResult[Any]
   
   /** strait forward evaluation and return result of expression */
-  def eval (ctx:ScriptContext) : RSResult
+  def eval (ctx:ScriptContext) : RSResult[Any]
  
   /** interactive evaluation - more complex interaction */ 
-  def interactive (ctx:ScriptContext) : RSResult
+  def interactive (ctx:ScriptContext) : RSResult[Any]
 }

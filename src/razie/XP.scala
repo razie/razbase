@@ -32,14 +32,15 @@ class XPSolved [T] (val xp : XP[T], val ctx:XpSolver[T,Any]) {
 /** simple base class to decouple parsing the elements from their actual functionality */
 case class GPath (val expr:String) {
    // list of parsed elements
-   val elements =  
-      for (val e <- (expr split "/").filter(_!="")) 
-        yield new XpElement(e)
-   lazy val nonaelements = elements.filter(_.attr!="@")
+  val elements =  
+    for (val e <- (expr split "/").filter(_!="")) 
+      yield new XpElement(e)
+  
+  lazy val nonaelements = elements.filter(_.attr!="@")
    
   def requireAttr = 
-     if (elements.last.attr != "@") 
-        throw new IllegalArgumentException ("ERR_XP result should be attribute but it's an entity...")
+    if (elements.last.attr != "@") 
+      throw new IllegalArgumentException ("ERR_XP result should be attribute but it's an entity...")
    
   def requireNotAttr = 
     if (elements.size > 0 && elements.last.attr == "@") 
@@ -183,7 +184,7 @@ trait XpSolver[+A,+B] {
 
 /** an element in the path */
 protected class XpElement (val expr:String){
-   val parser = """(\{.*\})*([@])*(\w+)(\[.*\])*""".r
+   val parser = """(\{.*\})*([@])*(\w+|\*)(\[.*\])*""".r
    val parser(assoc_, attr, name, scond) = expr
    val cond = XpCondFactory.make (scond)
 

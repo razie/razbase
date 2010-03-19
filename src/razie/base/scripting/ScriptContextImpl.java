@@ -15,7 +15,7 @@ import razie.base.AttrAccess;
 import razie.base.AttrAccessImpl;
 
    /** a simple context - supports parents, function overrides and guards */
-   public class ScriptContextImpl extends AttrAccess.TreeImpl implements ScriptContext {
+   public class ScriptContextImpl extends razie.WrapAttrAccess implements ScriptContext {
       private static ScriptContext    main    = new ScriptContextImpl();
 
       protected Map<String, String>   macros  = new HashMap<String, String>();
@@ -47,8 +47,7 @@ import razie.base.AttrAccessImpl;
       };
 
       public ScriptContextImpl(ScriptContext parent, AttrAccessImpl aa) {
-         super(parent);
-         this._attrs = aa._attrs;
+         super(parent, aa);
       };
 
       /** supports a map as well */

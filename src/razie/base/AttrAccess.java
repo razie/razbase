@@ -24,12 +24,7 @@ import org.json.JSONObject;
  * 
  * @author razvanc99
  */
-public interface AttrAccess {
-
-   /** these types MUST be supported by forms for capture, not necessarily by displays */
-   public static enum AttrType {
-      STRING, MEMO, SCRIPT, INT, FLOAT, DATE, DEFAULT
-   };
+public interface AttrAccess extends ScalaAttrAccess {
 
    // TODO 3-2 protect this against idiot code
    public static AttrAccess EMPTY = new AttrAccessImpl();
@@ -72,6 +67,9 @@ public interface AttrAccess {
 
    /** check if an attribute is populated */
    public boolean isPopulated(String name);
+   
+   /** check if an attribute is populated */
+   public boolean hasAttrType(String name);
 
    /**
     * @return the type of the named attribute OR null if not known. Default is by convention String
@@ -104,45 +102,4 @@ public interface AttrAccess {
     */
    public String addToUrl(String url);
 
-   /** hierarchical implementation */
-   public class TreeImpl extends AttrAccessImpl {
-      AttrAccess parent;
-
-      /** dummy */
-      public TreeImpl(AttrAccess parent) {
-         super();
-         this.parent = parent;
-      };
-
-      public AttrAccess getParent () {  return parent; }
-      
-      /**
-       * build from sequence of parm/value pairs or other stuff
-       * 
-       * @parm pairs are pais of name/value, i.e. "car", "lexus" OR a Properties, OR another
-       *       AttrAccess OR a Map<String,String>
-       */
-      public TreeImpl(AttrAccess parent, Object... pairs) {
-         this(parent);
-         this.setAttr(pairs);
-      }
-
-      @Override
-      public Object getAttr(String name) {
-         Object o = this._attrs != null ? this._attrs.get(name) : null;
-         return o != null ? o : (parent != null ? parent.getAttr(name) : null);
-      }
-
-      @Override
-      public boolean isPopulated(String name) {
-         boolean b = this._attrs != null && this._attrs.containsKey(name);
-         return b ? true : (parent != null ? parent.isPopulated(name) : false);
-      }
-
-      @Override
-      public String toString() {
-         String ret = parent != null ? parent.toString() : "";
-         return ret + super.toString();
-      }
-   }
 }

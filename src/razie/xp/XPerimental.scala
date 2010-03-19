@@ -4,20 +4,93 @@
  */
 package razie.xp
 
-import razie._
+import razie.GPath
+import razie.XP
+
+object PreDef {
+  implicit def stog (s:String) : GPath = GPath (s)
+}
 
 /** 
- * Implement this resolution in smart objects...otherwise inject it with an XPSolver
+ * the simplest solver: can solve an attribute - basically AttrAccess. 
+ * In this case, the expression can only a single attribute name
  */
-trait OXP {
-   /** find one element */
-   def xpe (path:String) : OXP
-   /** find a list of elements */
-   def xpl (path:String) : List[OXP]
+trait AXP {
    /** find one attribute */
-   def xpa (path:String) : String
+   def xpa (path:String) : Option[String]
+}
+
+/** 
+ * smart object with simple strings. the internal recursive structure of the object is irrelevant.
+ * 
+ * also, i assume most structures will implement GSOXP[Any], but you can also feeed your type-coucious yourself
+ */
+trait GOXP[A] extends AXP {
+   /** find one element */
+   def xpe (path:GPath) : Option[A]
+   /** find a list of elements */
+   def xpl (path:GPath) : Seq[A]
+   /** find one attribute */
+   def xpa (path:GPath) : Option[String]
    /** find a list of attributes */
-   def xpla (path:String) : List[String]
+   def xpla (path:GPath) : Seq[String]
+
+   /** find one element */
+   final def xpe (path:String) : Option[A] = xpe (GPath(path))
+   /** find a list of elements */
+   final def xpl (path:String) : Seq[A] = xpl (GPath(path))
+   /** find one attribute */
+   final def xpa (path:String) : Option[String] = xpa (GPath(path))
+   /** find a list of attributes */
+   final def xpla (path:String) : Seq[String] = xpla (GPath(path))
+}
+
+/** 
+ * IC stands for idiot controller. these are more like a visitor, who can resolve gpath on an R
+ */
+trait ICOXP[R,A] extends AXP {
+   /** find one element */
+   def xpe (path:GPath, root:R) : Option[A]
+   /** find a list of elements */
+   def xpl (path:GPath, root:R) : Seq[A]
+   /** find one attribute */
+   def xpa (path:GPath, root:R) : Option[String]
+   /** find a list of attributes */
+   def xpla (path:GPath, root:R) : Seq[String]
+
+   /** find one element */
+   final def xpe (path:String, root:R) : Option[A] = xpe (GPath(path), root)
+   /** find a list of elements */
+   final def xpl (path:String, root:R) : Seq[A] = xpl (GPath(path), root)
+   /** find one attribute */
+   final def xpa (path:String, root:R) : Option[String] = xpa (GPath(path), root)
+   /** find a list of attributes */
+   final def xpla (path:String, root:R) : Seq[String] = xpla (GPath(path), root)
+}
+
+/** 
+ * IC stands for idiot controller. these are more like a visitor, who can resolve gpath on an R
+ * 
+ * F stands for "From" - i.e. this is a resolved
+ */
+trait FICOXP[R,A] extends AXP {
+   /** find one element */
+   def xpe (path:GPath, root:R) : Option[A]
+   /** find a list of elements */
+   def xpl (path:GPath, root:R) : Seq[A]
+   /** find one attribute */
+   def xpa (path:GPath, root:R) : Option[String]
+   /** find a list of attributes */
+   def xpla (path:GPath, root:R) : Seq[String]
+
+   /** find one element */
+   final def xpe (path:String, root:R) : Option[A] = xpe (GPath(path), root)
+   /** find a list of elements */
+   final def xpl (path:String, root:R) : Seq[A] = xpl (GPath(path), root)
+   /** find one attribute */
+   final def xpa (path:String, root:R) : Option[String] = xpa (GPath(path), root)
+   /** find a list of attributes */
+   final def xpla (path:String, root:R) : Seq[String] = xpla (GPath(path), root)
 }
 
 /** 

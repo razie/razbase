@@ -6,6 +6,7 @@ package com.razie.pub.base.test;
 
 import razie.base.AttrAccess;
 import razie.base.AttrAccessImpl;
+import razie.base.AttrType;
 import junit.framework.TestCase;
 
 
@@ -58,9 +59,9 @@ public class AttrAccessTest extends TestCase {
         if (howmuch >= 2)
             assertTrue(aa.isPopulated("attr2"));
 
-        assertTrue(AttrAccess.AttrType.STRING.equals(aa.getAttrType("attr1")));
+        assertTrue(AttrType.STRING.equals(aa.getAttrType("attr1")));
         if (howmuch >= 2)
-            assertTrue(AttrAccess.AttrType.INT.equals(aa.getAttrType("attr2")));
+            assertTrue(AttrType.INT.equals(aa.getAttrType("attr2")));
 
         assertTrue("val1".equals(aa.getAttr("attr1")));
         if (howmuch >= 2)
