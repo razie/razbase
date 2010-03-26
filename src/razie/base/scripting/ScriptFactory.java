@@ -31,7 +31,7 @@ public class ScriptFactory {
 
     /** make a new context, using the global as parent - all contexts can mess with the global one */
     public static ScriptContext mkContext (ScriptContext... parent) {
-        return auto().mkContextImpl(parent.length > 0 ? parent[0] : ScriptContextImpl.global());
+        return auto().mkContextImpl(parent.length > 0 && parent[0] != null ? parent[0] : ScriptContextImpl.global());
     }
 
     // TODO make protected

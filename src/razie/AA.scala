@@ -88,8 +88,8 @@ class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
 
   // TODO optimize
   def rebuild() : scala.collection.mutable.Map[String,Null] = {
-     val a : List[String] = if(this._order != null) JC.asBuffer(this._order).toList else List[String]()
-     val b : List[String] = JC.asIterable(parent.getPopulatedAttr).toList 
+     val a : List[String] = if(this._order != null) JC.asBuffer(this._order).toList else Nil
+     val b : List[String] = if (this.parent != null) JC.asIterable(parent.getPopulatedAttr).toList  else Nil
      
      val m = new scala.collection.mutable.HashMap[String,Null]()
      a.map(x=>m.put (x,null))
@@ -99,7 +99,7 @@ class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
   }
     
   override def isPopulated(name:String ) : Boolean = 
-    super.isPopulated(name) || parent.isPopulated(name)
+    super.isPopulated(name) || (parent != null && parent.isPopulated(name))
 
   override def getPopulatedAttr() : java.lang.Iterable[String] =  JC.asIterable(rebuild.keySet)
 
@@ -111,12 +111,12 @@ class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
 
    override def getAttrType(name:String ) : AttrType = {
       val t = if(this._types != null) this._types.get(name) else null
-      if (t == null) parent.getAttrType(name) else t
+      if (t == null && parent != null) parent.getAttrType(name) else t
    }
 
    override def getAttr(name:String ) : AnyRef = {
-     val o = if(this._attrs != null) this._attrs.get(name) else null;
-     if (o != null)  o else if(parent != null) parent.getAttr(name) else null
+     val o = if(this._attrs != null) this._attrs.get(name) else null
+     if (o == null && parent != null) parent.getAttr(name) else o
    }
 
 }

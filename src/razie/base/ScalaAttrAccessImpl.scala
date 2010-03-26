@@ -31,21 +31,9 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
 
        def sgetPopulatedAttr = (razie.RJS apply (this.getPopulatedAttr))
 
-//        public Iterable<String> getPopulatedAttr() {
-//            return this.parms == null ? Collections.EMPTY_LIST : this.order;
-//        }
-//
-//        def size() : Int {
-//            return this.parms == null ? 0 : this.parms.size();
-//        }
-//
-//        public boolean isPopulated(String name) {
-//            return this.parms != null && this.parms.containsKey(name);
-//        }
-
    override def toString() : String = 
       (for (a <- this.sgetPopulatedAttr) 
-         yield a + (if (this.hasAttrType(a)) (":"+getAttrType(a)) else "") + "=" + getAttr(a).toString()).mkString(",")
+         yield a + (if (this.hasAttrType(a)) (":"+getAttrType(a)) else "") + "=" + sa(a)).mkString(",")
        
    override def toXml() : String = 
       (for (a <- this.sgetPopulatedAttr)  
@@ -63,6 +51,14 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
          url+s
      else 
         s
+   }
+   
+   override def a(name:String) : AnyRef = getAttr(name)
+
+   override def sa(name:String) : String = {
+      val v = this a name
+      if (v == null) ""
+      else v.toString
    }
 
    private def toStr (o:Object):String = if (o != null) o.toString() else ""
@@ -89,9 +85,3 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
    }
 
 }
-
-
-   
-
-
-

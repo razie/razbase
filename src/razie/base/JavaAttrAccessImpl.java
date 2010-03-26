@@ -115,14 +115,6 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
       return this._attrs != null ? this._attrs.get(name) : null;
    }
 
-   public Object a(String name) {
-      return getAttr(name);
-   }
-
-   public String sa(String name) {
-      return (String) a(name);
-   }
-
    /**
     * @parm pairs are pais of name/value, i.e. setAttr("car", "lexus") OR a Properties, OR another AttrAccess
     *       OR a Map<String,String>
@@ -245,7 +237,7 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
       return a;
    }
 
-   /** TODO implement */
+   /** TODO reflection proxy to an object's properties */
    public final static JavaAttrAccessImpl reflect(Object o) {
       // TODO implement reflection
       throw new UnsupportedOperationException("TODO");
@@ -266,7 +258,6 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
 
    public void setAttrType(String name, AttrType type) {
       checkMap();
-      // TODO maybe it's too slow this toString?
       this._types.put(name, type);
    }
 }

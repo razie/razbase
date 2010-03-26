@@ -38,7 +38,11 @@ public interface AttrAccess extends ScalaAttrAccess {
    /** I'm really starting to hate typing... shortcut for getAttr */
    public Object a(String name);
 
-   /** most of the time they're just strings - i'll typecast here... this is a() typcast to String */
+   /** 
+    * most of the time they're just strings - i'll typecast here... this is a() typcast to String 
+    * 
+    * @return "" or the actual toString of the respective value
+    */
    public String sa(String name);
 
    /** set the value of the named attribute + the name can be of the form name:type */
