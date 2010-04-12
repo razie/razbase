@@ -38,7 +38,42 @@ trait Graph [N <: GNode[_,_], L <:GLink[N]] {
 /** smart graph, each node is a sub-graph of "child" nodes and links */
 trait GNode[N<:GNode[N,L], L<:GLink[N]] extends GSNode with Graph[N, L] {
   this : N =>
-//  def gnodes : Seq[GNode[L]]
-//  def glinks : Seq[L] // by convention, all links with a == this
+  
+  def mkString = GStuff.mkString[N,L] (this)
 }
 
+/** traversal helpers */
+object GStuff {
+  /** you better give me a DAG :) */
+  def mkString [N<:GNode[N,L], L<:GLink[N]] (n:N) : String = {
+    var s = new StringBuffer()
+    s.append("Graph: \n")
+    s.append(pt(" ", 0) + n.toString+"\n")
+    foreach (n,
+          (x:N,v:Int)=>{}, // nothing - I print nodes as part of the assocs pointing to them
+          (l:L,v:Int)=>{s.append(pt(" ", v) + "->" + l.z.toString+"\n")},
+          0
+          )
+    s.toString
+  }
+
+  /** you better give me a DAG :) */
+  def mkString2 [N<:GNode[N,L], L<:GLink[N]] (n:N) : String = {
+    var s = new StringBuffer()
+    s.append("Graph: \n")
+    foreach (n,
+          (x:N,v:Int)=>{s.append(pt(" ", v) + x.toString+"\n")},
+          (l:L,v:Int)=>{s.append(pt(" ", v) + "->" + l.z.toString+"\n")},
+          0
+          )
+    s.toString
+  }
+
+  def pt (s:String, i:Int) = (Range(0,i).map(k=>s)).mkString
+     
+//  def foreach [L <:GLink[_]] (n:GNode[_,_], fn:(GNode[_,_], Int)=>Unit, fl:(GLink[_<:GNode[_,_]], Int)=>Unit, level:Int = 0) {
+  def foreach [N<:GNode[N,L], L<:GLink[N]] (n:N, fn:(N, Int)=>Unit, fl:(L, Int)=>Unit, level:Int = 0) {
+    fn(n,level)
+    n.glinks.foreach(l=>{ fl(l, level); foreach(l.z, fn, fl, level+1) })
+  }
+}

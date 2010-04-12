@@ -4,8 +4,7 @@
  *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
  */
 package razie
-
-import com.razie.pub.base.{log => pblog}
+ import com.razie.pub.base.{log => pblog}
 
 /** 
  * some logging basics 
@@ -98,4 +97,12 @@ object Debug {
 
 object Audit {
    def apply (f : => Any) = Log.audit (f.toString)
+}
+
+object Alarm {
+   def apply (f : => Any) = Log.alarm (f.toString)
+}
+
+object Error {
+   def apply (f : => Any) = Log.error (f.toString)
 }
