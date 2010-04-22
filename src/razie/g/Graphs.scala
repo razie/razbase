@@ -35,12 +35,50 @@ trait Graph [N <: GNode[_,_], L <:GLink[N]] {
   def glinks : Seq[L] // by convention, all links with a == this
 }
 
+/** a modifyable graph */
+trait WRGraph [N <: GNode[_,_], L <:GLink[N]] extends Graph[N,L] {
+  this : N =>
+ 
+  type LFactory = (N, N) => L
+  
+  def gnodes_= (s:Seq[N])
+  def glinks_= (s:Seq[L]) // by convention, all links with a == this
+  
+  /** reroute */
+  def --> ( z:N)(implicit linkFactory: LFactory)  = {
+    glinks = linkFactory(this,z) :: Nil
+    this
+    }
+  /** add a new dependency */
+  def +-> ( z:N)(implicit linkFactory: LFactory)  = {
+    glinks = linkFactory (this, z) :: glinks.toList.asInstanceOf[List[L]]
+    this
+  }
+  /** par depy a -> (b,c) */
+  def --> (z:Seq[N])(implicit linkFactory: LFactory) = {
+    glinks = z.map (linkFactory(this,_)).toList
+    this
+  } 
+  /** par depy a -> (b,c) */
+  def +-> ( z:Seq[N])(implicit linkFactory: LFactory)  = {
+    glinks = glinks.toList.asInstanceOf[List[L]] ::: z.map (linkFactory(this,_)).toList
+    this
+  } 
+}
+
 /** smart graph, each node is a sub-graph of "child" nodes and links */
 trait GNode[N<:GNode[N,L], L<:GLink[N]] extends GSNode with Graph[N, L] {
   this : N =>
   
   def mkString = GStuff.mkString[N,L] (this)
+  
+//  def filtered (f: GNode[N, L] => Boolean) : GNode[N, L] = Filtered (this, f)
 }
+
+//case class Filtered [N<:GNode[N,L], L<:GLink[N]] (base:GNode[N, L], f: GNode[N, L] => Boolean) 
+//extends GNode[N, L] {
+//   
+//}
 
 /** traversal helpers */
 object GStuff {
@@ -76,4 +114,14 @@ object GStuff {
     fn(n,level)
     n.glinks.foreach(l=>{ fl(l, level); foreach(l.z, fn, fl, level+1) })
   }
+  
+  def filterNodes [N<:GNode[N,L], L<:GLink[N]] (n:N) (f: N => Boolean) : Seq[N] = {
+    val ret = razie.Listi[N]
+    GStuff.foreach (n,
+      (x:N,v:Int)=>{if (f(x)) ret append x},
+      (l:L,v:Int)=>{},
+      0
+      )
+    ret
+    }
 }

@@ -9,7 +9,7 @@ import razie.{G}
 import razie.base.scripting.ScriptContext
 import razie.base.ActionItem
 
-/** it's either an url or a directory...or both */
+/** it's either an url or a directory...or both - this basically keeps track of the gremlin's whereabouts */
 case class GLoc (val url:String, val dir:String = null) {
    override def toString : String = {
       val sep = if (url != null && dir != null) "::" else ""
