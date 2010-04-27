@@ -8,6 +8,7 @@ package razie.base.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
+import razie.base.AttrAccess;
 import razie.base.AttrAccessImpl;
 
 /** a simple context - supports parents, function overrides and guards */

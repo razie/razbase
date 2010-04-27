@@ -5,7 +5,7 @@
  */
 package razie.base.scripting
 
-import razie.base.ActionContext;
+import razie.base._
 
 /**
  * actions execute in a context of objects available at that time in that environment.
@@ -22,7 +22,7 @@ import razie.base.ActionContext;
  * @author razvanc99
  * deprecated move code to ActContext
  */
-trait ScriptContext extends ActionContext {
+trait ScriptContext extends AttrAccess {
   /**
    * define a new function - these are evaluated every time they are invoked. these also overwrite
    * another symbol, so you can redefine a symbol to do something else.

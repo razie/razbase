@@ -5,9 +5,6 @@
  */
 package razie.g
 
-object Graphs {
-}
-
 //-------------------------- simple (set) graphs, with structure induced on an existing set
 
 /** a graph is a set of nodes and links between these nodes */
@@ -45,22 +42,22 @@ trait WRGraph [N <: GNode[_,_], L <:GLink[N]] extends Graph[N,L] {
   def glinks_= (s:Seq[L]) // by convention, all links with a == this
   
   /** reroute */
-  def --> ( z:N)(implicit linkFactory: LFactory)  = {
+  def --> [T<:N] (z:T)(implicit linkFactory: LFactory) : N = {
     glinks = linkFactory(this,z) :: Nil
     this
     }
   /** add a new dependency */
-  def +-> ( z:N)(implicit linkFactory: LFactory)  = {
-    glinks = linkFactory (this, z) :: glinks.toList.asInstanceOf[List[L]]
+  def +-> [T<:N](z:T)(implicit linkFactory: LFactory) : N = {
+    glinks = glinks.toList.asInstanceOf[List[L]] ::: List(linkFactory (this, z))
     this
   }
   /** par depy a -> (b,c) */
-  def --> (z:Seq[N])(implicit linkFactory: LFactory) = {
+  def --> [T<:N] (z:Seq[T])(implicit linkFactory: LFactory) : N = {
     glinks = z.map (linkFactory(this,_)).toList
     this
   } 
   /** par depy a -> (b,c) */
-  def +-> ( z:Seq[N])(implicit linkFactory: LFactory)  = {
+  def +-> [T<:N] (z:Seq[N])(implicit linkFactory: LFactory) : N = {
     glinks = glinks.toList.asInstanceOf[List[L]] ::: z.map (linkFactory(this,_)).toList
     this
   } 
@@ -70,7 +67,7 @@ trait WRGraph [N <: GNode[_,_], L <:GLink[N]] extends Graph[N,L] {
 trait GNode[N<:GNode[N,L], L<:GLink[N]] extends GSNode with Graph[N, L] {
   this : N =>
   
-  def mkString = GStuff.mkString[N,L] (this)
+  def mkString = Graphs.mkString[N,L] (this)
   
 //  def filtered (f: GNode[N, L] => Boolean) : GNode[N, L] = Filtered (this, f)
 }
@@ -81,7 +78,7 @@ trait GNode[N<:GNode[N,L], L<:GLink[N]] extends GSNode with Graph[N, L] {
 //}
 
 /** traversal helpers */
-object GStuff {
+object Graphs {
   /** you better give me a DAG :) */
   def mkString [N<:GNode[N,L], L<:GLink[N]] (n:N) : String = {
     var s = new StringBuffer()
@@ -117,7 +114,7 @@ object GStuff {
   
   def filterNodes [N<:GNode[N,L], L<:GLink[N]] (n:N) (f: N => Boolean) : Seq[N] = {
     val ret = razie.Listi[N]
-    GStuff.foreach (n,
+    Graphs.foreach (n,
       (x:N,v:Int)=>{if (f(x)) ret append x},
       (l:L,v:Int)=>{},
       0

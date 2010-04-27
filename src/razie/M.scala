@@ -29,26 +29,43 @@ trait M[+A] {
       case _ => false
    }
 
-   def tryConvertingToM[A] (y:Any) : M[A] = {
-      y match {
-         case l : java.util.List[A] => M.apply (l)
-         case i : java.util.Iterator[A] => M.apply(i)
-         case b : java.lang.Iterable[A] => M.apply(b)
-         case m : java.util.Map[_,A] => M.apply (m.values) 
-         case a : Array[A] => M.apply(a)
-         case s : scala.Seq[A] => M.apply(s)
-         case _ => y.asInstanceOf[M[A]]
-      }
-
-   }
+   def tryConvertingToM[A] (y:Any) : M[A] = M any y
+   
    def sort (lt:(A,A) => Boolean) : List[A] = M.sort(this, lt)
    override def toString = toList.toString
+   
+   def anyOrder : M[A] = new MonaDisordera (this)
+   class MonaDisordera[A] (val l:M[A]) extends M[A] {
+     override def map[B](f: A => B): M[B] = new MonaDisordera(l.map(f))
+     override def flatMap[B](f: A => M[B]): M[B] = new MonaDisordera (l.flatMap(x => f(x)))
+     override def filter(p: A => Boolean): M[A] = new MonaDisordera(l.filter(p))
+     override def foreach[U](f: A => U) = l.foreach(f)
+
+     override def iterator: Iterator[A]  = l.iterator
+     override def toList: List[A] = l.toList
+     
+     override def equals (y:Any) : Boolean = tryConvertingToM[A] (y) match {
+        case m : M[A] => M.equalsNotOrdered(this, m) (_==_)
+        case _ => false
+     }
+   }
 }
 
 // special chars: a : 
 
 /** helper class - has all the conversions */
 object M {
+  // NOT recommended
+  def any[A] (y:Any) : M[A] = y match {
+    case l : java.util.List[A] => M.apply (l)
+    case i : java.util.Iterator[A] => M.apply(i)
+    case b : java.lang.Iterable[A] => M.apply(b)
+    case m : java.util.Map[_,A] => M.apply (m.values) 
+    case a : Array[A] => M.apply(a)
+    case s : scala.Seq[A] => M.apply(s)
+    case _ => y.asInstanceOf[M[A]]
+  }
+
 //   implicit def apply[A] (l:Iterator[A]) : M[A] = new MonaTravestita[A] (l.toList)
    implicit def apply[A] (l:Iterator[A]) : M[A] = new MonaItera[A] (l)
    class MonaItera[A] (val l:Iterator[A]) extends M[A] {
@@ -117,6 +134,34 @@ object M {
     M(res)
    }
 
+   /** compare two monads, regardless of the element's order. It's expensive
+    * 
+    * it will basically make sure that EACH element in x will have a match in y 
+    * 
+    * TODO should it and then that each element in y has a match in x?
+    * 
+    * @param x - to compare
+    * @param y - to compare
+    * @param eeq - eq function 
+    */
+   def equalsNotOrdered[A,B] (x:M[A], y:M[B]) (eeq:(A,B)=>Boolean) = {
+      // TODO optimize
+    val i1 = x.iterator
+    val i2 = y.iterator
+    var bad = false
+
+    for (i1 <- x if (!bad)) {
+      var loopDone = false
+      
+      for (i2 <- y if (!loopDone)) if (eeq(i1, i2))  loopDone = true
+       
+      if (!loopDone)
+         bad = true
+    }
+    
+    !bad 
+   }
+   
    /** compare two monads, given a comparison function 
     * 
     * @param x - to compare
@@ -206,7 +251,6 @@ object MOLD {
    }
    def f (x: => Any) = apply (x)
 }
-
 
 
 /** it sucks to have to import the stupid long package name all the time... */

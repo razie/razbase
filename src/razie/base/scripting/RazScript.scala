@@ -15,12 +15,14 @@ object RazScript {
   class RSResult[+A] { 
     def map[B>:A] (f:A=>B) : RSResult[B] = RSUnsupported 
     def getOrElse[B >: A] (f: => B) : B = f
+    def getOrThrow:A = throw new IllegalArgumentException (this.toString)
     def jgetOrElse (f:Any) : Any = getOrElse(f)
   }
 
   case class RSSucc[A] (res:A) extends RSResult[A] { 
     override def map[B] (f:A=>B) : RSResult[B] = RSSucc(f(res))
     override def getOrElse[B >: A] (f: => B) : B = res
+    override def getOrThrow:A = res
   }
 
   case class RSError (err:String) extends RSResult[String]

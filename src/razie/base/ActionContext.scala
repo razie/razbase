@@ -8,6 +8,6 @@ package razie.base
  * 
  * @author razvanc99
  */
-trait ActionContext extends AttrAccess {
+trait ActionContext extends BBAttrAccess {
 
 }
