@@ -5,6 +5,8 @@
  */
 package razie.base.scripting
 
+import razie.base.ActionContext
+
 /**
  * some statics
  * 
@@ -48,11 +50,11 @@ trait RazScript {
    * 
    * @return SError or SSuccNoValue...or others
    */
-  def compile (ctx:ScriptContext) : RSResult[Any]
+  def compile (ctx:ActionContext) : RSResult[Any]
   
   /** strait forward evaluation and return result of expression */
-  def eval (ctx:ScriptContext) : RSResult[Any]
+  def eval (ctx:ActionContext) : RSResult[Any]
  
   /** interactive evaluation - more complex interaction */ 
-  def interactive (ctx:ScriptContext) : RSResult[Any]
+  def interactive (ctx:ActionContext) : RSResult[Any]
 }

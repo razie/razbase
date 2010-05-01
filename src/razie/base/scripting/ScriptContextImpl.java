@@ -8,7 +8,7 @@ package razie.base.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
-import razie.base.AttrAccess;
+import razie.base.*;
 import razie.base.AttrAccessImpl;
 
 /** a simple context - supports parents, function overrides and guards */
@@ -30,25 +30,21 @@ public class ScriptContextImpl extends razie.WrapAttrAccess implements ScriptCon
       this((ScriptContext) null);
    };
 
-   public ScriptContextImpl(AttrAccessImpl aa) {
-      this(null, aa);
-   };
-
    /** supports a map as well */
    public ScriptContextImpl(Object... pairs) {
       this(null, pairs);
    }
 
-   public ScriptContextImpl(ScriptContext parent) {
+   public ScriptContextImpl(AttrAccess parent) {
       super(parent);
    };
 
-   public ScriptContextImpl(ScriptContext parent, AttrAccessImpl aa) {
+   public ScriptContextImpl(AttrAccess parent, AttrAccessImpl aa) {
       super(parent, aa);
    };
 
    /** supports a map as well */
-   public ScriptContextImpl(ScriptContext parent, Object... pairs) {
+   public ScriptContextImpl(AttrAccess parent, Object... pairs) {
       super(parent, pairs);
    }
 
