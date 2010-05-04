@@ -32,8 +32,8 @@ class XPSolved [T] (val xp : XP[T], val ctx:XpSolver[T,Any]) {
 
 /** simple base class to decouple parsing the elements from their actual functionality */
 case class GPath (val expr:String) {
-   // list of parsed elements
-  val elements =  
+  // list of parsed elements
+  lazy val elements =  
     for (val e <- (expr split "/").filter(_!="")) 
       yield new XpElement(e)
   
