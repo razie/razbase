@@ -106,7 +106,7 @@ class WrapAttrAccess (val parent:BBAttrAccess, s:AnyRef* ) extends AA {
   override def size() : Int = rebuild.keySet.size
 
   override def hasAttrType(name:String ) : Boolean = {
-      (this._types != null && this._types.get(name) != null) || parent.hasAttrType(name);
+      (this._types != null && this._types.get(name) != null) || (parent != null && parent.hasAttrType(name));
    }
 
    override def getAttrType(name:String ) : AttrType = {

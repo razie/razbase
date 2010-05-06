@@ -15,7 +15,7 @@ import razie.base.ActionContext
 object RazScript {
    // the result of running a smart script
   class RSResult[+A] { 
-    def map[B>:A] (f:A=>B) : RSResult[B] = RSUnsupported 
+    def map[B>:A] (f:A=>B) : RSResult[B] = RSUnsupported ("by default")
     def getOrElse[B >: A] (f: => B) : B = f
     def getOrThrow:A = throw new IllegalArgumentException (this.toString)
     def jgetOrElse (f:Any) : Any = getOrElse(f)
@@ -29,7 +29,7 @@ object RazScript {
 
   case class RSError (err:String) extends RSResult[String]
       object RSIncomplete  extends RSResult[Any]   // expression is incomplete...
-      object RSUnsupported extends RSResult[Nothing] // interactive mode unsupported
+  case class RSUnsupported (what:String) extends RSResult[Nothing] // interactive mode unsupported
       object RSSuccNoValue extends RSResult[Any] // successful, but no value returned
   
   def err (msg:String) = RSError(msg)
