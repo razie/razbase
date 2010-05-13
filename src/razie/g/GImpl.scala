@@ -162,16 +162,16 @@ trait GReferenceable {
 }
 
 trait GResolver [T] {
-   def resolve (key : GRef) : T
+   def resolve (key : GRef) : Option[T]
 }
 
 object GAMResolver {
    var assetMgr : GResolver[AnyRef] = null
-   def resolve (key : GRef) : AnyRef = assetMgr.resolve(key)
+   def resolve (key : GRef) : Option[AnyRef] = assetMgr.resolve(key)
 }
 
 trait GAssocResolver [From, To] {
-   def resolve (from:From, as:String) : To
+   def resolve (from:From, as:String) : Option[To]
 }
 
 object GUid {
