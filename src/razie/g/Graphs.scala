@@ -46,6 +46,9 @@ trait WRGraph [N <: GNode[_,_], L <:GLink[N]] extends Graph[N,L] {
     glinks = linkFactory(this,z) :: Nil
     this
     }
+  /** reroute */
+//  def <-- [T<:WRGraph[N,L]] (z:T)(implicit linkFactory: LFactory) : N =  z --> (this)
+//  def <-+ [T<:WRGraph[N,L]] (z:T)(implicit linkFactory: LFactory) : N =  z +-> (this)
   /** add a new dependency */
   def +-> [T<:N](z:T)(implicit linkFactory: LFactory) : N = {
     glinks = glinks.toList.asInstanceOf[List[L]] ::: List(linkFactory (this, z))
@@ -57,7 +60,7 @@ trait WRGraph [N <: GNode[_,_], L <:GLink[N]] extends Graph[N,L] {
     this
   } 
   /** par depy a -> (b,c) */
-  def +-> [T<:N] (z:Seq[N])(implicit linkFactory: LFactory) : N = {
+  def +-> [T<:N] (z:Seq[T])(implicit linkFactory: LFactory) : N = {
     glinks = glinks.toList.asInstanceOf[List[L]] ::: z.map (linkFactory(this,_)).toList
     this
   } 
