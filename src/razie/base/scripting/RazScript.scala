@@ -30,6 +30,7 @@ object RazScript {
   case class RSError (err:String) extends RSResult[String]
       object RSIncomplete  extends RSResult[Any]   // expression is incomplete...
   case class RSUnsupported (what:String) extends RSResult[Nothing] // interactive mode unsupported
+      object RSUnsupported extends RSUnsupported ("todo") // interactive mode unsupported
       object RSSuccNoValue extends RSResult[Any] // successful, but no value returned
   
   def err (msg:String) = RSError(msg)

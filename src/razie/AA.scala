@@ -12,10 +12,13 @@ import razie.base._
  * @author razvanc
  */
 object AA {
-   def apply (s:AnyRef*):AA = {val x = new AA(); x.setAttr(s:_*); x }
-   def apply ():AA = new AA()
+  // TODO 3-2 protect this against idiot code
+  final val EMPTY = AA()
+   
+  def apply (s:AnyRef*):AA = {val x = new AA(); x.setAttr(s:_*); x }
+  def apply ():AA = new AA()
 
-   def wrap (a:AttrAccess, s:AnyRef*) = new WrapAttrAccess (a,s:_*)
+  def wrap (a:AttrAccess, s:AnyRef*) = new WrapAttrAccess (a,s:_*)
    
    /** simplify accessing attributes of asset classes 
     * 
@@ -88,12 +91,14 @@ class WrapAttrAccess (val parent:BBAttrAccess, s:AnyRef* ) extends AA {
 
   // TODO optimize
   def rebuild() : scala.collection.mutable.Map[String,Null] = {
-     val a : List[String] = if(this._order != null) JC.asBuffer(this._order).toList else Nil
-     val b : List[String] = if (this.parent != null) JC.asIterable(parent.getPopulatedAttr).toList  else Nil
+//     val a : List[String] = if(this._order != null) JC.asBuffer(this._order).toList else Nil
+     val a = this._order
+//     val b : List[String] = if (this.parent != null) JC.asIterable(parent.getPopulatedAttr).toList  else Nil
+     val b = if (this.parent != null) parent.sgetPopulatedAttr  else Nil
      
      val m = new scala.collection.mutable.HashMap[String,Null]()
-     a.map(x=>m.put (x,null))
-     b.map(x=>m.put (x,null))
+     a.foreach(x=>m.put (x,null))
+     b.foreach(x=>m.put (x,null))
      
      m
   }

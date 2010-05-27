@@ -33,4 +33,8 @@ trait ScalaAttrAccess {
   def map [A,B] (f : (String, A) => B) : ScalaAttrAccess 
   
   def mapValues [A,B] (f : (A) => B) : Seq[B]
+  
+//  def apply (name:String) : Any
+  
+//  def sset (name:String, v:Any) : Any
 }

@@ -90,9 +90,7 @@ public class ExecutionContext extends AttrAccessImpl {
    public static void resetJVM() {
       instances.clear();
       NoStatics.reset();
-      DFLT_CTX._attrs=null;
-      DFLT_CTX._types=null;
-      DFLT_CTX._order=null;
+      DFLT_CTX.clear();
    }
 
    /*

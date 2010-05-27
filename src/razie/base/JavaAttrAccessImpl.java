@@ -20,7 +20,7 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
    // lazy - using underscore since many classes may derive from here...
    public Map<String, Object> _attrs = null;
    protected Map<String, AttrType> _types = null;
-   protected List<String> _order = null;
+//   protected List<String> _order = null;
 
    /** dummy */
    public JavaAttrAccessImpl() {
@@ -107,7 +107,8 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
          this.setAttrType(s.n(), s.t());
 
       if (!this._attrs.containsKey(s.n()))
-         this._order.add(s.n());
+//         this._order.add(s.n());
+         tempso (s.n());
       this._attrs.put(s.n(), value);
    }
 
@@ -168,14 +169,14 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
       if (this._attrs == null) {
          this._attrs = new HashMap<String, Object>();
          this._types = new HashMap<String, AttrType>();
-         this._order = new ArrayList<String>();
+//         this._order = new ArrayList<String>();
       }
    }
 
-   @SuppressWarnings("unchecked")
-   public Iterable<String> getPopulatedAttr() {
-      return this._attrs == null ? Collections.EMPTY_LIST : this._order;
-   }
+//   @SuppressWarnings("unchecked")
+//   public Iterable<String> getPopulatedAttr() {
+//      return this._attrs == null ? Collections.EMPTY_LIST : this._order;
+//   }
 
    public int size() {
       return this._attrs == null ? 0 : this._attrs.size();
@@ -259,5 +260,11 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
    public void setAttrType(String name, AttrType type) {
       checkMap();
       this._types.put(name, type);
+   }
+   
+   public void clear () {
+      _attrs = null;
+      _types = null;
+      tempcl();
    }
 }

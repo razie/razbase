@@ -17,6 +17,9 @@ import org.json.JSONObject;
 
 /** simple base implementation */
 abstract class ScalaAttrAccessImpl extends AttrAccess {
+//   lazy val _attrs : scala.collection.mutable.HashMap[String, Any] = new scala.collection.mutable.HashMap[String, Any] ()
+//   lazy val _types : scala.collection.mutable.HashMap[String, AttrType] = new scala.collection.mutable.HashMap[String, AttrType] ()
+   lazy val _order : scala.collection.mutable.ListBuffer[String] = new scala.collection.mutable.ListBuffer[String] ()
     
    def hasAttrType(name:String):Boolean 
 
@@ -63,6 +66,11 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
 
    private def toStr (o:Object):String = if (o != null) o.toString() else ""
       
+//   def getAttr(name:String) : AnyRef =  _attrs.getOrElse(name, null)
+//  def apply (name:String) : Any = _attrs (name)
+  
+//  def sset (name:String, v:Any) : Any = { _attrs.put (name, v); v }
+  
    def getOrElse(name:String, dflt:AnyRef) : AnyRef = if (isPopulated (name)) getAttr(name) else dflt
    def sgetOrElse(name:String, dflt:String) : String = getOrElse (name, dflt).toString
 
@@ -84,4 +92,11 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
      aa 
    }
 
+   def getPopulatedAttr() : java.lang.Iterable[String] = {
+      import scala.collection.JavaConversions._
+      this._order;
+   }
+
+   def tempso (name:String) : Unit = _order append name
+   def tempcl () = _order.clear
 }
