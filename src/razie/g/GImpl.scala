@@ -33,7 +33,8 @@ trait GRef {
 }
 
 object GRef {
-   def from (s:String) : GRef = null
+   def from       (s:String) : GRef = parse(s)
+   def fromString (s:String) : GRef = parse(s)
    
    def apply(m:String, id:String, loc:GLoc=G.LOCAL) = GIDRef (m, id, loc)
    def id   (m:String, id:String, loc:GLoc=G.LOCAL) = GIDRef (m, id, loc)
