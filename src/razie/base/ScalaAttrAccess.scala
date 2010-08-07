@@ -1,8 +1,11 @@
-/**
- * Razvan's public code. Copyright 2008 based on Apache license (share alike) see LICENSE.txt for
- * details.
+/**  ____    __    ____  ____  ____,,___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___)/ __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__) \__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
  */
 package razie.base;
+
+import org.json.JSONObject;
 
 /**
  * simple attribute access interface and implementation - a bunch of name-value pairs with many
@@ -22,8 +25,87 @@ package razie.base;
  * 
  * @author razvanc99
  */
-trait ScalaAttrAccess {
+trait ScalaAttrAccess extends JavaAttrAccess {
 
+   /** @return the value of the named attribute or null */
+   def getAttr(name:String) : AnyRef
+
+   /** @return the value of the named attribute or null */
+   def getOrElse(name:String, dflt:AnyRef ) : AnyRef
+   
+   /** I'm really starting to hate typing... shortcut for getAttr */
+   def a(name:String) : AnyRef
+
+   /** 
+    * most of the time they're just strings - i'll typecast here... this is a() typcast to String 
+    * 
+    * @return "" or the actual toString of the respective value
+    */
+   def sa(name:String) : String
+
+   /** set the value of the named attribute + the name can be of the form name:type */
+   def set(name:String, value:AnyRef ) : Unit
+   
+   /** set the value of the named attribute + the name can be of the form name:type */
+   def set(name:String, value:AnyRef , t:AttrType ) : Unit
+
+   /** set the value of the named attribute + the name can be of the form name:type */
+   def setAttr(name:String, value:AnyRef ) : Unit
+
+//   /**
+//    * set the value of one or more attributes
+//    * 
+//    * @parm pairs are pais of name/value, i.e. "car", "lexus" OR a Properties, OR another AttrAccess
+//    *       OR a Map<String,String>. Note that the parm name can contain the type, i.e.
+//    *       "name:string".
+//    */
+//   def setAttr(pairs:AnyRef*) : Unit
+
+   /** the number of populated attributes */
+   def size() : Int
+
+   /** iterate through the populated attributes */
+   def getPopulatedAttr() : java.lang.Iterable[String]
+
+   /** check if an attribute is populated */
+   def isPopulated(name:String) : Boolean
+   
+   /** check if an attribute is populated */
+   def hasAttrType(name:String) : Boolean
+
+   /**
+    * @return the type of the named attribute OR null if not known. Default is by convention String
+    */
+   def getAttrType(name:String) : AttrType
+
+   /**
+    * set the type of the named attribute
+    */
+   def setAttrType(name:String, ttype:AttrType ) : Unit
+
+   /** some random xml format */
+   def toXml() : String
+
+   /** same pairs format name,value,name,value... */
+   def toPairs() : Array[AnyRef]
+
+   /**
+    * add my attributes to the JSONObject passed in. If null passed in, empty object is created
+    * first
+    * 
+    * @param obj an json object to add to or null if this is a single element
+    * @return
+    */
+   def toJson(obj:JSONObject) : JSONObject
+
+   /**
+    * add these attributes to an url, respecting the url parm format, i.e.
+    * getMovie?name=300.divx&producer=whoknows
+    */
+   def addToUrl(url:String ) : String
+ 
+   
+   
   def sgetPopulatedAttr : Iterable[String]
        
   def foreach (f : (String, AnyRef) => Unit) : Unit 

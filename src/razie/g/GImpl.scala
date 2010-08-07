@@ -6,10 +6,16 @@
 package razie.g
 
 import razie.{G}
-import razie.base.scripting.ScriptContext
+import razie.base.{ActionContext=>AC}
 import razie.base.ActionItem
 
-/** it's either an url or a directory...or both - this basically keeps track of the gremlin's whereabouts */
+/** 
+ * the entire world is a graph of regferenceable entities...Here's all we need to mess with it :D
+ */
+object snakked {
+}
+
+/** generic location: it's either an url or a directory...or both - this basically keeps track of the gremlin's whereabouts */
 case class GLoc (val url:String, val dir:String = null) {
    override def toString : String = {
       val sep = if (url != null && dir != null) "::" else ""
@@ -24,14 +30,16 @@ case class GLoc (val url:String, val dir:String = null) {
         else dir
 }
 
-/** base ref - uniquely identifies one (or more?) entities */
+/** generic reference - uniquely identifies one (or more?) entities */
 trait GRef {
+   /** the meta may include a schema */
    def meta:String
    def loc:GLoc
    override def toString : String
    def urlEncoded : String = java.net.URLEncoder.encode(toString, "UTF-8")
 }
 
+/** gref utilities */
 object GRef {
    def from       (s:String) : GRef = parse(s)
    def fromString (s:String) : GRef = parse(s)
@@ -158,19 +166,24 @@ case class GXQRef (xp:String, val loc:GLoc) extends GRef {
        G.GXQREF+":" + meta + ":" + (if(xp == null ) "" else java.net.URLEncoder.encode(xp, "UTF-8")) + (if (loc == null || G.LOCAL.equals(loc)) "" else ("@" + loc.toString()))
 }
 
+/** generic referenceable entities */
 trait GReferenceable {
    def key : GRef
 }
 
+/** generic referenceable entity resolver / manager */
 trait GResolver [T] {
    def resolve (key : GRef) : Option[T]
+   // TODO add query API ?
 }
 
+/** static entry point for a resolver */
 object GAMResolver {
    var assetMgr : GResolver[AnyRef] = null
    def resolve (key : GRef) : Option[AnyRef] = assetMgr.resolve(key)
 }
 
+/** association resolver */
 trait GAssocResolver [From, To] {
    def resolve (from:From, as:String) : Option[To]
 }
@@ -186,24 +199,24 @@ object GUid {
 }
 
 // TODO handling exception scenarios
-trait GCRUD {
-   def c (k:GRef)        : Option[Any]  // create an entity - return the "skeleton"
-   def r (k:GRef)        : Option[Any]  // read, i.e. retrieve an entity
-   def u (k:GRef, x:Any) : Option[Any]  // update the entity with the given values
-   def d (k:GRef)        : Option[Any]  // delete the entity
+trait GCRUD [A] {
+   def c (k:GRef, ctx:AC) : Option[A]  // create an entity - return the "skeleton"
+   def r (k:GRef)         : Option[A]  // read, i.e. retrieve an entity
+   def u (k:GRef, x:A)    : Option[A]  // update the entity with the given values
+   def d (k:GRef)         : Option[A]  // delete the entity
    
    def q (k:GRef) : Seq[GRef]
 }
 
 trait GAct {
-   def actions (k:GRef)           : Seq[ActionItem]
-   def act     (k:GRef, a:String, ctx:ScriptContext) : Any   
+   def actions (k:GRef) : Seq[ActionItem]
+   def act     (k:GRef, a:String, ctx:AC) : Any   
 }
 
 object GAMAct extends GAct {
    var assetMgr : GAct = null
-   def actions (k:GRef)             : Seq[ActionItem] = assetMgr.actions(k)
-   def act     (k:GRef, a:String, ctx:ScriptContext) : Any   = assetMgr.act(k, a, ctx)
+   def actions (k:GRef) : Seq[ActionItem] = assetMgr.actions(k)
+   def act     (k:GRef, a:String, ctx:AC) : Any   = assetMgr.act(k, a, ctx)
 }
 
 //class Concentrator extends GCRUD with GAct {

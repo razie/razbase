@@ -22,6 +22,9 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
    protected Map<String, AttrType> _types = null;
 //   protected List<String> _order = null;
 
+   // TODO 3-2 protect this against idiot code
+   public static AttrAccess EMPTY = new JavaAttrAccessImpl();
+   
    /** dummy */
    public JavaAttrAccessImpl() {
    };

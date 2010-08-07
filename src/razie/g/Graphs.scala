@@ -8,17 +8,20 @@ package razie.g
 //-------------------------- simple (set) graphs, with structure induced on an existing set
 
 /** a graph is a set of nodes and links between these nodes */
-trait SGraph [N <: GSNode, L <:GLink[N]] {
+trait SGraph [N <: GSNode[_], L <:GLink[N]] {
   def gnodes : Seq[N]
   def glinks : Seq[L]
 }
 
 /** a node is... anything */
-trait GSNode {
+trait GSNode[A] extends GNode[GSNode[A], GLink[GSNode[A]]] {
+  def content:A
+//trait GSNode {
 }
 
 /** a link between two nodes */
-trait GLink [N <: GSNode] {
+trait GLink [N <: GNode[_,_]] {
+//trait GLink [N <: GSNode] {
   def a : N
   def z : N
 }
@@ -67,7 +70,8 @@ trait WRGraph [N <: GNode[_,_], L <:GLink[N]] extends Graph[N,L] {
 }
 
 /** smart graph, each node is a sub-graph of "child" nodes and links */
-trait GNode[N<:GNode[N,L], L<:GLink[N]] extends GSNode with Graph[N, L] {
+trait GNode[N<:GNode[N,L], L<:GLink[N]] extends Graph[N, L] {
+//trait GNode[N<:GNode[N,L], L<:GLink[N]] extends GSNode with Graph[N, L] {
   this : N =>
   
   def mkString = Graphs.mkString[N,L] (this)

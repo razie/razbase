@@ -15,7 +15,7 @@ class SuiteRazieIWishItWorked extends SuperSuite (
 )
 
 /** TODO this is sooooooooooooo messed up... */
-class SuiteRazie () extends junit.framework.TestSuite(classOf[XNada]) {
+class SuiteRazie () extends junit.framework.TestSuite(classOf[XNadaRazie]) {
   
   // this is where you list the tests...
    addTestSuite(classOf[com.razie.pub.base.test.AttrAccessTest])
@@ -36,6 +36,6 @@ class SuiteRazie () extends junit.framework.TestSuite(classOf[XNada]) {
 }
 
 // this is here to convince eclipse to run as/junit...
-class XNada extends junit.framework.TestCase {
+class XNadaRazie extends junit.framework.TestCase {
  def testNada : Unit =  {}
 }

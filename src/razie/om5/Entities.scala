@@ -27,19 +27,19 @@ case class Parm (val parmDefn:String) {
 //--------------- entities
 
 object Service {
-   def apply (name:String) : Service = ServiceSpec (name) make
-//   def CF (name:String) : CFService = ServiceSpec (name) make
-//   def NF (name:String) : NFService = ServiceSpec (name) make
+   def apply (name:String) : Service = ServiceSpec (name).make
+//   def CF (name:String) : CFService = ServiceSpec (name).make
+//   def NF (name:String) : NFService = ServiceSpec (name).make
 }
 
 object Product {
-   def apply (name:String) : Product = ProductSpec (name) make
+   def apply (name:String) : Product = ProductSpec (name).make
 }
 
 
      class Service (id:String, val specKey:Key) extends Entity (Key("Service", id)) with HasSpec
-case class CFService (id:String, override specKey:Key) extends Service (id,specKey) with HasSpec
-case class RFService (id:String, override specKey:Key) extends Service (id,specKey) with HasSpec
+case class CFService (id:String, override val specKey:Key) extends Service (id,specKey) with HasSpec
+case class RFService (id:String, override val specKey:Key) extends Service (id,specKey) with HasSpec
 case class Product (id:String, val spec:ProductSpec) extends Entity (Key("Product", id)) with HasSpec {
   def decompose : Seq[CFService] = Nil
   def specKey:Key = spec.key
@@ -97,7 +97,7 @@ case class Item [T<:Entity] (val entityKey:Key, val action:Action, val attr:Stri
 class Request[T<:Entity] (val items:Seq[Item[_<:T]]) 
    extends Entity (Key("Request", ""))
 
-case class Order[T<:Entity] (override items:Seq[Item[T]]) extends Request (items) {
+case class Order[T<:Entity] (override val items:Seq[Item[T]]) extends Request (items) {
 	override def toString = "Order: " + items.mkString
 }
 

@@ -9,7 +9,6 @@ package com.razie.pub.base.log;
  * Just overwrite this in the classpath - easier, eh?
  */
 public class Factory {
-
    public Log create(String component, String categoryName) {
       return new Log(component, categoryName);
    }

@@ -227,8 +227,17 @@ public class Log {
        return msg;
    }
 
+   // excuse the stupid decoupling...
+   public static Factory initFactory() {
+   try {
+      if (Class.forName("com.razie.pub.base.log.Log4jFactory") != null)
+        return (Factory) Class.forName("com.razie.pub.base.log.Log4jFactory").newInstance();
+   } catch (Exception e) {
+   }
+        return new Factory();
+   }
 
-   public static Factory factory = new Factory();
+   public static Factory factory = initFactory();
    public static Log logger = factory.create("?", "DFLTLOG");
    
    public static Log create(String component, String categoryName) {

@@ -15,7 +15,7 @@ object AA {
   // TODO 3-2 protect this against idiot code
   final val EMPTY = AA()
    
-  def apply (s:AnyRef*):AA = {val x = new AA(); x.setAttr(s:_*); x }
+  def apply (s:Any*):AA = {val x = new AA(); x.setAttr(s.asInstanceOf[Seq[AnyRef]]:_*); x }
   def apply ():AA = new AA()
 
   def wrap (a:AttrAccess, s:AnyRef*) = new WrapAttrAccess (a,s:_*)
@@ -76,7 +76,7 @@ class AA extends AttrAccessImpl {
 
 /** this one adds stuff to a parent's */
    /** hierarchical implementation */
-class WrapAttrAccess (val parent:BBAttrAccess, s:AnyRef* ) extends AA {
+class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
   import scala.collection.{JavaConversions => JC}
    
   setAttr(s:_*); 
