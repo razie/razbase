@@ -138,6 +138,8 @@ public class Log {
 
    public static void traceThis(String m) { logger.trace(1, m); }
    public static void traceThis(String m, Throwable t) { logger.trace(1, m, t); }
+   public static void traceThis(int level, String m) { logger.trace(level, m); }
+   public static void traceThis(int level, String m, Throwable t) { logger.trace(level, m, t); }
 
    public static void logThis(String m, Throwable t) {
       logger.log(m + (t != null ? " Exception: " + getStackTraceAsString(t) : ""));

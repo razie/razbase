@@ -180,7 +180,10 @@ trait GResolver [T] {
 /** static entry point for a resolver */
 object GAMResolver {
    var assetMgr : GResolver[AnyRef] = null
+   /** main entry point for finding entities: resolve them */
    def resolve (key : GRef) : Option[AnyRef] = assetMgr.resolve(key)
+   /** Java jas issues using Some<A> so this returns the object or null */
+   def jresolve (key : GRef) : AnyRef = resolve(key).get
 }
 
 /** association resolver */

@@ -181,3 +181,4 @@ object LearnString extends Application {
    "" split "\\s+"
    " " split "\\s+"
 }
+

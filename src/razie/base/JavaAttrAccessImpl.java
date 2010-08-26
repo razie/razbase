@@ -109,12 +109,24 @@ public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAcces
       if (s.t() != AttrType.DEFAULT)
          this.setAttrType(s.n(), s.t());
 
-      if (!this._attrs.containsKey(s.n()))
+      if (value == null) unpopulate (name);
+      else {
+        if (!this._attrs.containsKey(s.n()))
 //         this._order.add(s.n());
-         tempso (s.n());
-      this._attrs.put(s.n(), value);
+           tempso (s.n());
+        this._attrs.put(s.n(), value);
+        }
    }
 
+   // remove it - it's unpopulated
+   @Override
+   public void unpopulate (String name) {
+      this._attrs.remove(name);
+      super.unpopulate(name);
+//      this._order -= name
+      this._types.remove(name);
+   }
+   
    public Object getAttr(String name) {
       return this._attrs != null ? this._attrs.get(name) : null;
    }

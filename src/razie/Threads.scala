@@ -1,14 +1,40 @@
-/**
- * Razvan's public code. Copyright 2008 based on Apache license (share alike) see LICENSE.txt for
- * details. No warranty implied nor any liability assumed for this code.
+/**  ____    __    ____  ____  ____,,___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___)/ __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__) \__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
  */
 package razie
+
+import java.{lang => jl}
+
 
 /** multithreading helpers, to tie me over until I learn to effectively exploit actors or other 
  * inferior beings
  * @author razvanc
  */
 object Threads {
+
+   /** fork a bunch of threads, then join them and return the results...all within a timeout */
+   def forkjoinWithin[A,B>:Null<:AnyRef] (msec:Int)(as:Iterable[A]) (f:A =>B) : Iterable[B] = {
+      val threads = (for (a <- as) yield new FuncValThread (a, f)).toList
+      threads.foreach (_.start())
+      threads.foreach (new KillerThread (msec, _).start)
+      threads.foreach (_.join)
+      threads.map (_.res).toList // use toList since the iterable may not be strict
+   }
+
+   def forkWithin (msec:Int) (f: =>Unit) : java.lang.Thread = {
+      val thread = new java.lang.Thread(new java.lang.Runnable() {
+         override def run() = {
+            f
+         }
+      })
+      thread.start()
+     
+      new KillerThread (msec, thread).start
+      
+      thread
+   }
    
    /** run a func in its own, separate thread - don't wait for result */
    def fork (f: =>Unit) : java.lang.Thread = {
@@ -77,5 +103,16 @@ object Threads {
       var res: A = null
 
       override def run() = res = f (thread)
+   }
+  
+   class ThreadTimeoutRtException (val msec:Int) extends RuntimeException (
+         "Thread timed out - took more than " + msec + " msec")
+   
+   class KillerThread (val msec:Int, val c:jl.Thread) extends jl.Thread {
+      require(msec > 0)
+      override def run() = {
+         jl.Thread.sleep (msec)
+         c stop new ThreadTimeoutRtException (msec)
+      }
    }
 }

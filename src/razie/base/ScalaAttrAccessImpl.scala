@@ -98,6 +98,13 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
       this._order;
    }
 
+   def unpopulate (name:String) {
+//      this._attrs.remove(name)
+      this._order -= name
+//      this._types.remove(name)
+   }
+   
+
    def tempso (name:String) : Unit = _order append name
    def tempcl () = _order.clear
 }
