@@ -258,9 +258,15 @@ object MOLD {
 /** it sucks to have to import the stupid long package name all the time... */
 object Mapi {
    def apply [K,V] () = new scala.collection.mutable.HashMap [K, V] ()
+   
+   def immutable [K,V] (m:scala.collection.mutable.HashMap [K, V]) : Map[K,V] =
+      scala.collection.immutable.Map[K,V]() ++ m
 }
 
 /** it sucks to have to import the stupid long package name all the time...when retrofitting old code */
 object Listi {
    def apply [K] () = new scala.collection.mutable.ListBuffer [K] ()
+   
+   def immutable [K] (m:scala.collection.mutable.ListBuffer [K]) : List[K] =
+      List[K]() ++ m
 }

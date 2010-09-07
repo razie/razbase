@@ -64,7 +64,7 @@ trait ScalaAttrAccess extends JavaAttrAccess {
    /** the number of populated attributes */
    def size() : Int
 
-   /** iterate through the populated attributes */
+   /** iterate through the populated attributes. BE very careful: if you set attrs with NULL values, they are NOT populated! */
    def getPopulatedAttr() : java.lang.Iterable[String]
 
    /** check if an attribute is populated */

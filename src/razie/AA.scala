@@ -7,6 +7,11 @@ package razie
 
 import razie.base._
 
+object args {
+  def apply (s:Any*):AA = {val x = new AA(); x.setAttr(s.asInstanceOf[Seq[AnyRef]]:_*); x }
+  def apply ():AA = new AA()
+}
+
 /** simplify usage of AttrAccess - attribute management
  * 
  * @author razvanc
@@ -93,7 +98,8 @@ class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
   def rebuild() : scala.collection.mutable.Map[String,Null] = {
 //     val a : List[String] = if(this._order != null) JC.asBuffer(this._order).toList else Nil
      val a = this._order
-//     val b : List[String] = if (this.parent != null) JC.asIterable(parent.getPopulatedAttr).toList  else Nil
+//     val b : List[String] = 
+//       if (this.parent != null) JC.asIterable(parent.getPopulatedAttr).toList  else Nil
      val b = if (this.parent != null) parent.sgetPopulatedAttr  else Nil
      
      val m = new scala.collection.mutable.HashMap[String,Null]()

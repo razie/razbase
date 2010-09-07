@@ -46,8 +46,8 @@ object Perf {
     println ("REPORT: ")
 
     val asmap = {
-       val m = new java.util.TreeMap[Integer, String]
-       graph.foreach (x => m.put(new Integer(x._1), x._2.toString))
+       val m = new java.util.TreeMap[java.lang.Integer, String]
+       graph.foreach (x => m.put(new java.lang.Integer(x._1), x._2.toString))
        m
        }
     

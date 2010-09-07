@@ -4,16 +4,17 @@ import razie.base._
 
 //--------------- foundation 
 
-case class Key (val meta:String, val id:String)
+     class Key (val meta:String, val id:String)
 case class QKey (val q:Query) extends Key (q.meta, "")
 case class Query (val meta:String, val name:String, val args:String*)
 
-case class Entity (val key:Key) extends razie.AA {
+object Entity { def apply (k:Key) = new Entity (k) }
+class Entity (val key:Key) extends razie.AA {
    override def toString = "Entity: " + key + " - " + super.toString
 }
 
 trait IsSpec {
-	def make : Entity
+  def make : Entity
 }
 trait HasSpec {
    def specKey:Key
@@ -37,23 +38,23 @@ object Product {
 }
 
 
-     class Service (id:String, val specKey:Key) extends Entity (Key("Service", id)) with HasSpec
+     class Service (id:String, val specKey:Key) extends Entity (new Key("Service", id)) with HasSpec
 case class CFService (id:String, override val specKey:Key) extends Service (id,specKey) with HasSpec
 case class RFService (id:String, override val specKey:Key) extends Service (id,specKey) with HasSpec
-case class Product (id:String, val spec:ProductSpec) extends Entity (Key("Product", id)) with HasSpec {
+case class Product (id:String, val spec:ProductSpec) extends Entity (new Key("Product", id)) with HasSpec {
   def decompose : Seq[CFService] = Nil
   def specKey:Key = spec.key
 }
 
 //--------------- specs
 
-case class ServiceSpec (name:String) extends Entity (Key("SSpec", name)) with IsSpec {
+case class ServiceSpec (name:String) extends Entity (new Key("SSpec", name)) with IsSpec {
 	override def make = new Service ("", this.key)
  def actions : List[Action] = Nil 
 	def parms : List[Parm] = Nil
 }
      
-case class ProductSpec (name:String) extends Entity (Key("PSpec", name)) with IsSpec {
+case class ProductSpec (name:String) extends Entity (new Key("PSpec", name)) with IsSpec {
 	override def make () = new Product ("", this)
 
 	def actions : List[Action] = Nil 
@@ -62,7 +63,9 @@ case class ProductSpec (name:String) extends Entity (Key("PSpec", name)) with Is
 	def decompose : List[ServiceSpec] = Nil
 }
 
-case class Action (val name:String) {
+object Action { def apply (name:String) = new Action (name) }
+
+     class Action (val name:String) {
 	def apply[T<:Entity] (e:T, attr:String*) = new Item[T] (e, this) 
 	def apply[T<:Entity] (e:Key, attr:String*) = new Item (e, this)
 	def apply[T<:Entity] (e:Query, attr:String*) = new Item (QKey (e), this)
@@ -83,7 +86,7 @@ import Implicits._
 //---------------------------- orders
 
 case class Item [T<:Entity] (val entityKey:Key, val action:Action, val attr:String*) 
-   extends Entity (Key("Item", "")) {
+   extends Entity (new Key("Item", "")) {
 	var entity : Option[T] = None
 	
    def this (e:T, a:Action) = {
@@ -95,7 +98,7 @@ case class Item [T<:Entity] (val entityKey:Key, val action:Action, val attr:Stri
 }
 
 class Request[T<:Entity] (val items:Seq[Item[_<:T]]) 
-   extends Entity (Key("Request", ""))
+   extends Entity (new Key("Request", ""))
 
 case class Order[T<:Entity] (override val items:Seq[Item[T]]) extends Request (items) {
 	override def toString = "Order: " + items.mkString
@@ -103,7 +106,7 @@ case class Order[T<:Entity] (override val items:Seq[Item[T]]) extends Request (i
 
 //------------------------ gremlins
 
-class Wf extends Entity (Key("Wf", ""))
+class Wf extends Entity (new Key("Wf", ""))
 class BigWf
 
 //------------------------ specs

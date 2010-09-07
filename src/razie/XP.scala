@@ -34,7 +34,7 @@ class XPSolved [T] (val xp : XP[T], val ctx:XpSolver[T,Any]) {
 case class GPath (val expr:String) {
   // list of parsed elements
   lazy val elements =  
-    for (val e <- (expr split "/").filter(_!="")) 
+    for (e <- (expr split "/").filter(_!="")) 
       yield new XpElement(e)
   
   lazy val nonaelements = elements.filter(_.attr!="@")
