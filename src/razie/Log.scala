@@ -132,6 +132,10 @@ object Audit {
   def apply(f: => Any) = Log.audit (f.toString)
 }
 
+object Warn {
+  def apply(f: => Any) = Log.alarm (f.toString)
+}
+
 object Alarm {
   def apply(f: => Any) = Log.alarm (f.toString)
 }
