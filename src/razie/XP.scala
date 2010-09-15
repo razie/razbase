@@ -15,7 +15,8 @@ object XP {
 }
 
 /** 
- * Simple helper to simplify client code when the context doesn't change: it pairs an XP with a particular context/solver.
+ * Simple helper to simplify client code when the context doesn't change:
+ * it pairs an XP with a particular context/solver.
  * 
  * So you can just use it after creation and not worry about carrying both arround. 
  */

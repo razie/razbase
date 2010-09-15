@@ -7,7 +7,7 @@ package razie.xp.test
 
 import org.scalatest.junit._
 import org.scalatest.SuperSuite
-import razie.XP
+import razie.{ XP, DomXpSolver }
 
 /**
  * junit tests for the XP stuff
@@ -16,20 +16,20 @@ import razie.XP
  */
 class TestXpScalaXml extends JUnit3Suite {
 
-   def test41 = expect (List("a")) { xpl("/a").map(_.label) }
-   def test42 = expect (List("a")) { xpl("a").map(_.label) }
-   def test43 = expect (List("b1","b2")) { xpl("/a/b").map(x=>(x \ "@ba").toString) }
-   def test44 = expect (List("b1","b2")) { xpla("/a/b/@ba") }
-   def test45 = expect (List("c11","c12","c13")) { xpla("/a/b[@ba=='b1']/c/@ca") }
- 
-   def xpl (path:String) = XP forScala (path) xpl (TXXmls.x) 
-   def xpla(path:String) = XP forScala (path) xpla (TXXmls.x) 
- 
-// def test31 = expect (List("a")) { sx("/a").map(_.name) }
-// def test32 = expect (List("a")) { sx("a").map(_.name) }
-// def test33 = expect (List("b1","b2")) { sx("/a/b").map(_ a "ba") }
-// 
-// def sx(path:String) = new XP[RazElement] (path).xpl(new DomXqSolver, TXXmls.x) 
+  def test41 = expect(List("a")) { xpl("/a").map(_.label) }
+  def test42 = expect(List("a")) { xpl("a").map(_.label) }
+  def test43 = expect(List("b1", "b2")) { xpl("/a/b").map(x => (x \ "@ba").toString) }
+  def test44 = expect(List("b1", "b2")) { xpla("/a/b/@ba") }
+  def test45 = expect(List("c11", "c12", "c13")) { xpla("/a/b[@ba=='b1']/c/@ca") }
+
+  def xpl(path: String) = XP forScala (path) xpl (TXXmls.x)
+  def xpla(path: String) = XP forScala (path) xpla (TXXmls.x)
+
+  def test31 = expect(List("a")) { sx("/a").map(_.name) }
+  def test32 = expect(List("a")) { sx("a").map(_.name) }
+  def test33 = expect(List("b1", "b2")) { sx("/a/b").map(_ a "ba") }
+
+  def sx(path: String) = XP[razie.base.data.RazElement](path).xpl(new DomXpSolver, TXXmls.x)
 }
 
 object TXXmls {
@@ -46,5 +46,5 @@ object TXXmls {
         <c ca="c23"/>
       </b>
     </a>
-    }
+  }
 }
