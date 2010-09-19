@@ -21,6 +21,7 @@ class TestXpScalaXml extends JUnit3Suite {
   def test43 = expect(List("b1", "b2")) { xpl("/a/b").map(x => (x \ "@ba").toString) }
   def test44 = expect(List("b1", "b2")) { xpla("/a/b/@ba") }
   def test45 = expect(List("c11", "c12", "c13")) { xpla("/a/b[@ba=='b1']/c/@ca") }
+  def test46 = expect(List("b1", "b2")) { xpla("/*/*/@ba") }
 
   def xpl(path: String) = XP forScala (path) xpl (TXXmls.x)
   def xpla(path: String) = XP forScala (path) xpla (TXXmls.x)
