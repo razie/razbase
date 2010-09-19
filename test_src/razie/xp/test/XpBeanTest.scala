@@ -27,6 +27,9 @@ class XpBeanTest extends JUnit3Suite {
   def test9 = expect(List("a", "b")) { xpla("/l/@value") }
   def test0 = expect("s") { xpe("/j/a/s") }
   def testa = expect("s") { xpa("/j/@s") }
+  def testb = expect("s") { xpe("/j/*/s") }
+  def testc = expect(List("s", "s")) { xpl("/j/*/s") }
+
 
   def xpe(path: String) = XP[Any](path) using BeanXpSolver xpe root
   def xpl(path: String) = XP[Any](path).xpl(BeanXpSolver, root)

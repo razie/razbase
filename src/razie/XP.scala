@@ -5,6 +5,76 @@
  */
 package razie
 
+
+/** a simple resolver for x path like stuff 
+ * 
+ * can resolve the following expressions
+ * 
+ * /a/b/c
+ * /a/b/@c
+ * /a/b[cond]/...
+ * /a/{assoc}b[cond]/...
+ * 
+ * / a / * / c    - ignore one level: explore all possibilities for just that level
+ * 
+ * It differs from a classic xpath by having the {assoc} option. Useful when 
+ * navigating models that use assocations as well as composition. Using 
+ * "/a/{assoc}b" means that it will use association {assoc} to find the b starting 
+ * from a...
+ * 
+ * TODO the type system here is all gefuckt...need better understanding of variance in scala. 
+ * See this http://www.nabble.com/X-String--is-not-a-subtype-of-X-AnyRef--td23428970.html
+ * 
+ * Example usage: 
+ * <ul>
+ * <li> on Strings: XP("/root").xpl(new StringXpSolver, "/root")
+ * <li> on scala xml: XP[scala.xml.Elem] ("/root").xpl(new ScalaDomXpSolver, root) 
+ * </ul>
+ * 
+ * NOTE - this is stateless with respect to the parsed object tree - it only keeps the pre-compiled xpath expression so you should reuse them as much as possible
+ */
+case class XP[T](val gp: GPath) {
+  razie.Debug ("building XP with GPath: " + gp.elements.mkString("/"))
+  
+  /** return the matching list - solve this path starting with the root and the given solving strategy */
+  def xpl(ctx: XpSolver[T, Any], root: T): List[T] = {
+    gp.requireNotAttr
+    ixpl(ctx, root)
+  }
+
+  /** return the matching single element - solve this path starting with the root and the given solving strategy */
+  def xpe(ctx: XpSolver[T, Any], root: T): T = xpl(ctx, root).head
+
+  /** return the matching attribute - solve this path starting with the root and the given solving strategy */
+  def xpa(ctx: XpSolver[T, Any], root: T): String = {
+    gp.requireAttr
+    ctx.getAttr(ixpl(ctx, root).head, gp.elements.last.name)
+  }
+
+  /** return the list of matching attributes - solve this path starting with the root and the given solving strategy */
+  def xpla(ctx: XpSolver[T, Any], root: T): List[String] = {
+    gp.requireAttr
+    ixpl(ctx, root).map(ctx.getAttr(_, gp.elements.last.name))
+  }
+
+  /** if you'll keep using the same context there's no point dragging it around */
+  def using(ctx: XpSolver[T, Any]) = new XPSolved(this, ctx)
+
+  /** internal implementation - a simple fold */
+  private def ixpl(ctx: XpSolver[T, Any], root: T): List[T] =
+    for (e <- gp.nonaelements.foldLeft(List((root, List(root).asInstanceOf[Any])))((x, xe) => solve(xe, ctx, x).asInstanceOf[List[(T, Any)]])) yield e._1
+
+  // -------------------------- these were in XPElement 
+
+  /** from res get the path and then reduce with condition looking for elements */
+  private def solve(xe: XpElement, ctx: XpSolver[T, Any], res: List[(T, Any)]): List[(T, Any)] =
+    for (e <- res; x <- ctx.reduce(ctx.getNext(e, xe.name, xe.assoc), xe.cond)) yield x
+
+  /* looking for an attribute */
+  private def solvea(xe: XpElement, ctx: XpSolver[Any, Any], res: Any): String =
+    ctx.getAttr(res, xe.name)
+}
+
 /** Example of creating a dedicated solver */
 object XP {
   def forScala(xpath: String) = XP[scala.xml.Elem](xpath) using ScalaDomXpSolver
@@ -12,6 +82,11 @@ object XP {
   def forBean(xpath: String) = XP[Any](xpath) using BeanXpSolver
 
   def apply[T](expr: String) = { new XP[T](GPath(expr)) }
+
+  /** TODO make it private */
+  def stareq (what:String, tag:String) = 
+    if ("*" == tag) true
+    else what == tag
 }
 
 /** 
@@ -46,73 +121,6 @@ case class GPath(val expr: String) {
   def requireNotAttr =
     if (elements.size > 0 && elements.last.attr == "@")
       throw new IllegalArgumentException("ERR_XP result should be entity but it's an attribute...")
-}
-
-/** a simple resolver for x path like stuff 
- * 
- * can resolve the following expressions
- * 
- * /a/b/c
- * /a/b/@c
- * /a/b[cond]/...
- * /a/{assoc}b[cond]/...
- * 
- * It differs from a classic xpath by having the {assoc} option. Useful when 
- * navigating models that use assocations as well as composition. Using 
- * "/a/{assoc}b" means that it will use association {assoc} to find the b starting 
- * from a...
- * 
- * TODO the type system here is all gefuckt...need better understanding of variance in scala. 
- * See this http://www.nabble.com/X-String--is-not-a-subtype-of-X-AnyRef--td23428970.html
- * 
- * Example usage: 
- * <ul>
- * <li> on Strings: XP("/root").xpl(new StringXpSolver, "/root")
- * <li> on scala xml: XP[scala.xml.Elem] ("/root").xpl(new ScalaDomXpSolver, root) 
- * </ul>
- * 
- * NOTE - this is stateless with respect to the parsed object tree - it only keeps the pre-compiled xpath expression so you should reuse them as much as possible
- */
-case class XP[T](val gp: GPath) {
-
-  /** return the matching list solve this path starting with the root and the given solving strategy */
-  def xpl(ctx: XpSolver[T, Any], root: T): List[T] = {
-    gp.requireNotAttr
-    ixpl(ctx, root)
-  }
-
-  /** return the matching list solve this path starting with the root and the given solving strategy */
-  def xpe(ctx: XpSolver[T, Any], root: T): T = xpl(ctx, root).head
-
-  /** return the matching attribute solve this path starting with the root and the given solving strategy */
-  def xpa(ctx: XpSolver[T, Any], root: T): String = {
-    gp.requireAttr
-    ctx.getAttr(ixpl(ctx, root).head, gp.elements.last.name)
-  }
-
-  /** return the list of matching attribute solve this path starting with the root and the given solving strategy */
-  def xpla(ctx: XpSolver[T, Any], root: T): List[String] = {
-    gp.requireAttr
-    ixpl(ctx, root).map(ctx.getAttr(_, gp.elements.last.name))
-  }
-
-  /** if you'll keep using the same context there's no point dragging it around */
-  def using(ctx: XpSolver[T, Any]) = new XPSolved(this, ctx)
-
-  /** return the matching list solve this path starting with the root and the given solving strategy */
-  private def ixpl(ctx: XpSolver[T, Any], root: T): List[T] =
-    for (e <- gp.nonaelements.foldLeft(List((root, List(root).asInstanceOf[Any])))((x, xe) => solve(xe, ctx, x).asInstanceOf[List[(T, Any)]])) yield e._1
-
-  // -------------------------- these were in XPElement 
-
-  /** from res get the path and then reduce with condition looking for elements */
-  private def solve(xe: XpElement, ctx: XpSolver[T, Any], res: List[(T, Any)]): List[(T, Any)] =
-    for (e <- res; x <- ctx.reduce(ctx.getNext(e, xe.name, xe.assoc), xe.cond)) yield x
-
-  /* looking for an attribute */
-  private def solvea(xe: XpElement, ctx: XpSolver[Any, Any], res: Any): String =
-    ctx.getAttr(res, xe.name)
-
 }
 
 /** overwrite this if you want other scriptables for conditions...it's just a syntax marker */
@@ -192,6 +200,8 @@ protected class XpElement(val expr: String) {
     case s: String => { val p = """\{(\w)\}""".r; val p(aa) = s; aa }
     case _ => assoc_
   }
+  
+  override def toString = List(assoc_, attr, name, scond) mkString ","
 }
 
 /** this example resolves strings with the /x/y/z format */
@@ -210,6 +220,7 @@ object StringXpSolver extends XpSolver[String, List[String]] {
   // there is no solver in a string, eh?
   override def reduce[T >: String, U >: List[String]](o: Iterable[(T, U)], cond: XpCond): Iterable[(T, U)] =
     o
+    
 }
 
 /** this resolves dom trees*/
@@ -217,7 +228,7 @@ import razie.base.data.RazElement
 
 class DomXpSolver extends XpSolver[RazElement, List[RazElement]] {
   override def getNext[T >: RazElement, U >: List[RazElement]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] = {
-    val n = o._2.asInstanceOf[List[RazElement]] filter (_.name == tag)
+    val n =  o._2.asInstanceOf[List[RazElement]] filter (zz => XP.stareq (zz.name, tag))
     for (e <- n) yield (e, e.children.asInstanceOf[U])
   }
 
@@ -228,7 +239,7 @@ class DomXpSolver extends XpSolver[RazElement, List[RazElement]] {
 /** this resolves dom trees*/
 object ScalaDomXpSolver extends XpSolver[scala.xml.Elem, List[scala.xml.Elem]] {
   override def getNext[T >: scala.xml.Elem, U >: List[scala.xml.Elem]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] =
-    o._2.asInstanceOf[List[scala.xml.Elem]].filter(_.label == tag).map(x => { val t = (x.asInstanceOf[T], children(x).toList.asInstanceOf[U]); println("t=" + t); t }).toList
+    o._2.asInstanceOf[List[scala.xml.Elem]].filter(zz => XP.stareq(zz.label, tag)).map(x => { val t = (x.asInstanceOf[T], children(x).toList.asInstanceOf[U]); println("t=" + t); t }).toList
 
   override def getAttr[T >: scala.xml.Elem](o: T, attr: String): String =
     (o.asInstanceOf[scala.xml.Elem] \ ("@" + attr)) text
@@ -244,17 +255,26 @@ object BeanXpSolver extends XpSolver[AnyRef, List[AnyRef]] {
   override def getNext[T >: AnyRef, U >: List[AnyRef]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
     val n = resolve(o._1.asInstanceOf[AnyRef], tag)
 
-    for (x <- razie.MOLD(n)) yield (x.asInstanceOf[T], List())
+    for (x <- n; y <- razie.MOLD(x)) yield (y.asInstanceOf[T], List())
   }
 
   override def getAttr[T >: AnyRef](o: T, attr: String): String = {
-    resolve(o.asInstanceOf[AnyRef], attr).toString
+    resolve(o.asInstanceOf[AnyRef], attr).head.toString
   }
 
   //   override def reduce[T>:scala.xml.Elem,U>:List[scala.xml.Elem]] (o:Iterable[(T,U)],cond:XpCond) : Iterable[(T,U)] = 
 
   // attr can be: field name, method name (with no args) or property name */
-  def resolve(o: AnyRef, attr: String): Any = {
+  def resolve(o: AnyRef, attr: String) : List[Any] = {
+    razie.Debug ("Resolving: " + attr)
+    val result =  if ("*" == attr) {
+      // match all the fields of the class
+      // TODO use getXXX as well
+      // TODO restrict them by type or patter over type
+      // TODO make lazy
+      val result = o.getClass.getFields.map(_.get(o))
+      result.toList
+    } else {
     // java getX scala x or member x
     val m: java.lang.reflect.Method = try {
       o.getClass.getMethod("get" + toZ(attr))
@@ -282,6 +302,9 @@ object BeanXpSolver extends XpSolver[AnyRef, List[AnyRef]] {
       case _ => null
     }
 
+    List(result)
+    }
+    razie.Debug ("resolved: " + result.mkString)
     result
   }
 
