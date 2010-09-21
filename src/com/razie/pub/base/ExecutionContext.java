@@ -63,6 +63,7 @@ public class ExecutionContext extends AttrAccessImpl {
                                                                 .synchronizedMap(new HashMap<Thread, ExecutionContext>());
 
    public static ExecutionContext               DFLT_CTX  = new ExecutionContext(null);
+   public static ExecutionContext               DEFAULT  = DFLT_CTX;
 
    // these locals are cleaned upon current thread exiting the context
    List<String>                                 locals    = new ArrayList<String>();

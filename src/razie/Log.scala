@@ -33,7 +33,7 @@ class PbLog(component: String, category: String) extends Log {
     if (pbl.isTraceLevel(1)) pbl.trace(1, { val x = f; x.toString })
   override def log(msg: String, t: Throwable = null) = pbl.log(msg, t)
   override def alarm(msg: String, t: Throwable = null) = pbl.alarm(msg, t)
-  override def audit(msg: String, t: Throwable = null) = pbl.log("AUDIT:" + msg, t)
+  override def audit(msg: String, t: Throwable = null) = pbl.log("AUDIT: " + msg, t)
   override def error(msg: String, t: Throwable = null) = pblog.Log.alarmThisAndThrow(msg, t)
 }
 
@@ -41,7 +41,7 @@ class RaziepbLog extends Log {
   override def trace(f: => Any) = pblog.Log.traceThis ({ val x = f; x.toString })
   override def log(msg: String, t: Throwable = null) = pblog.Log.logThis (msg, t)
   override def alarm(msg: String, t: Throwable = null) = pblog.Log.alarmThis (msg, t)
-  override def audit(msg: String, t: Throwable = null) = pblog.Log.logThis ("AUDIT:" + msg, t)
+  override def audit(msg: String, t: Throwable = null) = pblog.Log.logThis ("AUDIT: " + msg, t)
   override def error(msg: String, t: Throwable = null) = pblog.Log.alarmThisAndThrow(msg, t)
 }
 

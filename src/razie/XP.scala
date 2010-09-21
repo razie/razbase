@@ -6,7 +6,7 @@
 package razie
 
 
-/** a simple resolver for x path like stuff 
+/** a simple resolver for x path like stuff. note the limitation at the bottom
  * 
  * can resolve the following expressions
  * 
@@ -18,7 +18,7 @@ package razie
  * / a / * / c    - ignore one level: explore all possibilities for just that level
  * 
  * It differs from a classic xpath by having the {assoc} option. Useful when 
- * navigating models that use assocations as well as composition. Using 
+ * navigating models that use assocations as well as composition (graphs). Using 
  * "/a/{assoc}b" means that it will use association {assoc} to find the b starting 
  * from a...
  * 
@@ -31,7 +31,14 @@ package razie
  * <li> on scala xml: XP[scala.xml.Elem] ("/root").xpl(new ScalaDomXpSolver, root) 
  * </ul>
  * 
- * NOTE - this is stateless with respect to the parsed object tree - it only keeps the pre-compiled xpath expression so you should reuse them as much as possible
+ * NOTE - this is stateless with respect to the parsed object tree - it only keeps the pre-compiled xpath 
+ * expression so you should reuse them as much as possible
+ * 
+ * Note that this is a limited play-type thing. There are full XPATH implementations to browse stuff, 
+ * like Apache's JXpath. 
+ * 
+ * The main features of this implementation are: 1) small and embeddable 2) works for most every-day things and 
+ * 3) extensiblity: you can easily plugin resolvers.
  */
 case class XP[T](val gp: GPath) {
   razie.Debug ("building XP with GPath: " + gp.elements.mkString("/"))
@@ -63,8 +70,6 @@ case class XP[T](val gp: GPath) {
   /** internal implementation - a simple fold */
   private def ixpl(ctx: XpSolver[T, Any], root: T): List[T] =
     for (e <- gp.nonaelements.foldLeft(List((root, List(root).asInstanceOf[Any])))((x, xe) => solve(xe, ctx, x).asInstanceOf[List[(T, Any)]])) yield e._1
-
-  // -------------------------- these were in XPElement 
 
   /** from res get the path and then reduce with condition looking for elements */
   private def solve(xe: XpElement, ctx: XpSolver[T, Any], res: List[(T, Any)]): List[(T, Any)] =
