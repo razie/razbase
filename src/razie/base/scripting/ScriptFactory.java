@@ -5,6 +5,8 @@
  */
 package razie.base.scripting;
 
+import razie.base.ActionContext;
+
 /**
  * minimal factory to decouple scripting
  * 
@@ -30,8 +32,10 @@ public class ScriptFactory {
     }
 
     /** make a new context, using the global as parent - all contexts can mess with the global one */
-    public static ScriptContext mkContext (ScriptContext... parent) {
-        return auto().mkContextImpl(parent.length > 0 && parent[0] != null ? parent[0] : ScriptContextImpl.global());
+    public static ScriptContext mkContext (String lang, ActionContext... parent) {
+        return auto().mkContextImpl(
+            lang, 
+            parent.length > 0 && parent[0] != null ? parent[0] : ScriptContextImpl.global());
     }
 
     // TODO make protected
@@ -40,7 +44,7 @@ public class ScriptFactory {
     }
     
     // TODO make protected
-    public ScriptContext mkContextImpl(ScriptContext parent) {
+    public ScriptContext mkContextImpl(String lang, ActionContext parent) {
         return new ScriptContextImpl (parent);
     }
 }

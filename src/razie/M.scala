@@ -233,15 +233,15 @@ object M {
    }
    
    def sort[A] (x:M[A], lt:(A,A) => Boolean) : List[A] = x.toList.sort(lt)
-
-   def minmax[A] (x:M[A], lt:(A,A) => Boolean) : Option[A] = {
-      // TODO optimize - how to stop filter ?
-      class State[A] {var s:Option[A] = firstOpt(x)}
-      val state = new State[A]()
-      val f = (s:State[A], y:A) => {if (s.s.isDefined) false else {if (cond(y)) {s.s=Some(y); true} else false} }
-      val m = x.filter (f (state, _))
-      state.s
-   }
+//
+//   def minmax[A] (x:M[A], lt:(A,A) => Boolean) : Option[A] = {
+//      // TODO optimize - how to stop filter ?
+//      class State[A] {var s:Option[A] = firstOpt(x)}
+//      val state = new State[A]()
+//      val f = (s:State[A], y:A) => {if (s.s.isDefined) false else {if (cond(y)) {s.s=Some(y); true} else false} }
+//      val m = x.filter (f (state, _))
+//      state.s
+//   }
 }
 
 /** my first ugly attempt - not type-safe */
