@@ -6,6 +6,7 @@
 package razie
 
 import java.{lang => jl}
+import java.util.{concurrent => juc}
 
 
 /** multithreading helpers, to tie me over until I learn to effectively exploit actors or other 
@@ -14,7 +15,8 @@ import java.{lang => jl}
  */
 object Threads {
 
-   /** fork a bunch of threads, then join them and return the results...all within a timeout */
+   /** fork a bunch of threads, then join them and return the results...all within a timeout. 
+    * The return should have an element for each input that finished in time... */
    def forkjoinWithin[A,B>:Null<:AnyRef] (msec:Int)(as:Iterable[A]) (f:A =>B) : Iterable[B] = {
       val threads = (for (a <- as) yield new FuncValThread (a, f)).toList
       threads.foreach (_.start())
@@ -23,8 +25,8 @@ object Threads {
       threads.map (_.res).toList // use toList since the iterable may not be strict
    }
 
-   def forkWithin (msec:Int) (f: =>Unit) : java.lang.Thread = {
-      val thread = new java.lang.Thread(new java.lang.Runnable() {
+   def forkWithin (msec:Int) (f: =>Unit) : jl.Thread = {
+      val thread = new jl.Thread(new jl.Runnable() {
          override def run() = {
             f
          }
@@ -36,6 +38,17 @@ object Threads {
       thread
    }
    
+   /** make a promise and start it in the background */
+   def promise[A] (f: => A) : juc.Future[A] = {
+     val callable = new juc.Callable[A] {
+       override def call() = f
+     }
+     val fut = new juc.FutureTask[A] (callable)
+      val thread = new jl.Thread(fut)
+      thread.start()
+      fut
+   }
+
    /** run a func in its own, separate thread - don't wait for result */
    def fork (f: =>Unit) : java.lang.Thread = {
       val thread = new java.lang.Thread(new java.lang.Runnable() {
