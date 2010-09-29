@@ -67,7 +67,7 @@ trait WRGraph[N <: GNode[N, L], L <: GLink[N]] extends GNode[N, L] { this: N =>
     this
   }
 
-  /** par depy a -> (b,c) */
+  /** add a new par depy a -> (b,c) */
   def +->[T <: N](z: Seq[T])(implicit linkFactory: LFactory): N = {
     glinks = glinks.toList.asInstanceOf[List[L]] ::: z.map(linkFactory(this, _)).toList
     this
