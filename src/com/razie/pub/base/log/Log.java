@@ -28,11 +28,12 @@ public class Log {
 
    private String category;
    private String component;
-   public static String program = "dflt";
+//   public static String program = "dflt";
    public static int MAXLOGS = 1000;
    public static String[] lastLogs = new String[MAXLOGS];
    public static int curLogLine = 0;
    public static boolean DEBUGGING = true;
+   public static boolean SILENT = false;
 
    public Log(String componentNm, String categoryNm) {
       this.category = categoryNm;
@@ -91,17 +92,22 @@ public class Log {
    }
 
    public void log(Object... o) {
+     ilog ("LOG", o);
+   }
+   
+   protected void ilog(String cat, Object... o) {
       String m = "";
       for (int i = 0; i < o.length; i++) {
          m += o[i].toString();
       }
 
-      String msg = "LOG-" + program + "-" + component + "-" + category + ": " + m;
+//      String msg = program + "-" + component + "-" + category + ": " + m;
+      String msg = component + "-" + category + cat + ": " + m;
       System.out.println(msg);
    }
 
    public void alarm(String m, Throwable... e) {
-      log(m + (e.length <= 0 ? "" : getStackTraceAsString(e[0])));
+      ilog("ALARM", m + (e.length <= 0 ? "" : getStackTraceAsString(e[0])));
    }
 
    /**
@@ -114,16 +120,16 @@ public class Log {
          for (int i = 0; i < o.length; i++) {
             m += (o[i] == null ? "null" : o[i].toString());
          }
-         log(m);
+         ilog("DEBUG", m);
       }
    }
 
    public boolean isTraceLevel(int l) {
-      return DEBUGGING;
+      return DEBUGGING && !SILENT;
    }
 
    public static boolean isTraceOn() {
-      return DEBUGGING;
+      return DEBUGGING && !SILENT;
    }
 
    public static void logThis(String m) {
@@ -132,11 +138,11 @@ public class Log {
 
    // TODO 2-1 implement the separate audit facility
    public static void audit(String m) {
-      logger.log("AUDIT: " + m);
+      logger.ilog("AUDIT", m);
    }
 
    public static void audit(String m, Throwable t) {
-      logger.log("AUDIT: " + m, t);
+      logger.log("AUDIT", m, t);
    }
 
    public static void traceThis(String m) {
@@ -260,7 +266,7 @@ public class Log {
    }
 
    public static Factory factory = initFactory();
-   public static Log logger = factory.create("?", "DFLTLOG");
+   public static Log logger = factory.create("?", "?");
 
    public static Log create(String component, String categoryName) {
       return factory.create(component, categoryName);

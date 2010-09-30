@@ -46,25 +46,34 @@ class RaziepbLog extends Log {
 }
 
 class StupidLog extends Log {
-  private def th = Thread.currentThread.getName + " " 
-  override def trace(f: => Any) = println ("DEBUG: " +th+ f)
-  override def log(msg: String, t: Throwable = null) = println ("LOG: " +th+ msg + t)
-  override def alarm(msg: String, t: Throwable = null) = println ("ALARM: " +th+ msg, t)
-  override def audit(msg: String, t: Throwable = null) = println ("AUDIT: " +th+ msg, t)
-  override def error(msg: String, t: Throwable = null) = { println("ERROR: " + th+msg, t); throw t }
+  private def th = Thread.currentThread.getName + " "
+  override def trace(f: => Any) = println ("DEBUG: " + th + f)
+  override def log(msg: String, t: Throwable = null) = println ("LOG: " + th + msg + t)
+  override def alarm(msg: String, t: Throwable = null) = println ("ALARM: " + th + msg, t)
+  override def audit(msg: String, t: Throwable = null) = println ("AUDIT: " + th + msg, t)
+  override def error(msg: String, t: Throwable = null) = { println("ERROR: " + th + msg, t); throw t }
+}
+
+class SILENTLOG extends Log {
+  private def th = Thread.currentThread.getName + " "
+  override def trace(f: => Any) = {}
+  override def log(msg: String, t: Throwable = null) = {}
+  override def alarm(msg: String, t: Throwable = null) = println ("ALARM: " + th + msg, t)
+  override def audit(msg: String, t: Throwable = null) = println ("AUDIT: " + th + msg, t)
+  override def error(msg: String, t: Throwable = null) = { println("ERROR: " + th + msg, t); throw t }
 }
 
 // TODO WTF - I can't use the Log object directly WTF...F..F..F..
 object NewLog {
 
   val fuckers = 3
-  
+
   // respect the Log.factory.create signature
   val factory = new Object {
     def create(component: String, category: String) = new PbLog(component, category)
   }
   def create(component: String, category: String) = new PbLog(component, category)
-  
+
 }
 
 /** some logging basics 
@@ -73,16 +82,16 @@ object NewLog {
  */
 object Log extends Log {
   // overwrite/change this to use different logging mechanism
-  var impl = new RaziepbLog()
+  var impl : Log = new RaziepbLog()
 
   val fuckers = 3
-  
+
   // respect the Log.factory.create signature
-  val factory = new Object {
+  var factory = new Object {
     def create(component: String, category: String) = new PbLog(component, category)
   }
   def create(component: String, category: String) = new PbLog(component, category)
-  
+
   override def trace(f: => Any) = impl.trace(f)
   override def log(msg: String, t: Throwable = null) = impl.log(msg, t)
   override def alarm(msg: String, t: Throwable = null) = impl.alarm(msg, t)
@@ -125,10 +134,23 @@ object Log extends Log {
 
 }
 
-object Debug {
-  def apply(f: => Any) = Log.traceThis (f)
-}
-
 object Audit {
   def apply(f: => Any) = Log.audit (f.toString)
 }
+
+object Debug {
+  def apply(f: => Any) = Log.trace(f)
+}
+
+object Warn {
+  def apply(f: => Any) = Log.alarm (f.toString)
+}
+
+object Alarm {
+  def apply(f: => Any) = Log.alarm (f.toString)
+}
+
+object Error {
+  def apply(f: => Any) = Log.error (f.toString)
+}
+
