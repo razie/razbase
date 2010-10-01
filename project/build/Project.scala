@@ -1,7 +1,12 @@
 import sbt._
 
 class Project(info: ProjectInfo) extends ParentProject(info) {
-  // need to use defs for dependencies - thejy're used in sub-projects
+
+  override def managedStyle = ManagedStyle.Maven
+  val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
+  Credentials(Path.userHome / ".ivy2.credentials", log)
+    
+    // need to use defs for dependencies - thejy're used in sub-projects
   def scalatest = "org.scalatest" % "scalatest" % "1.2"
   def junit = "junit" % "junit" % "4.5"
 
