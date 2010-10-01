@@ -1,0 +1,25 @@
+//select the following defs and issue "run selection"
+class Num (val i:Int) {
+           def + (other:Num) = new Num (this.i + other.i)
+  override def toString      = "Numero " + i.toString
+}
+
+object Num { // this lets you do Num(3) instead of new Num(3)
+  def apply (i:Int) = new Num (i)
+}
+
+implicit def toNum (i:Int) = Num (i) // this makes the conversion implicit
+
+def add (i:Num*) = { // varargs
+  val ss = "12344"
+  var ii = Num(0)
+  for (k <- i) ii = ii + k                  // boo hoo - the way of the java...
+  assert (ii == i.foldLeft (Num(0)) (_+_))  // woo hoo - the way of the lambda ...
+  ii
+  }
+
+//move cursor to following line and issue "run line"
+add (1+2, 8/4) // see the implicit conversion?
+
+//move cursor to end of following line and press ctrl+space for content assist
+java.lang.Sys
