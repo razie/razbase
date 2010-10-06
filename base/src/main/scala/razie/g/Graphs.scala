@@ -29,36 +29,49 @@ trait GLink[N <: GNode[_, _]] {
 //---------------------------- smart graphs of nodes, each node is a sub-graph with embedded structure
 
 /** smart graph, each node is a sub-graph of "child" nodes and links */
-trait GNode[N <: GNode[N, L], L <: GLink[N]] { 
-this: N =>
+trait GNode[N <: GNode[N, L], L <: GLink[N]] { this: N =>
   def glinks: Seq[L] // by convention, all links with a == this
 
   def mkString = Graphs.mkString[N, L](this)
 }
 
-/** a modifyable graph */
+/** a modifyable graph - use the defined operators to change it */
 trait WRGraph[N <: GNode[N, L], L <: GLink[N]] extends GNode[N, L] { this: N =>
 
   type LFactory = (N, N) => L
   type LVFactory[C <: Any] = (N, N, C) => L
+  type W = WRGraph[N, L]
 
-//  def gnodes_=(s: Seq[N])
+  //  def gnodes_=(s: Seq[N])
   def glinks_=(s: Seq[L]) // by convention, all links with a == this
 
-  /** reroute */
+  /** reroute all links to z - x --> y --> z doens't mean what you may think, see --: */
   def -->[T <: N](z: T)(implicit linkFactory: LFactory): N = {
     glinks = linkFactory(this, z) :: Nil
     this
+  }
+
+  /** reroute - this allows x --: y --: z to mean what you thinbk it should */
+  def --:[T <: W](z: T)(implicit linkFactory: LFactory): T = {
+    z.glinks = linkFactory(z.asInstanceOf[N], this) :: Nil
+    z
   }
 
   /** reroute */
   //  def <-- [T<:WRGraph[N,L]] (z:T)(implicit linkFactory: LFactory) : N =  z --> (this)
   //  def <-+ [T<:WRGraph[N,L]] (z:T)(implicit linkFactory: LFactory) : N =  z +-> (this)
 
+  /** add link to z - x +-> y --> z doens't mean what you may think, see +-: */
   /** add a new dependency */
   def +->[T <: N](z: T)(implicit linkFactory: LFactory): N = {
     glinks = glinks.toList.asInstanceOf[List[L]] ::: List(linkFactory(this, z))
     this
+  }
+
+  /** add a new dependency - this allows x +- y -- z to mean what you thinbk it should */
+  def +-:[T <: W](z: T)(implicit linkFactory: LFactory): T = {
+    z.glinks = z.glinks.toList.asInstanceOf[List[L]] ::: List(linkFactory(z.asInstanceOf[N], this))
+    z
   }
 
   /** par depy a -> (b,c) */
@@ -72,6 +85,7 @@ trait WRGraph[N <: GNode[N, L], L <: GLink[N]] extends GNode[N, L] { this: N =>
     glinks = glinks.toList.asInstanceOf[List[L]] ::: z.map(linkFactory(this, _)).toList
     this
   }
+
 }
 
 /** this is a filtered graph - a subgraph, see Graphs.colored */
@@ -87,6 +101,8 @@ trait GraphLike[N <: GNode[N, L], L <: GLink[N]] {
     iforeach (root, None, fn, fl, 0)
 
   protected def iforeach(n: N, from: Option[L], fn: (N, Int) => Unit, fl: (L, Int) => Unit, level: Int) {
+    if (Graphs.maxDebugDepth > 0 && level >= Graphs.maxDebugDepth)
+      throw new IllegalStateException("Maximum depth reached in graph: " + Graphs.maxDebugDepth + " reset Graphs.maxDebugDepth...")
     if (colored (n)) {
       fn(n, level)
       n.glinks.foreach(l => { fl(l, level); iforeach(l.z, Option(l), fn, fl, level + 1) })
@@ -114,33 +130,29 @@ trait GraphLike[N <: GNode[N, L], L <: GLink[N]] {
     s.toString
   }
 
+  def filterNodes(f: N => Boolean): Seq[N] = {
+    val ret = razie.Listi[N]
+    foreach ((x: N, v: Int) => { if (f(x)) ret append x }, (l: L, v: Int) => {})
+    ret
+  }
+
   // TODO this is just mean...
   def pt(s: String, i: Int) = (Range(0, i).map(k => s)).mkString
 
   def indexed = new IndexedGraphLike[N, L](this)
+  def dag = new NoCyclesGraphLike[N, L](this)
+  def depth(maxDepth: Int) = new DepthGraphLike[N, L](maxDepth)(this)
 }
 
-/** index the graph: count the entries to each node...then I can traverse each node just once */
-class IndexedGraphLike[N <: GNode[N, L], L <: GLink[N]](target: GraphLike[N, L]) extends GraphLike[N, L] {
-  import scala.collection.mutable
-
-  def root: N = target.root
-  def colored: N => Boolean = target.colored
-
-  val index = new mutable.HashMap[Any, mutable.ListBuffer[L]]()
+/** DAG - avoids cycles, if any...then I can traverse each node AND LINK just once */
+class IndexedGraphLike[N <: GNode[N, L], L <: GLink[N]] (target: GraphLike[N, L]) 
+extends NoCyclesGraphLike[N, L] (target) {
 
   // index it
   // TODO should warn if the graph is too big...how the heck do i find that out?
   var collecting = true
   foreach (notin, { (l: L, i: Int) => collect (l.z, Option(l)) })
   collecting = false
-
-  private def collect(n: N, into: Option[L]) =
-    if (index contains n)
-      index(n) += into.get
-    else
-      index put (n,
-        into.map (mutable.ListBuffer[L](_)) getOrElse mutable.ListBuffer[L]())
 
   override protected def iforeach(n: N, from: Option[L], fn: (N, Int) => Unit, fl: (L, Int) => Unit, level: Int) {
     if (colored (n) && (from.isDefined && index.get(n).isDefined &&
@@ -151,11 +163,66 @@ class IndexedGraphLike[N <: GNode[N, L], L <: GLink[N]](target: GraphLike[N, L])
       n.glinks.foreach(l => { fl(l, level); iforeach(l.z, Option(l), fn, fl, level + 1) })
     }
   }
+}
 
+/** then I can traverse each node just once */
+class NoCyclesGraphLike[N <: GNode[N, L], L <: GLink[N]](target: GraphLike[N, L]) extends GraphLike[N, L] {
+  import scala.collection.mutable
+
+  def root: N = target.root
+  def colored: N => Boolean = target.colored
+
+  val index = new mutable.HashMap[Any, mutable.ListBuffer[L]]()
+
+  protected def collect(n: N, from: Option[L]) =
+    if (index contains n)
+      index(n) += from.get
+    else
+      index put (n,
+        from.map (mutable.ListBuffer[L](_)) getOrElse mutable.ListBuffer[L]())
+
+  protected def isNodeCollected(n: N) = index.get(n).isDefined
+
+  protected def isCollected(n: N, from: Option[L]) =
+    from.isDefined &&
+      index.get(n).isDefined &&
+      index(n).filter(ll => ll == from.get).headOption.isDefined
+
+  override protected def iforeach(n: N, from: Option[L], fn: (N, Int) => Unit, fl: (L, Int) => Unit, level: Int) {
+    if (Graphs.maxDebugDepth > 0 && level >= Graphs.maxDebugDepth)
+      throw new IllegalStateException("Maximum depth reached in graph: " + Graphs.maxDebugDepth + " reset Graphs.maxDebugDepth...")
+    if (colored (n) && !isCollected (n, from)) {
+      if (!isNodeCollected(n))
+        fn(n, level)
+      collect (n, from)
+      n.glinks.filter(x => !isCollected(n,Option(x))).foreach(l => { 
+        fl(l, level)
+        iforeach(l.z, Option(l), fn, fl, level + 1) 
+        })
+    }
+  }
+
+}
+
+/** depth-limited graph - use for debugging cyclical dependencies - will throw up if more than X levelx */
+class DepthGraphLike[N <: GNode[N, L], L <: GLink[N]](max: Int)(target: GraphLike[N, L]) extends GraphLike[N, L] {
+  import scala.collection.mutable
+
+  def root: N = target.root
+  def colored: N => Boolean = target.colored
+
+  override protected def iforeach(n: N, from: Option[L], fn: (N, Int) => Unit, fl: (L, Int) => Unit, level: Int) {
+    if (level >= max)
+      throw new IllegalStateException("Maximum depth reached in graph: " + max)
+    super.iforeach (n, from, fn, fl, level)
+  }
 }
 
 /** traversal helpers */
 object Graphs {
+  /** set this to > 0 to limit all recursion for debug purposes */
+  var maxDebugDepth = -1
+
   // TODO make this work - the types don't work right now...
   implicit def toGraphLike[N <: GNode[N, L], L <: GLink[N]](root: N)(implicit mn: Manifest[N], ml: Manifest[L]) = entire[N, L] (root)
 
@@ -170,12 +237,8 @@ object Graphs {
     entire[N, L] (n) foreach (fn, fl)
   }
 
-  def filterNodes[N <: GNode[N, L], L <: GLink[N]](n: N)(f: N => Boolean): Seq[N] = {
-    val ret = razie.Listi[N]
-    Graphs.foreach(n, (x: N, v: Int) => { if (f(x)) ret append x }, (l: L, v: Int) => {},
-      0)
-    ret
-  }
+  def filterNodes[N <: GNode[N, L], L <: GLink[N]](n: N)(f: N => Boolean): Seq[N] =
+    entire[N, L] (n) filterNodes (f)
 
   class CGL[N <: GNode[N, L], L <: GLink[N]](val root: N, val colored: N => Boolean)
     extends GraphLike[N, L]

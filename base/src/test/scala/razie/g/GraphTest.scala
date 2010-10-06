@@ -83,5 +83,44 @@ class GraphTest extends JUnit3Suite with ShouldMatchers {
     println (Graphs.entire[MyN, MyL] (g1).indexed.index)
     (Graphs.entire[MyN, MyL] (g1).indexed.foreachNode (c1.count), c1)._2.c
   }
+  
+  // avoid loops
+  val g2 = x
+  val g3 = x --: g2 --: y --: g2
+  def testrec2 = expect (false) {
+    try {
+      println (Graphs.entire[MyN, MyL] (g3).mkString)
+      true
+    } catch {
+      case _ => false
+    } 
+  }
+  def testrec3 = expect (true) {
+    try {
+      println ("RECURSIVE MAMA" + Graphs.entire[MyN, MyL] (g3).dag.mkString)
+      true
+    } catch {
+      case _ => false
+    }
+  }
+  
+  val glarge1 = x --: x --: x --: x --: y
+  def testglarge1 = expect (false) {
+    try {
+      println (Graphs.entire[MyN, MyL] (glarge1).depth(3).mkString)
+      true
+    } catch {
+      case _ => false
+    } 
+  }
+  def testglarge2 = expect (true) {
+    try {
+      println ("LARGE MAMA" + Graphs.entire[MyN, MyL] (glarge1).depth(10).mkString)
+      true
+    } catch {
+      case _ => false
+    }
+  }
+  
 
 }

@@ -20,9 +20,12 @@ Here's how to build it:
 3. checkout the following projects
 
    cd ${w}
-   git clone git@github.com:razie/razxml.git
    git clone git@github.com:razie/razbase.git
 
+Note: if you don't have a github ssh key setup, use the anonymous checkout:
+
+    git clone http://github.com/razie/razbase.git
+            
 4. sbt build
 
    for ff in "razxml razbase "
