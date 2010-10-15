@@ -24,7 +24,7 @@ import com.razie.pub.http.LightServer;
  * 
  * @author razvanc99
  */
-public class TestLightBase extends TestCase {
+public class LightBaseTest extends TestCase {
    protected LightServer         server;
    protected Thread              serverThread;
 
@@ -82,5 +82,5 @@ public class TestLightBase extends TestCase {
       }
    }
 
-   static final Log logger = Log.create(TestLightBase.class.getName());
+   static final Log logger = Log.create(LightBaseTest.class.getName());
 }

@@ -112,7 +112,7 @@ public class SealedContext extends ScalaAttrAccessImpl implements ScriptContext 
    }
 
    @Override
-   public void setAttr(String name, Object value) {
+   public void setAttrPair(String name, Object value) {
       throw new IllegalStateException("This context is sealed - you can't override stuff.");
    }
 

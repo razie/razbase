@@ -104,7 +104,7 @@ public class SampleFileBrowser {
 
    public static void main(String[] argv) throws IOException {
       RazIconRes.init();
-      new SampleFileBrowser().start(TestLightServer.ME, new AgentCloud(TestLightServer.ME));
+      new SampleFileBrowser().start(LightServerTest.ME, new AgentCloud(LightServerTest.ME));
    }
 
    LightServer server = null; // setup in start

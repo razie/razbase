@@ -20,7 +20,7 @@ import com.razie.pub.http.sample.SampleWebServer;
  * 
  * @author razvanc99
  */
-public class TestLightServer extends TestLightBase {
+public class LightServerTest extends LightBaseTest {
 
    /** test the simple echo - this is like GET but is called 'echo' for testing of flexibility of extending protocol
     *

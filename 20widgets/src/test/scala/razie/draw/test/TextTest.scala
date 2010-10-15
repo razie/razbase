@@ -5,7 +5,7 @@ import java.io._
 import razie.draw._
 import razie.draw.samples._
 
-object TestText {
+object TextTest {
   
    def main (argv:Array[String]) {
    

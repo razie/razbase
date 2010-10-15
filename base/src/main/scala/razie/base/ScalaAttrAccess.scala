@@ -44,13 +44,13 @@ trait ScalaAttrAccess extends JavaAttrAccess {
    def sa(name:String) : String
 
    /** set the value of the named attribute + the name can be of the form name:type */
-   def set(name:String, value:AnyRef ) : Unit
+   def set(name:String, value:Any) : Unit
    
    /** set the value of the named attribute + the name can be of the form name:type */
-   def set(name:String, value:AnyRef , t:AttrType ) : Unit
+   def set(name:String, value:Any, t:AttrType) : Unit
 
    /** set the value of the named attribute + the name can be of the form name:type */
-   def setAttr(name:String, value:AnyRef ) : Unit
+   def setAttrPair(name:String, value:Any) : Unit
 
 //   /**
 //    * set the value of one or more attributes
@@ -103,8 +103,6 @@ trait ScalaAttrAccess extends JavaAttrAccess {
     * getMovie?name=300.divx&producer=whoknows
     */
    def addToUrl(url:String ) : String
- 
-   
    
   def sgetPopulatedAttr : Iterable[String]
        

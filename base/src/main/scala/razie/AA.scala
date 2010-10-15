@@ -112,7 +112,7 @@ class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
   override def isPopulated(name:String ) : Boolean = 
     super.isPopulated(name) || (parent != null && parent.isPopulated(name))
 
-  override def getPopulatedAttr() : java.lang.Iterable[String] =  JC.asIterable(rebuild.keySet)
+  override def getPopulatedAttr() : java.lang.Iterable[String] =  JC.asJavaIterable(rebuild.keySet)
 
   override def size() : Int = rebuild.keySet.size
 
@@ -121,12 +121,12 @@ class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
    }
 
    override def getAttrType(name:String ) : AttrType = {
-      val t = if(this._types != null) this._types.get(name) else null
+      val t = super.getAttrType (name)
       if (t == null && parent != null) parent.getAttrType(name) else t
    }
 
    override def getAttr(name:String ) : AnyRef = {
-     val o = if(this._attrs != null) this._attrs.get(name) else null
+     val o = super.getAttr (name)
      if (o == null && parent != null) parent.getAttr(name) else o
    }
 

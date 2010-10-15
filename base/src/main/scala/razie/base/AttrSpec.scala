@@ -16,7 +16,7 @@ case class AttrSpec (val name : String, val sample : String = "", val defaultVal
 //case class AttrSpec (val name : String, val dataType : String = "String", val default : String = "")
 
 object AttrSpec {
-  def apply (d:String) = JavaAttrAccessImpl.parseSpec(d)
+  def apply (d:String) = ScalaAttrAccessImpl.parseSpec(d)
 
   def factory1 (name:String, atype:AttrType, v:String) = 
     if (v == null)

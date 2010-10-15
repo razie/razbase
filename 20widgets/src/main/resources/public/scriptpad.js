@@ -162,9 +162,11 @@ function htmlBody (text) {
    return s;
 }
 
-function urlescape (s) {
+functio urlescape (s) {
    var ret = replace (escape(s), "\\+", "%2B");
-   return ret;
+   var ret1 = replace (encodeURI(s), "\\+", "%2B");
+   var ret2 = encodeURI(s)
+   return ret2;
 }
 
 
