@@ -13,19 +13,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import razie.base.AttrAccess;
 
 import com.razie.pub.base.data.ByteArray;
 import com.razie.pub.base.log.Log;
-//import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 
 /**
  * communications utils

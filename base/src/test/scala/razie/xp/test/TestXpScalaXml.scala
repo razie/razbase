@@ -8,6 +8,7 @@ package razie.xp.test
 import org.scalatest.junit._
 import org.scalatest.SuperSuite
 import razie.{ XP, DomXpSolver }
+import razie.base.data.RazElement._
 
 /**
  * junit tests for the XP stuff

@@ -18,59 +18,29 @@ import scala.swing._
  * @version $Id$
  * 
  */
-class SwingDrawStream (paint: Component => Unit) extends DrawStream (Technology.SWING) {
-   
-//    protected void writeBytes(byte[] b) {
-//        try {
-//            out.write(b);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+class SwingDrawStream(paint: Component => Unit) extends DrawStream(Technology.SWING) {
 
-    override def close() {}
+  override def close() {}
 
-    override def renderObjectToStream(d:AnyRef) = {
-       val o = d match {
-          case r:Drawable => Renderer.Helper.draw(r, technology, this);
-          case r:DrawableSource => Renderer.Helper.draw(r, technology, this);
-          case _ => Renderer.Helper.draw(razie.Draw.toString(d), technology, this);
-       }
-
-       val newo:Component = o match {
-          case c:Component => c
-          case _ => new Button ("UNKNOWN: " + o)
-       }
-       
-       paint(newo)
+  def renderObjectToStream(d: AnyRef) = {
+    val o = d match {
+      case r: Drawable => Renderer.Helper.draw(r, technology, this);
+      case r: DrawableSource => Renderer.Helper.draw(r, technology, this);
+      case _ => Renderer.Helper.draw(razie.Draw.toString(d), technology, this);
     }
 
-    override def renderElement(d:StreamableContainer, e:AnyRef) { renderObjectToStream (e) }
-    override def renderFooter(d:StreamableContainer) { }
-    override def renderHeader(d:StreamableContainer) { }
+    val newo: Component = o match {
+      case c: Component => c
+      case _ => new Button("UNKNOWN: " + o)
+    }
 
-//    @Override
-//    public void renderElement(StreamableContainer container, Object element) {
-//        Object result = ((ContainerRenderer) ((Drawable3) container).getRenderer(technology)).renderElement(
-//                container, element, technology, this);
-//        writeBytes(result.toString().getBytes());
-//    }
-//
-//    @Override
-//    protected void renderFooter(StreamableContainer container) {
-//        Object result = ((ContainerRenderer) ((Drawable3) container).getRenderer(technology)).renderFooter(
-//                container, technology, this);
-//        writeBytes(result.toString().getBytes());
-//    }
-//
-//    @Override
-//    protected void renderHeader(StreamableContainer container) {
-//        Object result = ((ContainerRenderer) ((Drawable3) container).getRenderer(technology)).renderHeader(
-//                container, technology, this);
-//        writeBytes(result.toString().getBytes());
-//    }
-//
-//    public String toString() {
-//        return out.toString();
-//    }
+    paint(newo)
+  }
+
+  def renderElement(d: StreamableContainer, e: AnyRef) { renderObjectToStream (e) }
+  def renderFooter(d: StreamableContainer) {}
+  def renderHeader(d: StreamableContainer) {}
+  //    public String toString() {
+  //        return out.toString();
+  //    }
 }

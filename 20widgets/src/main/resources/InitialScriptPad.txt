@@ -1,11 +1,14 @@
-//select the following defs and issue "run selection"
+//crash-course into scala: select the following defs and issue "run selection"
 class Num (val i:Int) {
-           def + (other:Num) = new Num (this.i + other.i)
-  override def toString      = "Numero " + i.toString
+           def + (other:Num)      = new Num (this.i + other.i)
+  override def toString : String  = "Numero " + i.toString
+  override def equals (other:Any) = other.asInstanceOf[Num].i == i
 }
 
-object Num { // this lets you do Num(3) instead of new Num(3)
+object Num { // companion object contains statics for Num
+  // this lets you do Num(3) instead of new Num(3)
   def apply (i:Int) = new Num (i)
+  def valueOf (s:String) = new Num (s.toInt)
 }
 
 implicit def toNum (i:Int) = Num (i) // this makes the conversion implicit

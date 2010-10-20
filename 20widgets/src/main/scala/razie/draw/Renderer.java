@@ -5,8 +5,6 @@
  */
 package razie.draw;
 
-import razie.draw.Drawable3.DefaultRenderer;
-
 import com.razie.pub.base.data.HtmlRenderUtils;
 import com.razie.pub.base.data.IndexedMemDb;
 

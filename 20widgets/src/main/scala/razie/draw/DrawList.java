@@ -22,7 +22,7 @@ import razie.draw.Renderer.Helper;
  * @author razvanc99
  * 
  */
-    @SuppressWarnings("unchecked")
+@SuppressWarnings("unchecked")
 public class DrawList extends StreamableContainer.Impl implements Drawable3, StreamableContainer {
 
     private List   list       = new ArrayList();

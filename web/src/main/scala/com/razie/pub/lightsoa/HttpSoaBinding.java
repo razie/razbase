@@ -12,7 +12,6 @@ import java.util.Properties;
 import razie.base.AttrAccess;
 import razie.base.AttrAccessImpl;
 import razie.base.scripting.ScriptContext;
-import razie.base.scripting.ScriptContextImpl;
 import razie.base.scripting.ScriptFactory;
 import razie.draw.DrawStream;
 import razie.draw.HttpDrawStream;
@@ -216,7 +215,6 @@ public class HttpSoaBinding extends SoaBinding {
             out.close();
          return new StreamConsumedReply();
       }
-
       return response;
    }
 

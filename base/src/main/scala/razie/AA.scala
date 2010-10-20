@@ -8,7 +8,11 @@ package razie
 import razie.base._
 
 object args {
-  def apply (s:Any*):AA = {val x = new AA(); x.setAttr(s.asInstanceOf[Seq[AnyRef]]:_*); x }
+  def apply (s:Any*):AA = {
+    val x = new AA(); 
+    x.setAttr(s.asInstanceOf[Seq[AnyRef]]:_*); 
+    x 
+    }
   def apply ():AA = new AA()
 }
 

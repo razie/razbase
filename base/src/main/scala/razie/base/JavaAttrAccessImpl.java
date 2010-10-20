@@ -5,12 +5,8 @@
  */
 package razie.base;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /** simple base implementation */
 public class JavaAttrAccessImpl extends ScalaAttrAccessImpl implements AttrAccess {
