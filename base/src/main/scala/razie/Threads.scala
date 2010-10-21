@@ -17,7 +17,7 @@ object Threads {
 
    /** fork a bunch of threads, then join them and return the results...all within a timeout. 
     * The return should have an element for each input that finished in time... */
-   def forkjoinWithin[A,B>:Null<:AnyRef] (msec:Int)(as:Iterable[A]) (f:A =>B) : Iterable[B] = {
+   def forkjoinWithin[A,B>:Null<:AnyRef] (msec:Int)(as:Iterable[A]) (f:A =>B) : Iterable[Option[B]] = {
       val threads = (for (a <- as) yield new FuncValThread (a, f)).toList
       threads.foreach (_.start())
       threads.foreach (new KillerThread (msec, _).start)
@@ -78,7 +78,7 @@ object Threads {
    }
 
    /** fork a bunch of threads, then join them and return the results */
-   def forkjoin[A,B>:Null<:AnyRef] (as:Iterable[A]) (f:A =>B) : Iterable[B] = {
+   def forkjoin[A,B>:Null<:AnyRef] (as:Iterable[A]) (f:A =>B) : Iterable[Option[B]] = {
       val threads = (for (a <- as) yield new FuncValThread (a, f)).toList
       threads.foreach (_.start())
       threads.foreach (_.join)
@@ -107,9 +107,9 @@ object Threads {
       }
 
    class FuncValThread[A, B>:Null<:AnyRef] (val a:A, val f:A=>B) extends java.lang.Thread {
-      var res:B = null
+      var res:Option[B] = None
       
-      override def run() = res = f(a)
+      override def run() = res = Option(f(a))
    }
 
    class FuncThread[A>:Null<:AnyRef] (thread:Int, f:Int =>A) extends java.lang.Thread {
