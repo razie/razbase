@@ -8,7 +8,7 @@
 
 var editor = 0;
 var razParserFile= ["../contrib/scala/js/tokenizescala.js", "../contrib/scala/js/parsescala.js"];
-var razStyleSheet= "contrib/scala/scalacolors-dark.css"
+var razStyleSheet= "contrib/scala/css/scalacolors-dark.css"
 var razieCss="dark";
 
 function darklight (css, dcss, lcss) {

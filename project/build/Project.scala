@@ -13,7 +13,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   lazy val razBase = project("base", "base", new BaseProject(_))
   lazy val w20Project = project("20widgets", "20widgets", new W20Project(_), razBase)
-  lazy val swingProject = project("20w-swing", "20widgets-swing", new SwingProject(_), w20Project)
+  lazy val swingProject = project("20swing", "20widgets-swing", new SwingProject(_), w20Project)
   lazy val webProject = project("web", "razweb", new WebProject(_), razBase, w20Project)
 
   class BaseProject(info: ProjectInfo) extends DefaultProject(info) {
