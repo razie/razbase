@@ -6,16 +6,16 @@
 	<classpathentry kind="src" path="20widgets/src/main/resources"/>
 	<classpathentry kind="src" path="20widgets/src/main/scala"/>
 	<classpathentry kind="src" path="20widgets/src/test/scala"/>
-	<classpathentry kind="src" path="20w-swing/src/main/scala"/>
-	<classpathentry kind="src" path="20w-swing/src/test/scala"/>
 	<classpathentry kind="src" path="web/src/main/scala"/>
 	<classpathentry kind="src" path="web/src/test/scala"/>
+	<classpathentry kind="src" path="20swing/src/main/scala"/>
+	<classpathentry kind="src" path="20swing/src/test/scala"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="web/lib/mime-util.jar"/>
-	<classpathentry kind="lib" path="20w-swing/lib/jsyntaxpane-0.9.5-b29.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="base/lib_managed/scala_2.8.1.RC2/compile/json-20090211.jar"/>
 	<classpathentry kind="lib" path="base/lib_managed/scala_2.8.1.RC2/compile/scalatest-1.2.jar"/>
+	<classpathentry kind="lib" path="20swing/lib/jsyntaxpane-0.9.5-b29.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

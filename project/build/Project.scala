@@ -25,7 +25,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   }
 
   class SwingProject(info: ProjectInfo) extends DefaultProject(info) {
-    def scalaSwing = "org.scala-lang" % "scala-swing" % "2.8.1.RC1"
+    def scalaSwing = "org.scala-lang" % "scala-swing" % "2.8.1"
     override def libraryDependencies = Set(scalatest, junit, scalaSwing)
   }
 
