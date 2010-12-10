@@ -4,6 +4,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
 
   override def managedStyle = ManagedStyle.Maven
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
+  //val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
   Credentials(Path.userHome / ".ivy2.credentials", log)
     
   // need to use defs for dependencies - thejy're used in sub-projects

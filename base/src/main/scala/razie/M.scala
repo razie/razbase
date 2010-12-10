@@ -107,10 +107,10 @@ object M {
      def toOption[B] (m:M[B]) : Option[B] = firstOpt (m)
    }
   
-   implicit def apply[A] (l:ju.List[A]) : M[A] = apply (JavaConversions.asBuffer(l))
-   implicit def apply[A] (l:ju.Iterator[A]) : M[A] = apply (JavaConversions.asIterator(l))
-   implicit def apply[A] (l:jl.Iterable[A]) : M[A] = apply (JavaConversions.asIterable(l))
-   implicit def apply[A] (l:ju.Map[_,A]) : M[A] = apply (JavaConversions.asIterable(l.values))
+   implicit def apply[A] (l:ju.List[A]) : M[A] = apply (JavaConversions.asScalaBuffer(l))
+   implicit def apply[A] (l:ju.Iterator[A]) : M[A] = apply (JavaConversions.asScalaIterator(l))
+   implicit def apply[A] (l:jl.Iterable[A]) : M[A] = apply (JavaConversions.asScalaIterable(l))
+   implicit def apply[A] (l:ju.Map[_,A]) : M[A] = apply (JavaConversions.asScalaIterable(l.values))
    
   
    // ------------------- common monad stuff
