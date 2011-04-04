@@ -58,4 +58,7 @@ trait RazScript {
  
   /** interactive evaluation - more complex interaction */ 
   def interactive (ctx:ActionContext) : RSResult[Any]
+  
+  /** the language needs sometimes passed around to factories etc */
+  def lang : String
 }

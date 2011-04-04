@@ -14,7 +14,7 @@ import java.util.Map;
 import razie.base.AttrAccessImpl;
 
 /**
- * An execution context is used by entities (agents) that can span a few threads. You can think of
+ * An execution context is used by entities (agents) that EACH can span a few threads. You can think of
  * it as a MiniVM as well, with its own statics etc - see NoStatics.
  * 
  * <p>
