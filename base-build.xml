@@ -38,14 +38,22 @@
 
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
-            <fileset dir="src">
+            <fileset dir="**/src/main/scala" erroronmissingdir="false">
                 <exclude name="**/*.scala"/>
                 <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
-        </copy>
-        <copy includeemptydirs="false" todir="bin">
-            <fileset dir="test_src">
+            <fileset dir="**/src/main/resources" erroronmissingdir="false">
+                <exclude name="**/*.scala"/>
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+            <fileset dir="**/src/test/scala" erroronmissingdir="false">
+                <exclude name="**/*.scala"/>
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+            <fileset dir="**/src/test/resources" erroronmissingdir="false">
                 <exclude name="**/*.scala"/>
                 <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
