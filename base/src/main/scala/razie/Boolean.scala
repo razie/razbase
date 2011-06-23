@@ -5,10 +5,14 @@
  */
 package razie
 
-/** i can never find the stupid parse methods */
+/** i can never find the stupid parse methods
+ * Adapted by Alexandre Martins
+ */
 object Boolean {
   def apply (s:String) : Boolean = s.toUpperCase match {
      case "TRUE" | "ON" | "YES" => true
-     case _ => false
+     case "FALSE" | "OFF" | "NO" => false
+     case _ => throw new IllegalArgumentException("argument isn't an acceptable boolean value...");
+ 
   }
 }
