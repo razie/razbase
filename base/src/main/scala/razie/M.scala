@@ -68,7 +68,6 @@ object M {
 
   def anyOrder[A] (y:Any) : M[A] = M any y anyOrder
 
-//   implicit def apply[A] (l:Iterator[A]) : M[A] = new MonaTravestita[A] (l.toList)
    implicit def apply[A] (l:Iterator[A]) : M[A] = new MonaItera[A] (l)
    class MonaItera[A] (val l:Iterator[A]) extends M[A] {
      override def map[B](f: A => B): M[B] = new MonaItera(l.map(f))

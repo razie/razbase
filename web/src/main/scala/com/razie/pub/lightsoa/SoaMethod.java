@@ -11,11 +11,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import razie.base.AttrAccess;
-
 import razie.base.ActionItem;
+
 import com.razie.pub.comms.PermType;
-import com.razie.pub.http.SoaNotHtml;
 
 /**
  * mark the methods callable from by the lightsoa framework, on a service class

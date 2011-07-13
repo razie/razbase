@@ -4,7 +4,6 @@
  */
 package razie.draw;
 
-import razie.draw.Renderer.Helper;
 
 
 /**

@@ -1,13 +1,11 @@
 package razie.draw.widgets;
 
 import razie.draw.DrawStream;
-import razie.draw.Technology;
 import razie.draw.Drawable.Widget;
+import razie.draw.Technology;
 
-import razie.draw.Renderer;
-
-import com.razie.pub.base.data.*;
-import com.razie.pub.base.log.*;
+import com.razie.pub.base.data.HtmlRenderUtils;
+import com.razie.pub.base.log.Log;
 
 /**
  * dedicated error object (popups, info bars etc)

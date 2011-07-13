@@ -7,10 +7,9 @@ package razie.draw.widgets;
 import razie.base.ActionItem;
 import razie.base.ActionToInvoke;
 import razie.draw.DrawStream;
-import razie.draw.Technology;
 import razie.draw.Drawable.Widget;
+import razie.draw.Technology;
 
-import razie.draw.Renderer;
 import com.razie.pub.resources.RazIconRes;
 
 /**

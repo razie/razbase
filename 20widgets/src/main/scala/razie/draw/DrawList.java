@@ -10,11 +10,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import razie.draw.StreamableContainer.Impl;
-
-
 import razie.draw.Renderer.ContainerRenderer;
-import razie.draw.Renderer.Helper;
 
 /**
  * a drawable list of objects. objects must implement Drawable3 or else we'll use toString()

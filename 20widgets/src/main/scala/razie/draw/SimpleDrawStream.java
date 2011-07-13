@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import razie.draw.Renderer.ContainerRenderer;
-import razie.draw.Renderer.Helper;
 
 /**
  * simple stream to write in any technology to an output stream. Just translates from Draw to java

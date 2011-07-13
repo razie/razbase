@@ -33,6 +33,7 @@ public class HttpHelper {
     public static String httpWrap(String code, String s, long len) {
         String temp = (s == null ? "" : s);
         temp = HtmlRenderUtils.htmlWrap(temp);
+        @SuppressWarnings("unused")
         long finallen = len == 0 ? temp.getBytes().length : len;
         String r = httpHeader(code) + temp;
         return r;

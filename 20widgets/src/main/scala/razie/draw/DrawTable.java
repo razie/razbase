@@ -8,11 +8,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import razie.draw.StreamableContainer.Impl;
-
-
 import razie.draw.Renderer.ContainerRenderer;
-import razie.draw.Renderer.Helper;
 
 /**
  * a drawable table of rows of lists. objects must implement Drawable3 or else we'll use toString()

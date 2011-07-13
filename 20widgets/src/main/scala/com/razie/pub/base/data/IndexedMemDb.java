@@ -29,7 +29,8 @@ public class IndexedMemDb<K1, K2, V> {
     }
 
     /** @return the list for K or an empty list - never null */
-    public Map<K2, V> get(K1 k1) {
+    @SuppressWarnings("unchecked")
+	public Map<K2, V> get(K1 k1) {
         Map<K2, V> l = db.get(k1);
         if (l == null) {
             l = Collections.EMPTY_MAP;

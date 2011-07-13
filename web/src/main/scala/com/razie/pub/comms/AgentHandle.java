@@ -64,7 +64,8 @@ public class AgentHandle /* extends AssetKey */implements Cloneable, Serializabl
       // make sure port is ok...
       try {
          if (port != null && port.length() > 0) {
-            int p = Integer.parseInt(port);
+            @SuppressWarnings("unused")
+			int p = Integer.parseInt(port);
          }
       } catch (Throwable t) {
          String msg = "PORT " + port + " FOR device=" + hostname

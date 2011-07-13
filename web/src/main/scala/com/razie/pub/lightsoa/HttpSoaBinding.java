@@ -76,7 +76,6 @@ public class HttpSoaBinding extends SoaBinding {
                         + service.getClass().getName());
       } else if (serviceCls != null && serviceCls.getAnnotation(SoaAsset.class) != null) {
          SoaAsset s = (SoaAsset) serviceCls.getAnnotation(SoaAsset.class);
-         String debug = s.meta();
          if (s.meta().length() > 0 && !s.meta().equals(serviceName))
             throw new IllegalArgumentException(
                   "can't bind @SoaService/@SoaAsset with wrong name: " 

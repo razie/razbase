@@ -9,8 +9,6 @@ import razie.base.ActionToInvoke;
 import razie.draw.DrawStream;
 import razie.draw.Technology;
 
-import razie.draw.Renderer;
-
 /**
  * a button with an action and image that just does it's action and no change on the screen (POST in
  * html)
