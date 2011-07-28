@@ -77,7 +77,7 @@ object Lisa {
 
 //---------------
 
-object MonaLisa extends Application {
+object MonaLisa extends App {
    
    def simple (s:String) : Option [String] = s match {
       case "o" => Option ("oo")

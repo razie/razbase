@@ -102,7 +102,7 @@ object M1 {
    }
 }
 
-object RunMe2 extends Application {
+object RunMe2 extends App {
    val l = new ju.ArrayList[String](); l.add("a"); l 
    val stu = new Stupid()
    val sl = List(1,2,3)
@@ -162,12 +162,12 @@ trait TB extends T { override def nm = super.nm + "-TB" }
 class TC extends T with TA with TB { override def nm = super.nm + "-TC" }
 class TD extends TC with TA with TB { override def nm = super.nm + "-TD" }
 
-object LearnTraits extends Application {
+object LearnTraits extends App {
    println (new TD().nm)
 }
 
 //------------------
-object LearnStrict extends Application {
+object LearnStrict extends App {
 var prefix = "expected-"
 val list = for (i <- Map ("1"->"a","2"->"b", "3"->"c").values) yield prefix + i
 prefix = "UNEXPECTED-1-"
@@ -176,7 +176,7 @@ prefix = "UNEXPECTED-2-"
 println (list mkString)
 }
 
-object LearnString extends Application {
+object LearnString extends App {
    println ()
    "" split "\\s+"
    " " split "\\s+"

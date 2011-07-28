@@ -4,7 +4,7 @@
  *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
  */
 
-object Bibi extends Application {
+object Bibi extends App {
 
   println ((<a attr="val"/> \ "@attr") + "==val is " + ((<a attr="val"/> \ "@attr") == "val"))
   println ("because \"val\" isInstanceOf " + (<a attr="val"/> \ "@attr").getClass.getName)
