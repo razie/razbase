@@ -28,7 +28,7 @@ public interface ObjectStream {
     public boolean hasMore();
 
     public static class Impl implements ObjectStream {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "rawtypes" })
         List    objects = new ArrayList();
         boolean done    = false;
 
@@ -42,7 +42,8 @@ public interface ObjectStream {
             return this.objects.remove(0);
         }
 
-        public synchronized void write(Object o) {
+        @SuppressWarnings("unchecked")
+		public synchronized void write(Object o) {
             if (done) {
                 throw new IllegalStateException("ObjectStream closed for write()");
             }
