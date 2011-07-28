@@ -211,7 +211,7 @@ class SampleSM extends razie.SM.StateMachine {
     println("ate char: " + e.asInstanceOf[IEvent].i.toChar)
 }
 
-object SampleSMain extends Application {
+object SampleSMain extends App {
   implicit def e(i: Int) = SM.IEvent(i)
   val sm = new SampleSM()
   sm move 2 move 1 move 3 move -1 move 2 move 3 move 6 move 59

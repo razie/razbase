@@ -10,6 +10,6 @@ object U {
    def pwd = new java.io.File(".").getCanonicalFile
 }
 
-object UMain extends Application {
+object UMain extends App {
    println ("pwd == " + U.pwd)
 }

@@ -35,7 +35,7 @@ trait Test {
   }
 }
 
-object TestSample extends Application with razie.Test {
+object TestSample extends App with razie.Test {
   expect (3) { 3 }
   
   expect ("12") { "12" }
