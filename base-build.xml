@@ -65,13 +65,13 @@
         <delete dir="bin"/>
     </target>
 
+<!-- 
+
     <target depends="init" name="build">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <!--scalac srcdir="src" destdir="bin" addparams="-g"-->
         <scalac srcdir="src" destdir="bin" >
             <classpath refid="build.classpath" />
         </scalac>
-        <!--javac srcdir="src" destdir="bin" debug="yes"-->
         <javac srcdir="src" destdir="bin" debug="no">
             <classpath refid="build.classpath" />
         </javac>
@@ -110,5 +110,7 @@
         <jar basedir="bin" destfile="dist/${ant.project.name}.jar">
         </jar>
     </target>
+
+-->
 
 </project>
