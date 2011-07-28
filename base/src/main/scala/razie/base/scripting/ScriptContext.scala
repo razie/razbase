@@ -44,9 +44,6 @@ trait ScriptContext extends AttrAccess {
   /** content assist options */
   def options (script:String ) : java.util.List[String]
   
-  /** the last error message - NOT reset after each...*/
-  def lastError : String
-
   /** 
    * Reset this context. Normally a context would cache a parser/interpreter instance. 
    * Reset will make sure this is in pristine condition .

@@ -20,8 +20,6 @@ public class ScriptContextImpl extends razie.WrapAttrAccess implements ScriptCon
 
    protected boolean verbose = false;
 
-   String lastError = null;
-
    public static ScriptContext global() {
       return main;
    }
@@ -46,11 +44,6 @@ public class ScriptContextImpl extends razie.WrapAttrAccess implements ScriptCon
    /** supports a map as well */
    public ScriptContextImpl(AttrAccess parent, Object... pairs) {
       super(parent, pairs);
-   }
-
-   @Override
-   public String lastError() {
-      return lastError;
    }
 
    public Object getAttr(String name) {

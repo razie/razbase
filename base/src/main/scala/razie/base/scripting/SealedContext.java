@@ -17,10 +17,6 @@ import razie.base.ScalaAttrAccessImpl;
 public class SealedContext extends ScalaAttrAccessImpl implements ScriptContext {
    private ScriptContext wrapped;
 
-   public String lastError() {
-      return wrapped.lastError();
-   }
-
    /** content assist options */
    public java.util.List<String> options(String script) {
       return this.wrapped.options(script);
