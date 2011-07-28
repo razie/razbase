@@ -6,9 +6,11 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/"
   //val publishTo = "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
   Credentials(Path.userHome / ".ivy2.credentials", log)
+
+  val SCALAVER = "2.9.0-1"
     
   // need to use defs for dependencies - thejy're used in sub-projects
-  def scalatest = "org.scalatest" % "scalatest" % "1.2"
+  def scalatest = "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
   def junit = "junit" % "junit" % "4.5"
   def json = "org.json" % "json" % "20090211"
 
@@ -26,7 +28,7 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
   }
 
   class SwingProject(info: ProjectInfo) extends DefaultProject(info) {
-    def scalaSwing = "org.scala-lang" % "scala-swing" % "2.9.0-1"
+    def scalaSwing = "org.scala-lang" % "scala-swing" % SCALAVER
     override def libraryDependencies = Set(scalatest, junit, scalaSwing)
   }
 

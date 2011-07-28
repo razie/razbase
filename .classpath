@@ -16,6 +16,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="20swing/lib/jsyntaxpane-0.9.5-b29.jar"/>
 	<classpathentry kind="lib" path="base/lib_managed/scala_2.9.0.RC1/compile/json-20090211.jar"/>
-	<classpathentry kind="lib" path="base/lib_managed/scala_2.9.0.RC1/compile/scalatest-1.2.jar"/>
+	<classpathentry kind="lib" path="base/lib_managed/scala_2.9.0-1/compile/scalatest_2.9.0-1.6.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
