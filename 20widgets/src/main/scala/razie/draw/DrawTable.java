@@ -24,7 +24,8 @@ import razie.draw.Renderer.ContainerRenderer;
 @SuppressWarnings("unchecked")
 public class DrawTable extends StreamableContainer.Impl implements Drawable3, StreamableContainer {
 
-    private List        rows       = new ArrayList();
+    @SuppressWarnings("rawtypes")
+	private List        rows       = new ArrayList();
     // TODO 2-1 should use rowClass and CSS
     // CSS: tr.d0 td { background-color: #CC9999; color: black; }
     // html: <tr class="d0"><td>One</td><td>Fish</td></tr>

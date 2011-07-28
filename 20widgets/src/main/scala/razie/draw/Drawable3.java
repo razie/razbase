@@ -10,8 +10,8 @@ package razie.draw;
  */
 public interface Drawable3 extends Drawable {
    // TODO 1-2 get rid of this method and have everyone render oneself
-   @SuppressWarnings("unchecked")
-   public Renderer getRenderer(Technology technology);
+   @SuppressWarnings("rawtypes")
+public Renderer getRenderer(Technology technology);
 
    /** @deprecated replace with Renderer.DefaultRenderer */
    public static class DefaultRenderer extends Renderer.DefaultRenderer { }

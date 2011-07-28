@@ -21,7 +21,8 @@ import razie.draw.Renderer.ContainerRenderer;
 @SuppressWarnings("unchecked")
 public class DrawList extends StreamableContainer.Impl implements Drawable3, StreamableContainer {
 
-    private List   list       = new ArrayList();
+    @SuppressWarnings("rawtypes")
+	private List   list       = new ArrayList();
     public boolean isVertical = false;
     public String  valign     = null;
     public String  rowColor   = null;
