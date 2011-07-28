@@ -116,7 +116,8 @@ public class HttpSoaBinding extends SoaBinding {
     * @param socket the server socket
     * @return
     */
-   public Object execServer(String actionName, String protocol, String cmdargs, Properties parms,
+   @SuppressWarnings("unused")
+public Object execServer(String actionName, String protocol, String cmdargs, Properties parms,
          MyServerSocket socket) {
 
       Object otoi = this.service;
