@@ -6,14 +6,14 @@ import razie.dsl._
 /** simple collector example */
 class DslCollectorTest extends JUnit3Suite {
 
-  case class A(i: Int) extends DslCollectable
+  case class move(i: Int) extends DslCollectable
 
-  def test1 = expect(A(1) :: A(2) :: Nil) {
+  def test1 = expect(move(1) :: move(2) :: Nil) {
     val collected = new collection.mutable.ListBuffer[Any]()
 
     DslCollector.collect { collected += _ }(1) { // start a collector level
-      A(1) //collects itself
-      A(2) //collects itself
+      move(1) //collects itself
+      move(2) //collects itself
     } // collector ends
 
     collected
