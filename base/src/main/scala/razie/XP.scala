@@ -5,7 +5,6 @@
  */
 package razie
 
-
 /** a simple resolver for x path like stuff. note the limitation at the bottom
  * 
  * can resolve the following expressions
@@ -245,13 +244,8 @@ class DomXpSolver extends XpSolver[RazElement, List[RazElement]] {
 
 /** this resolves dom trees*/
 object ScalaDomXpSolver extends XpSolver[scala.xml.Elem, List[scala.xml.Elem]] {
-  /** get next element
-   * @param o starting node and continuation
-   * @param tag the tag to search
-   * @param assoc the association to filter
-   */
   override def getNext[T >: scala.xml.Elem, U >: List[scala.xml.Elem]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] =
-    o._2.asInstanceOf[List[scala.xml.Elem]].filter(zz => XP.stareq(zz.label, tag)).map(x => { val t = (x.asInstanceOf[T], children(x).toList.asInstanceOf[U]); println("t=" + t); t }).toList
+    o._2.asInstanceOf[List[scala.xml.Elem]].filter(zz => XP.stareq(zz.label, tag)).map(x => (x.asInstanceOf[T], children(x).toList.asInstanceOf[U])).toList
 
   override def getAttr[T >: scala.xml.Elem](o: T, attr: String): String =
     (o.asInstanceOf[scala.xml.Elem] \ ("@" + attr)) text
