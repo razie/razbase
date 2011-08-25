@@ -17,7 +17,9 @@ package razie
  * 
  * / a / * / c    - ignore one level: explore all possibilities for just that level
  * 
- * It differs from a classic xpath by having the {assoc} option. Useful when 
+ * One difference from classic xpath is that the root node can be specified, see "a" above
+ * 
+ * It also differs from a classic xpath by having the {assoc} option. Useful when 
  * navigating models that use assocations as well as composition (graphs). Using 
  * "/a/{assoc}b" means that it will use association {assoc} to find the b starting 
  * from a...
@@ -196,7 +198,7 @@ trait XpSolver[+A, +B] {
 
 /** an element in the path */
 protected class XpElement(val expr: String) {
-  val parser = """(\{.*\})*([@])*(\w+|\*)(\[.*\])*""".r
+  val parser = """(\{.*\})*([@])*([\/|\w]+|\*)(\[.*\])*""".r
   val parser(assoc_, attr, name, scond) = expr
   val cond = XpCondFactory.make(scond)
 
@@ -243,6 +245,11 @@ class DomXpSolver extends XpSolver[RazElement, List[RazElement]] {
 
 /** this resolves dom trees*/
 object ScalaDomXpSolver extends XpSolver[scala.xml.Elem, List[scala.xml.Elem]] {
+  /** get next element
+   * @param o starting node and continuation
+   * @param tag the tag to search
+   * @param assoc the association to filter
+   */
   override def getNext[T >: scala.xml.Elem, U >: List[scala.xml.Elem]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] =
     o._2.asInstanceOf[List[scala.xml.Elem]].filter(zz => XP.stareq(zz.label, tag)).map(x => { val t = (x.asInstanceOf[T], children(x).toList.asInstanceOf[U]); println("t=" + t); t }).toList
 
