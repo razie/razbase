@@ -60,7 +60,7 @@ object SM {
     override def equals(other: Any): Boolean = this ~= other
     override def ~=(other: Any): Boolean =
       if (other.isInstanceOf[Many])
-        error("can't compare many to many")
+        sys.error("can't compare many to many")
       else
         other.asInstanceOf[SEvent].name matches regex.pattern.pattern // TODO stupid matching :)))
   }
@@ -69,7 +69,7 @@ object SM {
 
     override def equals(other: Any): Boolean = this ~= other
     override def ~=(other: Any): Boolean =
-      if (other.isInstanceOf[Many]) error("can't compare many to many") else le contains other
+      if (other.isInstanceOf[Many]) sys.error("can't compare many to many") else le contains other
   }
   object NullEvent extends SEvent("NULL")
   object AnyEvent extends SEvent("ANY") {

@@ -18,17 +18,18 @@ class XpBeanTest extends JUnit3Suite {
 
   def test1 = expect(List(root)) { xpl("/") }
   def test2 = expect("s") { xpa("/@s") }
-  def test3 = expect("s") { xpe("/s") }
-  def test4 = expect("t") { xpa("/@t") }
-  def test5 = expect("u") { xpe("/u") }
-  def test6 = expect(List(new JavaB("j"))) { xpl("/j") }
-  def test7 = expect(List(new JavaB("a"), new JavaB("b"))) { xpl("/l") }
-  def test8 = expect("a") { xpa("/l[@value=='a']/@value") }
-  def test9 = expect(List("a", "b")) { xpla("/l/@value") }
-  def test0 = expect("s") { xpe("/j/a/s") }
-  def testa = expect("s") { xpa("/j/@s") }
-  def testb = expect("s") { xpe("/j/*/s") }
-  def testc = expect(List("s", "s")) { xpl("/j/*/s") }
+  def test3 = expect("s") { xpe("/root/s") }
+  def test4 = expect("t") { xpa("@t") }
+  def test5 = expect("u") { xpe("/root/u") }
+  def test6 = expect(List(new JavaB("j"))) { xpl("/root/j") }
+  def test7 = expect(List(new JavaB("a"), new JavaB("b"))) { xpl("/root/l") }
+  def test8 = expect("a") { xpa("/root/l[@value=='a']/@value") }
+  def test9 = expect(List("a", "b")) { xpla("/root/l/@value") }
+  def test0 = expect("s") { xpe("/root/j/a/s") }
+  def testa = expect("s") { xpa("/root/j/@s") }
+//  def testb = expect("s") { xpe("/root/j/*") }
+  def testb = expect("s") { xpe("/root/j/*/s") }
+  def testc = expect(List("s", "s")) { xpl("/root/j/*/s") }
 
 
   def xpe(path: String) = XP[Any](path) using BeanXpSolver xpe root
@@ -36,5 +37,5 @@ class XpBeanTest extends JUnit3Suite {
   def xpla(path: String) = XP[Any](path).xpla(BeanXpSolver, root)
   def xpa(path: String) = XP[Any](path).xpa(BeanXpSolver, root)
 
-  val root = new ScalaB("root")
+  val root = BeanXpSolver.WrapO(new ScalaB("root"))
 }

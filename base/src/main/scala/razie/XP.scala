@@ -1,49 +1,54 @@
-/**  ____    __    ____  ____  ____,,___     ____  __  __  ____
+/**
+ * ____    __    ____  ____  ____,,___     ____  __  __  ____
  *  (  _ \  /__\  (_   )(_  _)( ___)/ __)   (  _ \(  )(  )(  _ \           Read
  *   )   / /(__)\  / /_  _)(_  )__) \__ \    )___/ )(__)(  ) _ <     README.txt
  *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
  */
 package razie
+import razie.base.data.RazElement
+import java.lang.reflect.Method
+import java.lang.reflect.Field
 
-/** a simple resolver for x path like stuff. note the limitation at the bottom
- * 
+/**
+ * a simple resolver for x path like stuff. note the limitation at the bottom
+ *
  * can resolve the following expressions
- * 
+ *
  * /a/b/c
  * /a/b/@c
  * /a/b[cond]/...
  * /a/{assoc}b[cond]/...
- * 
+ *
  * / a / * / c    - ignore one level: explore all possibilities for just that level
- * 
+ *
  * One difference from classic xpath is that the root node can be specified, see "a" above
- * 
- * It also differs from a classic xpath by having the {assoc} option. Useful when 
- * navigating models that use assocations as well as composition (graphs). Using 
- * "/a/{assoc}b" means that it will use association {assoc} to find the b starting 
+ *
+ * It also differs from a classic xpath by having the {assoc} option. Useful when
+ * navigating models that use assocations as well as composition (graphs). Using
+ * "/a/{assoc}b" means that it will use association {assoc} to find the b starting
  * from a...
- * 
- * TODO the type system here is all gefuckt...need better understanding of variance in scala. 
+ *
+ * TODO the type system here is all gefuckt...need better understanding of variance in scala.
  * See this http://www.nabble.com/X-String--is-not-a-subtype-of-X-AnyRef--td23428970.html
- * 
- * Example usage: 
+ *
+ * Example usage:
  * <ul>
  * <li> on Strings: XP("/root").xpl(new StringXpSolver, "/root")
- * <li> on scala xml: XP[scala.xml.Elem] ("/root").xpl(new ScalaDomXpSolver, root) 
+ * <li> on scala xml: XP[scala.xml.Elem] ("/root").xpl(new ScalaDomXpSolver, root)
  * </ul>
- * 
- * NOTE - this is stateless with respect to the parsed object tree - it only keeps the pre-compiled xpath 
+ *
+ * NOTE - this is stateless with respect to the parsed object tree - it only keeps the pre-compiled xpath
  * expression so you should reuse them as much as possible
- * 
- * Note that this is a limited play-type thing. There are full XPATH implementations to browse stuff, 
- * like Apache's JXpath. 
- * 
- * The main features of this implementation are: 1) small and embeddable 2) works for most every-day things and 
+ *
+ * Note that this is a limited play-type thing. There are full XPATH implementations to browse stuff,
+ * like Apache's JXpath.
+ *
+ * The main features of this implementation are: 1) small and embeddable 2) works for most every-day things and
  * 3) extensiblity: you can easily plugin resolvers.
  */
 case class XP[T](val gp: GPath) {
-  razie.Debug ("building XP with GPath: " + gp.elements.mkString("/"))
-  
+  razie.Debug("building XP with GPath: " + gp.elements.mkString("/"))
+
   /** return the matching list - solve this path starting with the root and the given solving strategy */
   def xpl(ctx: XpSolver[T, Any], root: T): List[T] = {
     gp.requireNotAttr
@@ -90,16 +95,16 @@ object XP {
   def apply[T](expr: String) = { new XP[T](GPath(expr)) }
 
   /** TODO make it private */
-  def stareq (what:String, tag:String) = 
+  def stareq(what: String, tag: String) =
     if ("*" == tag) true
     else what == tag
 }
 
-/** 
+/**
  * Simple helper to simplify client code when the context doesn't change:
  * it pairs an XP with a particular context/solver.
- * 
- * So you can just use it after creation and not worry about carrying both arround. 
+ *
+ * So you can just use it after creation and not worry about carrying both arround.
  */
 class XPSolved[T](val xp: XP[T], val ctx: XpSolver[T, Any]) {
   /** find one element */
@@ -134,10 +139,11 @@ object XpCondFactory {
   def make(s: String) = if (s == null) null else new XpCond(s)
 }
 
-/** the condition of an element in the path. 
- * 
- * TODO 3-2 maybe i should extract a trait and use it? 
- * 
+/**
+ * the condition of an element in the path.
+ *
+ * TODO 3-2 maybe i should extract a trait and use it?
+ *
  * this default implementation supports something like "[@attrname==15]"
  */
 class XpCond(val expr: String) {
@@ -164,26 +170,29 @@ class XpCond(val expr: String) {
 
 /** the strategy to break down the input based on the current path element. The solving algorithm is: apply current sub-path to current sub-nodes, get the results and RESTs. Filter by conditions and recurse.  */
 trait XpSolver[+A, +B] {
-  /** get the next list of nodes at the current position in the path. 
-   * For each, return a tuple with the respective value and the REST to continue solving 
-   * 
+  /**
+   * get the next list of nodes at the current position in the path.
+   * For each, return a tuple with the respective value and the REST to continue solving
+   *
    * @param curr the list of (currelement, continuation) to analyze
    * @return
    */
   def getNext[T >: A, U >: B](curr: (T, U), tag: String, assoc: String): Iterable[(T, U)]
 
-  /** get the value of an attribute from the given node 
-   * 
+  /**
+   * get the value of an attribute from the given node
+   *
    * @param curr the current element
    * @return the value, toString, of the attribute
    */
   def getAttr[T >: A](curr: T, attr: String): String
 
-  /** reduce the current set of possible nodes based on the given condition. 
+  /**
+   * reduce the current set of possible nodes based on the given condition.
    * Note that the condition may be null - this is still called to give you a chance to cleanup?
-   * 
-   * This default implementation may be ok for most resolvers 
-   * 
+   *
+   * This default implementation may be ok for most resolvers
+   *
    * @param curr the list of (currelement, continuation) to reduce
    * @param cond the condition to use for filtering - may be null if there's no condition at this point
    * @return
@@ -206,7 +215,7 @@ protected class XpElement(val expr: String) {
     case s: String => { val p = """\{(\w)\}""".r; val p(aa) = s; aa }
     case _ => assoc_
   }
-  
+
   override def toString = List(assoc_, attr, name, scond) mkString ","
 }
 
@@ -226,15 +235,14 @@ object StringXpSolver extends XpSolver[String, List[String]] {
   // there is no solver in a string, eh?
   override def reduce[T >: String, U >: List[String]](o: Iterable[(T, U)], cond: XpCond): Iterable[(T, U)] =
     o
-    
+
 }
 
 /** this resolves dom trees*/
-import razie.base.data.RazElement
 
 class DomXpSolver extends XpSolver[RazElement, List[RazElement]] {
   override def getNext[T >: RazElement, U >: List[RazElement]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] = {
-    val n =  o._2.asInstanceOf[List[RazElement]] filter (zz => XP.stareq (zz.name, tag))
+    val n = o._2.asInstanceOf[List[RazElement]] filter (zz => XP.stareq(zz.name, tag))
     for (e <- n) yield (e, e.children.asInstanceOf[U])
   }
 
@@ -255,67 +263,150 @@ object ScalaDomXpSolver extends XpSolver[scala.xml.Elem, List[scala.xml.Elem]] {
     e.child.filter(_.isInstanceOf[scala.xml.Elem])
 }
 
-/** reflection resolved for java/scala objects 
- * "/Student/@name" or "Students/getStudents */
+/**
+ * reflection resolved for java/scala objects
+ * "/Student/@name" or "Students/getStudents
+ */
 object BeanXpSolver extends XpSolver[AnyRef, List[AnyRef]] {
-  override def getNext[T >: AnyRef, U >: List[AnyRef]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
-    val n = resolve(o._1.asInstanceOf[AnyRef], tag)
+  trait LazyB { def eval: Any }
+  abstract class BeanWrapper(val j: Any, val label: String = "root") extends LazyB {
+    override def equals (other:Any) = this.label == other.asInstanceOf[BeanWrapper].label
+  }
+  case class RootWrapper(override val j: Any, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = j }
+  case class FieldWrapper(override val j: Any, val f: Field, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = f.get(j) }
+  case class MethodWrapper(override val j: Any, val m: Method, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = m.invoke(j) }
+  def WrapO(j: Any, label: String = "root") = new RootWrapper(j, label)
+  def WrapF(j: Any, f: Field, label: String) = new FieldWrapper(j, f, label)
+  def WrapM(j: Any, m: Method, label: String) = new MethodWrapper(j, m, label)
 
-    for (x <- n; y <- razie.MOLD(x)) yield (y.asInstanceOf[T], List())
+  override def getNext[T >: BeanWrapper, U >: List[BeanWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
+    o._2.asInstanceOf[List[Any]].map(oo => if (oo.isInstanceOf[BeanWrapper]) oo else WrapO(oo, "root")).
+      asInstanceOf[List[BeanWrapper]].filter(zz => XP.stareq(zz.asInstanceOf[BeanWrapper].label, tag)).flatMap(src => {
+        val res = src.eval
+        for (y <- razie.MOLD(res))
+          yield (y.asInstanceOf[T], resolve(y.asInstanceOf[AnyRef], "*"))
+      }).toList
+    //    val n = resolve(o._1.asInstanceOf[AnyRef], tag)
+    //    for (x <- n; y <- razie.MOLD(x)) yield (y.asInstanceOf[T], List())
   }
 
-  override def getAttr[T >: AnyRef](o: T, attr: String): String = {
-    resolve(o.asInstanceOf[AnyRef], attr).head.toString
+  override def getAttr[T >: BeanWrapper](o: T, attr: String): String = {
+    val oo = if (o.isInstanceOf[BeanWrapper]) o else WrapO(o, "root")
+    resolve(oo.asInstanceOf[BeanWrapper].eval.asInstanceOf[AnyRef], attr).head.eval.toString
   }
-
-  //   override def reduce[T>:scala.xml.Elem,U>:List[scala.xml.Elem]] (o:Iterable[(T,U)],cond:XpCond) : Iterable[(T,U)] = 
 
   // attr can be: field name, method name (with no args) or property name */
-  def resolve(o: AnyRef, attr: String) : List[Any] = {
-    razie.Debug ("Resolving: " + attr)
-    val result =  if ("*" == attr) {
-      // match all the fields of the class
-      // TODO use getXXX as well
+  private def resolve(o: AnyRef, attr: String): List[BeanWrapper] = {
+    razie.Debug("Resolving: " + attr)
+    val result = if ("*" == attr) {
       // TODO restrict them by type or patter over type
-      // TODO make lazy
-      val result = o.getClass.getFields.map(_.get(o))
-      result.toList
+      val fields = o.getClass.getFields.map(f => WrapO(f.get(o), f.getName()))
+      val getters = o.getClass.getMethods.filter(_.getName.startsWith("get")).map(f => WrapM(o, f, fromZ(f.getName)))
+      val scalas = o.getClass.getMethods.filter( m=>
+        m.getParameterTypes.size == 0 && 
+        m.getReturnType.getName != "void" && 
+          ! m.getName.startsWith("get")
+          ).map(f => WrapM(o, f, f.getName))
+      // java getX scala x or member x while dropping duplicates
+      (scalas ++ fields ++ getters).map(p=>(p.label,p)).toMap.values.toList
     } else {
-    // java getX scala x or member x
-    val m: java.lang.reflect.Method = try {
-      o.getClass.getMethod("get" + toZ(attr))
-    } catch {
-      case _ => try {
-        o.getClass.getMethod(attr)
+      // java getX scala x or member x
+      val m: java.lang.reflect.Method = try {
+        o.getClass.getMethod("get" + toZ(attr))
       } catch {
-        case _ => null
-      }
-    }
-
-    val result = try {
-      if (m != null) m.invoke(o)
-      else {
-        val f = try {
-          o.getClass.getField(attr)
+        case _ => try {
+          o.getClass.getMethod(attr)
         } catch {
           case _ => null
         }
-
-        if (f != null) f.get(o)
-        else null // TODO should probably log or debug?
       }
-    } catch {
-      case _ => null
-    }
 
-    List(result)
+      val result = try {
+        if (m != null) WrapM(o, m, attr)
+        //      if (m != null) m.invoke(o)
+        else {
+          val f = try {
+            o.getClass.getField(attr)
+          } catch {
+            case _ => null
+          }
+
+          if (f != null) WrapO(f.get(o), attr)
+          else null // TODO should probably log or debug?
+        }
+      } catch {
+        case _ => null
+      }
+
+      List(result)
     }
-    razie.Debug ("resolved: " + result.mkString)
+    razie.Debug("resolved: " + result.mkString)
     result
   }
 
   private[this] def toZ(attr: String) = attr.substring(0, 1).toUpperCase + (if (attr.length > 1) attr.substring(1, attr.length - 1) else "")
+  private[this] def fromZ(getter: String) = if (getter.length > 3) getter.substring(3).substring(0, 1).toLowerCase + (if (getter.length > 4) getter.substring(4, getter.length - 1) else "") else getter
 }
+
+//object BeanXpSolver extends XpSolver[AnyRef, List[AnyRef]] {
+//  override def getNext[T >: AnyRef, U >: List[AnyRef]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
+//    val n = resolve(o._1.asInstanceOf[AnyRef], tag)
+//
+//    for (x <- n; y <- razie.MOLD(x)) yield (y.asInstanceOf[T], List())
+//  }
+//
+//  override def getAttr[T >: AnyRef](o: T, attr: String): String = {
+//    resolve(o.asInstanceOf[AnyRef], attr).head.toString
+//  }
+//
+//  //   override def reduce[T>:scala.xml.Elem,U>:List[scala.xml.Elem]] (o:Iterable[(T,U)],cond:XpCond) : Iterable[(T,U)] = 
+//
+//  // attr can be: field name, method name (with no args) or property name */
+//  def resolve(o: AnyRef, attr: String) : List[Any] = {
+//    razie.Debug ("Resolving: " + attr)
+//    val result =  if ("*" == attr) {
+//      // match all the fields of the class
+//      // TODO use getXXX as well
+//      // TODO restrict them by type or patter over type
+//      // TODO make lazy
+//      val result = o.getClass.getFields.map(_.get(o))
+//      result.toList
+//    } else {
+//    // java getX scala x or member x
+//    val m: java.lang.reflect.Method = try {
+//      o.getClass.getMethod("get" + toZ(attr))
+//    } catch {
+//      case _ => try {
+//        o.getClass.getMethod(attr)
+//      } catch {
+//        case _ => null
+//      }
+//    }
+//
+//    val result = try {
+//      if (m != null) m.invoke(o)
+//      else {
+//        val f = try {
+//          o.getClass.getField(attr)
+//        } catch {
+//          case _ => null
+//        }
+//
+//        if (f != null) f.get(o)
+//        else null // TODO should probably log or debug?
+//      }
+//    } catch {
+//      case _ => null
+//    }
+//
+//    List(result)
+//    }
+//    razie.Debug ("resolved: " + result.mkString)
+//    result
+//  }
+//
+//  private[this] def toZ(attr: String) = attr.substring(0, 1).toUpperCase + (if (attr.length > 1) attr.substring(1, attr.length - 1) else "")
+//}
 
 // TODO 2-2 build a hierarchical context/solver structure - to rule the world. It would include registration
 
