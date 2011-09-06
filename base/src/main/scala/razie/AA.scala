@@ -81,10 +81,12 @@ class AA extends AttrAccessImpl {
      }
    }
    
+   def ++  (other:AA) = new WrapAttrAccess (this, other)
+   def ++= (other:AA) = { setAttr(other); this }
+   
 }
 
-/** this one adds stuff to a parent's */
-   /** hierarchical implementation */
+/** hierarchical implementation - this one adds stuff to a parent's */
 class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
   import scala.collection.{JavaConversions => JC}
    

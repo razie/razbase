@@ -17,31 +17,37 @@ import org.json._
  * @author razvanc99
  */
 class XpJsonTest extends JUnit3Suite {
-   val json = "{" +
-   		"\"errorCode\": 203, "+ 
-   		"\"errorMessage\": \"You must be authenticated to access recent\", "+
-   		"\"statusCode\": \"ERROR\"," +
-   		"\"a\" : { \"value\": \"a1\" ," +
-       		"\"b\" : { \"value\": \"b1\" }}," +
-   		// TODO how to handle json arrays?
-//   		"["+
-//   		"\"b\" : { \"value\": \"b1\" }," +
-//   		"\"b\" : { \"value\": \"b2\" }," +
-//   		"]"+
-   		"}"
-
-   def test1  = expect ("203") { xpa("/@errorCode")}
-   def test1a = expect (203)   { xpe("/errorCode")}
-   def test2  = expect ("a1") { xpa("/a/@value")}
-   def test2a = expect ("a1") { xpa("/*/@value")}
-   def test3  = expect ("b1") { xpa("/a/b/@value")}
-   def test4  = expect ("b1") { xpa("/*/b/@value")}
+     val json = """
+{
+  "errorCode": 203, 
+  "errorMessage": "You must be authenticated to access recent", 
+  "statusCode": "ERROR",
+  "a" : { 
+    "value": "a1" ,
+    "b" : { 
+      "value": "b1" 
+    }
+  }
+}
+"""
+        // TODO how to handle json arrays?
+//          "["+
+//          "\"b\" : { \"value\": \"b1\" }," +
+//          "\"b\" : { \"value\": \"b2\" }," +
+//          "]"+
+       
+   def test1  = expect ("203") { xpa("/root/@errorCode")}
+   def test2  = expect ("a1") { xpa("/root/a/@value")}
+   def test2a = expect ("a1") { xpa("/root/*/@value")}
+   def test2b = expect ("a1") { xpa("root/a/@value")}
+   def test3  = expect ("b1") { xpa("/root/a/b/@value")}
+   def test4  = expect ("b1") { xpa("/root/*/b/@value")}
  
    def xpe(path:String) = XP[Any] (path) using XpJsonSolver xpe root
    def xpl (path:String) = XP[Any] (path).xpl(XpJsonSolver, root) 
    def xpla(path:String) = XP[Any] (path).xpla(XpJsonSolver, root) 
    def xpa(path:String) = XP[Any] (path).xpa(XpJsonSolver, root) 
 
-   val root = new JSONObject(json)
+   val root = XpJsonSolver.WrapO(new JSONObject(json))
 }
 

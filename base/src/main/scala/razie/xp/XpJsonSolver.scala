@@ -3,59 +3,60 @@ package razie.xp
 import razie._
 import org.json._
 
-/** resolving JSON structures */
-object XpJsonSolver extends XpSolver[AnyRef,List[AnyRef]] {
+/** "/root" denotes the root of a deduction */
+class JsonWrapper(val j: Any, val label: String = "root")
+case class JsonOWrapper(override val j: JSONObject, override val label: String = "root") extends JsonWrapper(j, label)
+case class JsonAWrapper(override val j: JSONArray, override val label: String = "root") extends JsonWrapper(j, label)
 
-   // TODO 2-2 need to simplify - this is just mean...
-   override def getNext[T>:AnyRef,U>:List[AnyRef]] (o:(T,U),tag:String, assoc:String) : List[(T,U)]={
-      val ret:List[(T,U)] = 
-         
-      if (! o._2.asInstanceOf[List[AnyRef]].isEmpty) {
-        if (tag != "*") 
-          o._2.asInstanceOf[List[AnyRef]].filter (b => b.asInstanceOf[JSONObject].has(tag)).map (b=>(b.asInstanceOf[JSONObject].get(tag), Nil)).toList
-        else {
-          // tricky: match any object
-          o._2.asInstanceOf[List[AnyRef]].filter (
-                b => b.isInstanceOf[JSONObject]
-                ).flatMap (
-                      b => values (b.asInstanceOf[JSONObject]).filter (c => c.isInstanceOf[JSONObject]).
-                      map (d => (d,Nil))
-                      ).toList
-        }
-      } else {
-      o._1 match {
-         case j : JSONObject => 
-           if (tag != "*") 
-              (j.get (tag), List()) :: Nil
-           else {
-              // tricky: match any object
-              for (s <- razie.MOLD(j.keys); if j.get(s.toString).isInstanceOf[JSONObject]) 
-                 yield (j.get(s.toString), Nil)
-           }
-         case a : JSONArray => Nil
-         case _ => Nil
-      }
-      }
-      ret
-   }
+/**
+ * NOTE that JSON xpath must start with "/root/..."
+ *
+ * resolving JSON structures
+ *
+ * NOTE to use JSON you need the json library, add this SBT/maven dependency:
+ *
+ * val json = "org.json" % "json" % "20090211"
+ *
+ * In Eclipse, pick up this library from lib_managed/
+ */
+object XpJsonSolver extends XpSolver[JsonWrapper, List[JsonWrapper]] {
+  def WrapO(j: JSONObject, label: String = "root") = new JsonOWrapper(j, label)
+  def WrapA(j: JSONArray, label: String = "root") = new JsonAWrapper(j, label)
 
-   private def values (b:JSONObject) = 
-     for (s <- razie.MOLD(b.keys); if b.get(s.toString).isInstanceOf[JSONObject])  
-       yield b.get(s.toString).asInstanceOf[JSONObject]
+  // TODO 2-2 need to simplify - this is just mean...
+  /** browsing json is different since only the parent konws the name of the child... a JSON Object doesn't know its own name/label/tag */
+  override def getNext[T >: JsonWrapper, U >: List[JsonWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] =
+    o._2.asInstanceOf[List[JsonWrapper]].filter(zz => XP.stareq(zz.asInstanceOf[JsonWrapper].label, tag)).flatMap (_ match {
+      case x: JsonOWrapper => (x, children2(x, "*").toList.asInstanceOf[U]) :: Nil
+      case x: JsonAWrapper => wrapElements(x.j, x.label) map (t=>(t, children2(t, "*").toList.asInstanceOf[U]))
+    }).toList
 
-   override def getAttr[T>:AnyRef] (o:T,attr:String) : String = {
-      val ret = o match {
-         case o : JSONObject => o.get (attr)
-         case _ => null
-      }
-      ret.toString
-   }
-   
-//   override def reduce[T>:scala.xml.Elem,U>:List[scala.xml.Elem]] (o:Iterable[(T,U)],cond:XpCond) : Iterable[(T,U)] = 
+  private def children2(node: JsonWrapper, tag: String): Seq[JsonWrapper] = {
+    val x = node match {
+      case b: JsonOWrapper =>
+        razie.MOLD(b.j.keys) filter ("*" == tag || tag == _) map (_.toString) map (n => Tuple2(n, b.j.get(n))) flatMap (t => t match {
+          case (name: String, o: JSONObject) => WrapO(o, name) :: Nil
+          case (name: String, a: JSONArray) => wrapElements(a, name)
+          case _ => Nil
+        })
+      case what @ _ => throw new IllegalArgumentException("Unsupported json type here: " + what)
+    }
+    //        println(tag, x)
+    x
+  }
 
-   // attr can be: field name, method name (with no args) or property name */
-   def resolve (o:AnyRef,attr:String) : Any = {
-   }
-   
-   private[this] def toZ (attr:String) = attr.substring(0,1).toUpperCase + (if (attr.length > 1) attr.substring (1, attr.length-1) else "")
+  private def wrapElements(node: JSONArray, tag: String) =
+    (0 until node.length()) map (node.get(_)) collect {
+      case o: JSONObject => WrapO(o, tag)
+      case a: JSONArray => WrapA(a, tag)
+    }
+
+  override def getAttr[T >: JsonWrapper](o: T, attr: String): String = {
+    val ret = o match {
+      case o: JsonOWrapper => o.j.get(attr)
+      case o: JSONObject => o.get(attr)
+      case _ => null
+    }
+    ret.toString
+  }
 }

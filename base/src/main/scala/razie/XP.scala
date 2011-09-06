@@ -197,7 +197,7 @@ trait XpSolver[+A, +B] {
 
 /** an element in the path */
 protected class XpElement(val expr: String) {
-  val parser = """(\{.*\})*([@])*([\/|\w]+|\*)(\[.*\])*""".r
+  val parser = """(\{.*\})*([@])*([\$|\w]+|\*)(\[.*\])*""".r
   val parser(assoc_, attr, name, scond) = expr
   val cond = XpCondFactory.make(scond)
 

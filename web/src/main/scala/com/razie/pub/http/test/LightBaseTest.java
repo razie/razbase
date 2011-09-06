@@ -82,5 +82,7 @@ public class LightBaseTest extends TestCase {
       }
    }
 
+   public void testNothing() {}
+   
    static final Log logger = Log.create(LightBaseTest.class.getName());
 }
