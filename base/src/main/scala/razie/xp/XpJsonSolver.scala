@@ -23,19 +23,21 @@ object XpJsonSolver extends XpSolver[JsonWrapper, List[JsonWrapper]] {
   def WrapO(j: JSONObject, label: String = "root") = new JsonOWrapper(j, label)
   def WrapA(j: JSONArray, label: String = "root") = new JsonAWrapper(j, label)
 
+  import razie.Debug._
+  
   override def children[T >: JsonWrapper, U >: List[JsonWrapper]](root: T): (T, U) =
     root match {
-      case x: JsonOWrapper => (x, children2(x, "*").toList.asInstanceOf[U])
+      case x: JsonOWrapper => (x, children2(x, "*").toList.tee(3, "C").asInstanceOf[U])
       case _ => throw new IllegalArgumentException()
     }
     
   // TODO 2-2 need to simplify - this is just mean...
   /** browsing json is different since only the parent konws the name of the child... a JSON Object doesn't know its own name/label/tag */
   override def getNext[T >: JsonWrapper, U >: List[JsonWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] =
-    o._2.asInstanceOf[List[JsonWrapper]].filter(zz => XP.stareq(zz.asInstanceOf[JsonWrapper].label, tag)).flatMap (_ match {
+    o._2.asInstanceOf[List[JsonWrapper]].filter(zz => XP.stareq(zz.asInstanceOf[JsonWrapper].label, tag)).tee(3, "D").flatMap (_ match {
       case x: JsonOWrapper => (x, children2(x, "*").toList.asInstanceOf[U]) :: Nil
       case x: JsonAWrapper => wrapElements(x.j, x.label) map (t=>(t, children2(t, "*").toList.asInstanceOf[U]))
-    }).toList
+    }).tee(3,"E").toList
 
   private def children2(node: JsonWrapper, tag: String): Seq[JsonWrapper] = {
     val x = node match {
@@ -65,4 +67,11 @@ object XpJsonSolver extends XpSolver[JsonWrapper, List[JsonWrapper]] {
     }
     ret.toString
   }
+  
+  override def reduce[T >: JsonWrapper, U >: List[JsonWrapper]](curr: Iterable[(T, U)], xe: XpElement): Iterable[(T, U)] =
+    (xe.cond match {
+      case null => curr.asInstanceOf[List[(T, U)]]
+      case _ => curr.asInstanceOf[List[(T, U)]].filter(x => xe.cond.passes(x._1, this))
+    }).filter(gaga => XP.stareq(gaga._1.asInstanceOf[JsonWrapper].label, xe.name))
+
 }

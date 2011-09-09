@@ -80,7 +80,7 @@ case class XP[T](val gp: GPath) {
     else
       ctx.unwrap(
         if (gp.nonaelements.size == 1) {
-          val c = ctx.children(root)
+          val c = ctx.children(root) // TODO this approach means we always introspec all to find one...
           val ret = ctx.reduce(List(c), gp.head).toList.map(_._1)
           // if unlucky, try children
           if (ret.size > 0) ret
@@ -254,13 +254,13 @@ trait XpSolver[+A, +B] {
     xe.cond match {
       case null => curr.asInstanceOf[List[(T, U)]]
       case _ => curr.asInstanceOf[List[(T, U)]].filter(x => xe.cond.passes(x._1, this))
-    }
+    } 
 }
 
 /** an element in the path */
 protected class XpElement(val expr: String) {
-  val parser = """(\{.*\})*([@])*([\$|\w]+|\**)(\[.*\])*""".r
-  val parser(assoc_, attr, name, scond) = expr
+  val parser = """(\{.*\})*([@])*([\w]+\:)*([\$|\w]+|\**)(\[.*\])*""".r
+  val parser(assoc_, attr, prefix, name, scond) = expr
   val cond = XpCondFactory.make(scond)
 
   def assoc = assoc_ match {
@@ -269,7 +269,7 @@ protected class XpElement(val expr: String) {
     case _ => assoc_
   }
 
-  override def toString = List(assoc_, attr, name, scond) mkString ","
+  override def toString = List(assoc_, attr, prefix, name, scond) mkString ","
 }
 
 /** this example resolves strings with the /x/y/z format */
@@ -319,9 +319,18 @@ object ScalaDomXpSolver extends XpSolver[scala.xml.Elem, List[scala.xml.Elem]] {
   override def getNext[T >: scala.xml.Elem, U >: List[scala.xml.Elem]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] =
     o._2.asInstanceOf[List[scala.xml.Elem]].filter(zz => XP.stareq(zz.label, tag)).map(x => children(x)).toList
 
-  override def getAttr[T >: scala.xml.Elem](o: T, attr: String): String =
-    (o.asInstanceOf[scala.xml.Elem] \ ("@" + attr)) text
+  // return node values as well, if proper atribute not found...
+  override def getAttr[T >: scala.xml.Elem](o: T, attr: String): String = {
+    val ns = (o.asInstanceOf[scala.xml.Elem] \ ("@" + attr)) 
+    if (! ns.isEmpty) ns.text
+    else (o.asInstanceOf[scala.xml.Elem] \ attr) text
+  }
 
+  override def reduce[T >: scala.xml.Elem, U >: List[scala.xml.Elem]](curr: Iterable[(T, U)], xe: XpElement): Iterable[(T, U)] =
+    (xe.cond match {
+      case null => curr.asInstanceOf[List[(T, U)]]
+      case _ => curr.asInstanceOf[List[(T, U)]].filter(x => xe.cond.passes(x._1, this))
+    }).filter(gaga => XP.stareq(gaga._1.asInstanceOf[scala.xml.Elem].label, xe.name))
 }
 
 /**
@@ -357,27 +366,18 @@ class MyBeanXpSolver (val excludeMatches:List[String=>Boolean]=Nil) extends XpSo
     (r, (() => resolve(r.j.asInstanceOf[AnyRef], "*")).asInstanceOf[U])
   }
 
-  implicit def toTee[T](l: Seq[T]): TeeSeq[T] = new TeeSeq[T](l)
-  class TeeSeq[T](l: Seq[T]) {
-    def tee: Seq[T] = {
-      if(debug) razie.Debug("TEE- " + l.mkString(", "))
-      l
-    }
-    def tee(level: Int, prefix: String): Seq[T] = {
-      if(debug) razie.Debug("TEE-" + prefix + " - " + l.mkString(", "))
-      l
-    }
-  }
+  import razie.Debug._
+  
   override def getNext[T >: BeanWrapper, U >: () => List[BeanWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
     if(debug) razie.Debug(3, "getNext " + tag)
     o._2.asInstanceOf[() => List[BeanWrapper]].apply().asInstanceOf[List[Any]].asInstanceOf[List[BeanWrapper]].
-      filter(zz => XP.stareq(zz.asInstanceOf[BeanWrapper].label, tag)).tee(3, "before").
+      filter(zz => XP.stareq(zz.asInstanceOf[BeanWrapper].label, tag)).teeIf(debug, 3, "before").
       flatMap(src => {
         val res = src.eval
         if(debug) println("DDDDDDDDDDDDD-" + res)
         for (y <- razie.MOLD(res))
           yield (WrapO(y.asInstanceOf[T], src.label), (() => resolve(y.asInstanceOf[AnyRef], "*")).asInstanceOf[U])
-      }).tee(3, "after").toList
+      }).teeIf(debug, 3, "after").toList
   }
 
   override def getAttr[T >: BeanWrapper](o: T, attr: String): String = {

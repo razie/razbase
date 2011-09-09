@@ -22,6 +22,9 @@ trait Log {
   def error(msg: String, t: Throwable = null) // alarm and throw
 
   def apply(msg: String, e: Throwable = null) = log (msg, e)
+
+  /** set debuggin on or off */
+  def silent (d:Boolean)
 }
 
 class PbLog(component: String, category: String) extends Log {
@@ -35,6 +38,8 @@ class PbLog(component: String, category: String) extends Log {
   override def alarm(msg: String, t: Throwable = null) = pbl.alarm(msg, t)
   override def audit(msg: String, t: Throwable = null) = pbl.log("AUDIT: " + msg, t)
   override def error(msg: String, t: Throwable = null) = pblog.Log.alarmThisAndThrow(msg, t)
+  
+  def silent (d:Boolean) { pblog.Log.SILENT = d }
 }
 
 class RaziepbLog extends Log {
@@ -43,6 +48,7 @@ class RaziepbLog extends Log {
   override def alarm(msg: String, t: Throwable = null) = pblog.Log.alarmThis (msg, t)
   override def audit(msg: String, t: Throwable = null) = pblog.Log.logThis ("AUDIT: " + msg, t)
   override def error(msg: String, t: Throwable = null) = pblog.Log.alarmThisAndThrow(msg, t)
+  def silent (d:Boolean) { pblog.Log.SILENT = d}
 }
 
 class StupidLog extends Log {
@@ -52,6 +58,7 @@ class StupidLog extends Log {
   override def alarm(msg: String, t: Throwable = null) = println ("ALARM: " + th + msg, t)
   override def audit(msg: String, t: Throwable = null) = println ("AUDIT: " + th + msg, t)
   override def error(msg: String, t: Throwable = null) = { println("ERROR: " + th + msg, t); throw t }
+  def silent (d:Boolean) { }
 }
 
 class SILENTLOG extends Log {
@@ -61,6 +68,7 @@ class SILENTLOG extends Log {
   override def alarm(msg: String, t: Throwable = null) = println ("ALARM: " + th + msg, t)
   override def audit(msg: String, t: Throwable = null) = println ("AUDIT: " + th + msg, t)
   override def error(msg: String, t: Throwable = null) = { println("ERROR: " + th + msg, t); throw t }
+  def silent (d:Boolean) { }
 }
 
 // TODO WTF - I can't use the Log object directly WTF...F..F..F..
@@ -83,6 +91,8 @@ object NewLog {
 object Log extends Log {
   // overwrite/change this to use different logging mechanism
   var impl : Log = new RaziepbLog()
+ 
+  def silent (d:Boolean) { impl.silent(d)}
 
   val fuckers = 3
 
@@ -140,6 +150,22 @@ object Audit {
 
 object Debug {
   def apply(f: => Any) = Log.trace(f)
+  
+  implicit def toTee[T](l: Seq[T]): TeeSeq[T] = new TeeSeq[T](l)
+  class TeeSeq[T](l: Seq[T]) {
+    def tee: Seq[T] = {
+      razie.Debug("TEE- " + l.mkString(", "))
+      l
+    }
+    def tee(level: Int, prefix: String): Seq[T] = {
+      razie.Debug("TEE-" + prefix + " - " + l.mkString(", "))
+      l
+    }
+    def teeIf(should:Boolean, level: Int, prefix: String): Seq[T] = {
+      if (should) razie.Debug("TEE-" + prefix + " - " + l.mkString(", "))
+      l
+    }
+  }
 }
 
 object Warn {
