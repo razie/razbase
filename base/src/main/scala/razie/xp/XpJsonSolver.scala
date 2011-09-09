@@ -23,6 +23,12 @@ object XpJsonSolver extends XpSolver[JsonWrapper, List[JsonWrapper]] {
   def WrapO(j: JSONObject, label: String = "root") = new JsonOWrapper(j, label)
   def WrapA(j: JSONArray, label: String = "root") = new JsonAWrapper(j, label)
 
+  override def children[T >: JsonWrapper, U >: List[JsonWrapper]](root: T): (T, U) =
+    root match {
+      case x: JsonOWrapper => (x, children2(x, "*").toList.asInstanceOf[U])
+      case _ => throw new IllegalArgumentException()
+    }
+    
   // TODO 2-2 need to simplify - this is just mean...
   /** browsing json is different since only the parent konws the name of the child... a JSON Object doesn't know its own name/label/tag */
   override def getNext[T >: JsonWrapper, U >: List[JsonWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] =

@@ -4,9 +4,9 @@
  */
 package razie.xp.test
 
-import org.scalatest.junit._
-import org.scalatest.SuperSuite
-import razie._
+import org.junit.Test
+import org.scalatest.junit.MustMatchersForJUnit
+import razie.XP
 import razie.xp.XpJsonSolver
 
 import org.json._
@@ -16,7 +16,7 @@ import org.json._
  * 
  * @author razvanc99
  */
-class XpJsonTest extends JUnit3Suite {
+class XpJsonTest extends MustMatchersForJUnit {
      val json = """
 {
   "errorCode": 203, 
@@ -36,12 +36,12 @@ class XpJsonTest extends JUnit3Suite {
 //          "\"b\" : { \"value\": \"b2\" }," +
 //          "]"+
        
-   def test1  = expect ("203") { xpa("/root/@errorCode")}
-   def test2  = expect ("a1") { xpa("/root/a/@value")}
-   def test2a = expect ("a1") { xpa("/root/*/@value")}
-   def test2b = expect ("a1") { xpa("root/a/@value")}
-   def test3  = expect ("b1") { xpa("/root/a/b/@value")}
-   def test4  = expect ("b1") { xpa("/root/*/b/@value")}
+   @Test def test1  = expect ("203") { xpa("/root/@errorCode")}
+   @Test def test2  = expect ("a1") { xpa("/root/a/@value")}
+   @Test def test2a = expect ("a1") { xpa("/root/*/@value")}
+   @Test def test2b = expect ("a1") { xpa("root/a/@value")}
+   @Test def test3  = expect ("b1") { xpa("/root/a/b/@value")}
+   @Test def test4  = expect ("b1") { xpa("/root/*/b/@value")}
  
    def xpe(path:String) = XP[Any] (path) using XpJsonSolver xpe root
    def xpl (path:String) = XP[Any] (path).xpl(XpJsonSolver, root) 

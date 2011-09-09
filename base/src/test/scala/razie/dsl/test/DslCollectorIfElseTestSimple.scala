@@ -1,5 +1,6 @@
 package razie.dsl.test
 
+import org.junit.Test
 import org.scalatest.junit._
 import razie.dsl._
 
@@ -94,16 +95,16 @@ object DslCollectorIfElseSimple {
   }
 }
 
-class DslCollectorIfElseSimpleTest extends JUnit3Suite {
+class DslCollectorIfElseSimpleTest extends MustMatchersForJUnit {
   import DslCollectorIfElseSimple._
 
-  def testa1 = expect(11) {
+  @Test def testa1 = expect(11) {
     expr1.print("1 ")
     expr1.eval
     vars("a")
   }
 
-  def testa2 = expect(41) {
+  @Test def testa2 = expect(41) {
     expr2.print("2 ")
     expr2.eval
     vars("a")
@@ -116,8 +117,8 @@ class DslCollectorIfElseSimpleTest extends JUnit3Suite {
     vars("a")
   }
 
-  def test1 = expect(11) { run(1) }
-  def test2 = expect(21) { run(2) }
-  def test3 = expect(31) { run(3) }
-  def test4 = expect(41) { run(4) }
+  @Test def test1 = expect(11) { run(1) }
+  @Test def test2 = expect(21) { run(2) }
+  @Test def test3 = expect(31) { run(3) }
+  @Test def test4 = expect(41) { run(4) }
 }

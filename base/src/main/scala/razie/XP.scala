@@ -75,11 +75,40 @@ case class XP[T](val gp: GPath) {
 
   /** internal implementation - a simple fold */
   private def ixpl(ctx: XpSolver[T, Any], root: T): List[T] =
-    for (e <- gp.nonaelements.foldLeft(List((root, List(root).asInstanceOf[Any])))((x, xe) => solve(xe, ctx, x).asInstanceOf[List[(T, Any)]])) yield e._1
+    if (gp.nonaelements.size == 0)
+      root :: Nil
+    else
+      ctx.unwrap(
+        if (gp.nonaelements.size == 1) {
+          val c = ctx.children(root)
+          val ret = ctx.reduce(List(c), gp.head).toList.map(_._1)
+          // if unlucky, try children
+          if (ret.size > 0) ret
+          else solve(gp.head, ctx, List(c)).toList.map(_._1)
+        } else for (
+          e <- (if (gp.head.name == "**") gp.nonaelements else gp.exceptFirst).foldLeft(
+            ctx.reduce(List(ctx.children(root)), gp.head).toList)((x, xe) => solve(xe, ctx, x).asInstanceOf[List[(T, Any)]])
+        ) yield e._1)
 
   /** from res get the path and then reduce with condition looking for elements */
-  private def solve(xe: XpElement, ctx: XpSolver[T, Any], res: List[(T, Any)]): List[(T, Any)] =
-    for (e <- res; x <- ctx.reduce(ctx.getNext(e, xe.name, xe.assoc), xe.cond)) yield x
+  private def solve(xe: XpElement, ctx: XpSolver[T, Any], res: List[(T, Any)]): List[(T, Any)] = {
+    if ("**" == xe.name)
+      ctx.reduce(recurseSS(xe, gp.afterSS, ctx, res), xe).toList
+    else
+      for (e <- res; x <- ctx.reduce(ctx.getNext(e, xe.name, xe.assoc), xe)) yield x
+  }
+
+  // must collect all possibilities recursively
+  private def recurseSS(xe: XpElement, next: XpElement, ctx: XpSolver[T, Any], res: List[(T, Any)]): List[(T, Any)] = {
+    val m = for (
+      e <- res;
+      x <- {
+        if (!ctx.getNext(e, next.name, next.assoc).isEmpty) e :: Nil
+        else recurseSS(xe, next, ctx, ctx.getNext(e, "*", "").toList)
+      }
+    ) yield x
+    m
+  }
 
   /* looking for an attribute */
   private def solvea(xe: XpElement, ctx: XpSolver[Any, Any], res: Any): String =
@@ -96,7 +125,7 @@ object XP {
 
   /** TODO make it private */
   def stareq(what: String, tag: String) =
-    if ("*" == tag) true
+    if ("*" == tag || "**" == tag) true
     else what == tag
 }
 
@@ -125,6 +154,11 @@ case class GPath(val expr: String) {
 
   lazy val nonaelements = elements.filter(_.attr != "@")
 
+  def head = nonaelements.head
+  def exceptFirst = if (nonaelements.size > 0) nonaelements drop 1 else nonaelements
+
+  lazy val startsFromRoot = expr.startsWith("/")
+
   def requireAttr =
     if (elements.last.attr != "@")
       throw new IllegalArgumentException("ERR_XP result should be attribute but it's an entity...")
@@ -132,6 +166,9 @@ case class GPath(val expr: String) {
   def requireNotAttr =
     if (elements.size > 0 && elements.last.attr == "@")
       throw new IllegalArgumentException("ERR_XP result should be entity but it's an attribute...")
+
+  /** the first element after a ** */
+  def afterSS: XpElement = elements(elements.indexWhere(_.name == "**") + 1)
 }
 
 /** overwrite this if you want other scriptables for conditions...it's just a syntax marker */
@@ -171,6 +208,22 @@ class XpCond(val expr: String) {
 /** the strategy to break down the input based on the current path element. The solving algorithm is: apply current sub-path to current sub-nodes, get the results and RESTs. Filter by conditions and recurse.  */
 trait XpSolver[+A, +B] {
   /**
+   * prepare to start from a node, figure out the continuations
+   *
+   * @param root the node we'll start resolving from
+   * @return
+   */
+  def children[T >: A, U >: B](root: T): (T, U)
+
+  /**
+   * finally unwrap whatever and serve plain objects
+   *
+   * @param root the node we'll start resolving from
+   * @return
+   */
+  def unwrap[T >: A](root: List[T]): List[T] = root
+
+  /**
    * get the next list of nodes at the current position in the path.
    * For each, return a tuple with the respective value and the REST to continue solving
    *
@@ -197,16 +250,16 @@ trait XpSolver[+A, +B] {
    * @param cond the condition to use for filtering - may be null if there's no condition at this point
    * @return
    */
-  def reduce[T >: A, U >: B](curr: Iterable[(T, U)], cond: XpCond): Iterable[(T, U)] =
-    cond match {
+  def reduce[T >: A, U >: B](curr: Iterable[(T, U)], xe: XpElement): Iterable[(T, U)] =
+    xe.cond match {
       case null => curr.asInstanceOf[List[(T, U)]]
-      case _ => curr.asInstanceOf[List[(T, U)]].filter(x => cond.passes(x._1, this))
+      case _ => curr.asInstanceOf[List[(T, U)]].filter(x => xe.cond.passes(x._1, this))
     }
 }
 
 /** an element in the path */
 protected class XpElement(val expr: String) {
-  val parser = """(\{.*\})*([@])*([\$|\w]+|\*)(\[.*\])*""".r
+  val parser = """(\{.*\})*([@])*([\$|\w]+|\**)(\[.*\])*""".r
   val parser(assoc_, attr, name, scond) = expr
   val cond = XpCondFactory.make(scond)
 
@@ -221,6 +274,8 @@ protected class XpElement(val expr: String) {
 
 /** this example resolves strings with the /x/y/z format */
 object StringXpSolver extends XpSolver[String, List[String]] {
+  override def children[T >: String, U >: List[String]](root: T): (T, U) = (root, List(root).asInstanceOf[U])
+
   override def getNext[T >: String, U >: List[String]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] = {
     val pat = """/*(\w+)(/.*)*""".r
     val pat(result, next) = o._2.asInstanceOf[List[String]].head
@@ -233,61 +288,96 @@ object StringXpSolver extends XpSolver[String, List[String]] {
   }
 
   // there is no solver in a string, eh?
-  override def reduce[T >: String, U >: List[String]](o: Iterable[(T, U)], cond: XpCond): Iterable[(T, U)] =
-    o
+  override def reduce[T >: String, U >: List[String]](o: Iterable[(T, U)], x: XpElement): Iterable[(T, U)] =
+    o.filter { zz: ((T, U)) => XP.stareq(zz._1.asInstanceOf[String], x.name) }
 
 }
 
 /** this resolves dom trees*/
 
 class DomXpSolver extends XpSolver[RazElement, List[RazElement]] {
+  override def children[T >: RazElement, U >: List[RazElement]](root: T): (T, U) =
+    (root, root.asInstanceOf[RazElement].children.asInstanceOf[U])
+
   override def getNext[T >: RazElement, U >: List[RazElement]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] = {
     val n = o._2.asInstanceOf[List[RazElement]] filter (zz => XP.stareq(zz.name, tag))
-    for (e <- n) yield (e, e.children.asInstanceOf[U])
+    for (e <- n) yield children(e)
   }
 
   override def getAttr[T >: RazElement](o: T, attr: String): String = o.asInstanceOf[RazElement] a attr
-  override def reduce[T >: RazElement, U >: List[RazElement]](o: Iterable[(T, U)], cond: XpCond): Iterable[(T, U)] = o.asInstanceOf[List[(T, U)]]
+
+  //  override def reduce[T >: RazElement, U >: List[RazElement]](o: Iterable[(T, U)], cond: XpCond): Iterable[(T, U)] = 
+  //    o.asInstanceOf[List[(T, U)]]
 }
 
 /** this resolves dom trees*/
 object ScalaDomXpSolver extends XpSolver[scala.xml.Elem, List[scala.xml.Elem]] {
+  /** TODO can't i optimize this? how do i inline it at least? */
+  override def children[T >: scala.xml.Elem, U >: List[scala.xml.Elem]](root: T): (T, U) =
+    (root, root.asInstanceOf[scala.xml.Elem].child.filter(_.isInstanceOf[scala.xml.Elem]).toList.asInstanceOf[U])
+
   override def getNext[T >: scala.xml.Elem, U >: List[scala.xml.Elem]](o: (T, U), tag: String, assoc: String): Iterable[(T, U)] =
-    o._2.asInstanceOf[List[scala.xml.Elem]].filter(zz => XP.stareq(zz.label, tag)).map(x => (x.asInstanceOf[T], children(x).toList.asInstanceOf[U])).toList
+    o._2.asInstanceOf[List[scala.xml.Elem]].filter(zz => XP.stareq(zz.label, tag)).map(x => children(x)).toList
 
   override def getAttr[T >: scala.xml.Elem](o: T, attr: String): String =
     (o.asInstanceOf[scala.xml.Elem] \ ("@" + attr)) text
 
-  /** TODO can't i optimize this? how do i inline it at least? */
-  private def children(e: scala.xml.Elem) =
-    e.child.filter(_.isInstanceOf[scala.xml.Elem])
 }
 
 /**
  * reflection resolved for java/scala objects
- * "/Student/@name" or "Students/getStudents
  */
-object BeanXpSolver extends XpSolver[AnyRef, List[AnyRef]] {
+object BeanXpSolver extends MyBeanXpSolver
+
+/** reflection implementation
+ * 
+ * @param excludeMatches - custom exclusion rules: nodes and attributes with these names won't be browsed
+ */
+class MyBeanXpSolver (val excludeMatches:List[String=>Boolean]=Nil) extends XpSolver[AnyRef, () => List[AnyRef]] {
   trait LazyB { def eval: Any }
   abstract class BeanWrapper(val j: Any, val label: String = "root") extends LazyB {
-    override def equals (other:Any) = this.label == other.asInstanceOf[BeanWrapper].label
+    override def equals(other: Any) =
+      other.isInstanceOf[BeanWrapper] && this.label == other.asInstanceOf[BeanWrapper].label
+    override def toString = "BW(" + label + ")"
   }
   case class RootWrapper(override val j: Any, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = j }
   case class FieldWrapper(override val j: Any, val f: Field, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = f.get(j) }
-  case class MethodWrapper(override val j: Any, val m: Method, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = m.invoke(j) }
+  case class MethodWrapper(override val j: Any, val m: Method, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = { razie.Debug(3, "invoke: " + m); m.invoke(j)} }
   def WrapO(j: Any, label: String = "root") = new RootWrapper(j, label)
   def WrapF(j: Any, f: Field, label: String) = new FieldWrapper(j, f, label)
   def WrapM(j: Any, m: Method, label: String) = new MethodWrapper(j, m, label)
 
-  override def getNext[T >: BeanWrapper, U >: List[BeanWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
-    o._2.asInstanceOf[List[Any]].map(oo => if (oo.isInstanceOf[BeanWrapper]) oo else WrapO(oo, "root")).
-      asInstanceOf[List[BeanWrapper]].filter(zz => XP.stareq(zz.asInstanceOf[BeanWrapper].label, tag)).flatMap(src => {
+  var debug = false
+  
+  override def children[T >: BeanWrapper, U >: () => List[BeanWrapper]](root: T): (T, U) = {
+    val r = root match {
+      case r1: BeanWrapper => r1
+      case _ => WrapO(root, "root")
+    }
+    (r, (() => resolve(r.j.asInstanceOf[AnyRef], "*")).asInstanceOf[U])
+  }
+
+  implicit def toTee[T](l: Seq[T]): TeeSeq[T] = new TeeSeq[T](l)
+  class TeeSeq[T](l: Seq[T]) {
+    def tee: Seq[T] = {
+      if(debug) razie.Debug("TEE- " + l.mkString(", "))
+      l
+    }
+    def tee(level: Int, prefix: String): Seq[T] = {
+      if(debug) razie.Debug("TEE-" + prefix + " - " + l.mkString(", "))
+      l
+    }
+  }
+  override def getNext[T >: BeanWrapper, U >: () => List[BeanWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
+    if(debug) razie.Debug(3, "getNext " + tag)
+    o._2.asInstanceOf[() => List[BeanWrapper]].apply().asInstanceOf[List[Any]].asInstanceOf[List[BeanWrapper]].
+      filter(zz => XP.stareq(zz.asInstanceOf[BeanWrapper].label, tag)).tee(3, "before").
+      flatMap(src => {
         val res = src.eval
+        if(debug) println("DDDDDDDDDDDDD-" + res)
         for (y <- razie.MOLD(res))
-          yield (y.asInstanceOf[T], resolve(y.asInstanceOf[AnyRef], "*"))
-      }).toList
-    //    val n = resolve(o._1.asInstanceOf[AnyRef], tag)
-    //    for (x <- n; y <- razie.MOLD(x)) yield (y.asInstanceOf[T], List())
+          yield (WrapO(y.asInstanceOf[T], src.label), (() => resolve(y.asInstanceOf[AnyRef], "*")).asInstanceOf[U])
+      }).tee(3, "after").toList
   }
 
   override def getAttr[T >: BeanWrapper](o: T, attr: String): String = {
@@ -295,20 +385,57 @@ object BeanXpSolver extends XpSolver[AnyRef, List[AnyRef]] {
     resolve(oo.asInstanceOf[BeanWrapper].eval.asInstanceOf[AnyRef], attr).head.eval.toString
   }
 
+  override def reduce[T >: BeanWrapper, U >: () => List[BeanWrapper]](curr: Iterable[(T, U)], xe: XpElement): Iterable[(T, U)] =
+    (xe.cond match {
+      case null => curr.asInstanceOf[List[(T, U)]]
+      case _ => curr.asInstanceOf[List[(T, U)]].filter(x => xe.cond.passes(x._1, this))
+    }).filter(gaga => XP.stareq(gaga._1.asInstanceOf[BeanWrapper].label, xe.name))
+
+  override def unwrap[T >: BeanWrapper](root: List[T]): List[T] =
+    (root map (_.asInstanceOf[BeanWrapper].j)).asInstanceOf[List[T]]
+
+  // exclude all methods from Object and some others
+  lazy val meth = resolve(new Object(), "*", false).map(x => (x.label, x.label)).toMap ++
+    List("productArity","productElements","productPrefix","productIterator").map(x => (x, x)).toMap
+
+  // some exclusion rules
+  val nomatch : List[String=>Boolean] = 
+      {x:String=>x.endsWith ("$outer")} ::
+      {x:String=>x.equals ("hashCode")} ::
+      Nil
+
+  // completely skip these classes
+  val nogo: List[Any] = List(
+    classOf[String], classOf[Int], classOf[Boolean], classOf[Float],
+    classOf[Integer]
+    )
+
   // attr can be: field name, method name (with no args) or property name */
-  private def resolve(o: AnyRef, attr: String): List[BeanWrapper] = {
-    razie.Debug("Resolving: " + attr)
+  private def resolve(o: AnyRef, attr: String, check: Boolean = true): List[BeanWrapper] = {
+    if(debug) razie.Debug(3, "Resolving: " + attr + " from root: " + o)
     val result = if ("*" == attr) {
       // TODO restrict them by type or patter over type
-      val fields = o.getClass.getFields.map(f => WrapO(f.get(o), f.getName()))
-      val getters = o.getClass.getMethods.filter(_.getName.startsWith("get")).map(f => WrapM(o, f, fromZ(f.getName)))
-      val scalas = o.getClass.getMethods.filter( m=>
-        m.getParameterTypes.size == 0 && 
-        m.getReturnType.getName != "void" && 
-          ! m.getName.startsWith("get")
-          ).map(f => WrapM(o, f, f.getName))
-      // java getX scala x or member x while dropping duplicates
-      (scalas ++ fields ++ getters).map(p=>(p.label,p)).toMap.values.toList
+      if (nogo.contains(o.getClass())) Nil
+      else {
+        val fields = o.getClass.getFields.map(f => WrapO(f.get(o), f.getName()))
+        val getters = o.getClass.getDeclaredMethods.filter(m =>
+          m.getName.startsWith("get") &&
+            m.getName != "getClass" &&
+            m.getParameterTypes.isEmpty).map(f => WrapM(o, f, fromZ(f.getName)))
+        val scalas = o.getClass.getDeclaredMethods.filter(m =>
+          m.getParameterTypes.size == 0 &&
+            m.getReturnType.getName != "void" &&
+            !m.getName.startsWith("get") &&
+            m.getDeclaringClass() == o.getClass()
+            ).map(f => WrapM(o, f, f.getName))
+        // java getX scala x or member x while dropping duplicates
+        (scalas ++ fields ++ getters).map(
+          p => (p.label, p)).toMap.filterKeys(name=>
+              check && 
+              !meth.contains(name) &&
+              !nomatch.foldLeft(false)((x,f)=>x || f(name)) &&
+              !excludeMatches.foldLeft(false)((x,f)=>x || f(name))).values.toList
+      }
     } else {
       // java getX scala x or member x
       val m: java.lang.reflect.Method = try {
@@ -340,73 +467,13 @@ object BeanXpSolver extends XpSolver[AnyRef, List[AnyRef]] {
 
       List(result)
     }
-    razie.Debug("resolved: " + result.mkString)
+    if(debug) razie.Debug("resolved: " + result.mkString(","))
     result
   }
 
   private[this] def toZ(attr: String) = attr.substring(0, 1).toUpperCase + (if (attr.length > 1) attr.substring(1, attr.length - 1) else "")
   private[this] def fromZ(getter: String) = if (getter.length > 3) getter.substring(3).substring(0, 1).toLowerCase + (if (getter.length > 4) getter.substring(4, getter.length - 1) else "") else getter
 }
-
-//object BeanXpSolver extends XpSolver[AnyRef, List[AnyRef]] {
-//  override def getNext[T >: AnyRef, U >: List[AnyRef]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
-//    val n = resolve(o._1.asInstanceOf[AnyRef], tag)
-//
-//    for (x <- n; y <- razie.MOLD(x)) yield (y.asInstanceOf[T], List())
-//  }
-//
-//  override def getAttr[T >: AnyRef](o: T, attr: String): String = {
-//    resolve(o.asInstanceOf[AnyRef], attr).head.toString
-//  }
-//
-//  //   override def reduce[T>:scala.xml.Elem,U>:List[scala.xml.Elem]] (o:Iterable[(T,U)],cond:XpCond) : Iterable[(T,U)] = 
-//
-//  // attr can be: field name, method name (with no args) or property name */
-//  def resolve(o: AnyRef, attr: String) : List[Any] = {
-//    razie.Debug ("Resolving: " + attr)
-//    val result =  if ("*" == attr) {
-//      // match all the fields of the class
-//      // TODO use getXXX as well
-//      // TODO restrict them by type or patter over type
-//      // TODO make lazy
-//      val result = o.getClass.getFields.map(_.get(o))
-//      result.toList
-//    } else {
-//    // java getX scala x or member x
-//    val m: java.lang.reflect.Method = try {
-//      o.getClass.getMethod("get" + toZ(attr))
-//    } catch {
-//      case _ => try {
-//        o.getClass.getMethod(attr)
-//      } catch {
-//        case _ => null
-//      }
-//    }
-//
-//    val result = try {
-//      if (m != null) m.invoke(o)
-//      else {
-//        val f = try {
-//          o.getClass.getField(attr)
-//        } catch {
-//          case _ => null
-//        }
-//
-//        if (f != null) f.get(o)
-//        else null // TODO should probably log or debug?
-//      }
-//    } catch {
-//      case _ => null
-//    }
-//
-//    List(result)
-//    }
-//    razie.Debug ("resolved: " + result.mkString)
-//    result
-//  }
-//
-//  private[this] def toZ(attr: String) = attr.substring(0, 1).toUpperCase + (if (attr.length > 1) attr.substring(1, attr.length - 1) else "")
-//}
 
 // TODO 2-2 build a hierarchical context/solver structure - to rule the world. It would include registration
 

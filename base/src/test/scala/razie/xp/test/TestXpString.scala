@@ -5,8 +5,8 @@
  */
 package razie.xp.test
 
-import org.scalatest.junit._
-import org.scalatest.SuperSuite
+import org.junit.Test
+import org.scalatest.junit.MustMatchersForJUnit
 import razie._
 
 /**
@@ -14,7 +14,7 @@ import razie._
  * 
  * @author razvanc99
  */
-class TestXpString extends JUnit3Suite {
+class TestXpString extends MustMatchersForJUnit {
 
   def test11a = expect(List("root")) {
     XP("/root").xpl(StringXpSolver, "/root")

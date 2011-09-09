@@ -10,6 +10,7 @@ import org.scalatest.SuperSuite
 import org.scalatest.matchers._
 import razie.{G}
 import razie.g._
+import org.junit.Test
 
 class MyL (val a:MyN, val z:MyN) extends razie.g.GLink[MyN]
 class MyLV (aaa:MyN, zzz:MyN, val selector:Any) extends MyL (aaa,zzz)                                            
@@ -46,7 +47,7 @@ class MyN (val color:String) extends razie.g.GNode[MyN, MyL] with razie.g.WRGrap
  * 
  * @author razvanc99
  */
-class GraphTest extends JUnit3Suite with ShouldMatchers {
+class GraphTest extends MustMatchersForJUnit with ShouldMatchers {
   import razie.g.Graphs._  // get the implicits
   
   // for the nice inherited --> operators                             
@@ -72,13 +73,13 @@ class GraphTest extends JUnit3Suite with ShouldMatchers {
     (root:N) (implicit mn:Manifest[N], ml:Manifest[L]) = entire[N,L] (root)
     
   // leaf counted 3 times...
-  def test1 = expect (7) {
+  @Test def test1 = expect (7) {
      val c1 = new Counter
     (Graphs.entire[MyN, MyL] (g1).foreachNode (c1.count), c1)._2.c
   }
 
   // all nodes counted JUST one time
-  def test2 = expect (5) {
+  @Test def test2 = expect (5) {
      val c1 = new Counter
     println (Graphs.entire[MyN, MyL] (g1).indexed.index)
     (Graphs.entire[MyN, MyL] (g1).indexed.foreachNode (c1.count), c1)._2.c
@@ -87,7 +88,7 @@ class GraphTest extends JUnit3Suite with ShouldMatchers {
   // avoid loops
   val g2 = x
   val g3 = x --: g2 --: y --: g2
-  def testrec2 = expect (false) {
+  @Test def testrec2 = expect (false) {
     try {
       println (Graphs.entire[MyN, MyL] (g3).mkString)
       true
@@ -95,7 +96,7 @@ class GraphTest extends JUnit3Suite with ShouldMatchers {
       case _ => false
     } 
   }
-  def testrec3 = expect (true) {
+  @Test def testrec3 = expect (true) {
     try {
       println ("RECURSIVE MAMA" + Graphs.entire[MyN, MyL] (g3).dag.mkString)
       true
@@ -105,7 +106,7 @@ class GraphTest extends JUnit3Suite with ShouldMatchers {
   }
   
   val glarge1 = x --: x --: x --: x --: y
-  def testglarge1 = expect (false) {
+  @Test def testglarge1 = expect (false) {
     try {
       println (Graphs.entire[MyN, MyL] (glarge1).depth(3).mkString)
       true
@@ -113,7 +114,7 @@ class GraphTest extends JUnit3Suite with ShouldMatchers {
       case _ => false
     } 
   }
-  def testglarge2 = expect (true) {
+  @Test def testglarge2 = expect (true) {
     try {
       println ("LARGE MAMA" + Graphs.entire[MyN, MyL] (glarge1).depth(10).mkString)
       true

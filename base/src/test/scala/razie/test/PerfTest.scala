@@ -10,14 +10,15 @@ import org.scalatest._
 import razie.Near
 import razie.Threads
 import razie.Perf
+import org.junit.Test
 
-class PerfTest extends JUnit3Suite {
+class PerfTest extends MustMatchersForJUnit {
 
-   def test1  = expect (false) { Near (10.0::10.0::Nil) == Near (15.0::10.0::Nil) }
-   def test1a = expect (true) { Near (10.0::10.0::Nil) == Near (11.9::8.1::Nil) }
-   def test1b = expect (false) { Near (10.0::10.0::Nil) == 15.0::10.0::Nil }
-   def test1c = expect (Near (10.0::10.0::Nil)) { Near (11.9::8.1::Nil) }
-//   def test1d = expect (Near (10.0::10.0::Nil)) { 11.9::8.1::Nil }
+   @Test def test1  = expect (false) { Near (10.0::10.0::Nil) == Near (15.0::10.0::Nil) }
+   @Test def test1a = expect (true) { Near (10.0::10.0::Nil) == Near (11.9::8.1::Nil) }
+   @Test def test1b = expect (false) { Near (10.0::10.0::Nil) == 15.0::10.0::Nil }
+   @Test def test1c = expect (Near (10.0::10.0::Nil)) { Near (11.9::8.1::Nil) }
+//   @Test def test1d = expect (Near (10.0::10.0::Nil)) { 11.9::8.1::Nil }
    
    def donttest2 = expect (Near (10.0::10.0::0.1::Nil, 50)) {
       val g1 = Perf.runmt(1, 10) { 
