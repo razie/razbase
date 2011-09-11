@@ -42,6 +42,10 @@ Here's how to build it:
    cd ${w}
    git clone git@github.com:razie/razbase.git
 
+Note: if you don't have a github ssh key setup, use the anonymous checkout:
+
+    git clone http://github.com/razie/razbase.git
+
 4. Setup sbt 0.7.7 (simple build tool) and scala 2.9.1 distribution
 
 ... 
