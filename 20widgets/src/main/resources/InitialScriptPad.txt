@@ -1,20 +1,19 @@
 //crash-course into scala: select the following defs and issue "run selection"
 class Num (val i:Int) {
-           def + (other:Num)      = new Num (this.i + other.i)
-  override def toString : String  = "Numero " + i.toString
+           def + (other:Num)      = new Num (this.i + other.i) // operators
+  override def toString : String  = "Numero " + i.toString     // inherit Java methods
   override def equals (other:Any) = other.asInstanceOf[Num].i == i
 }
 
 object Num { // companion object contains statics for Num
-  // this lets you do Num(3) instead of new Num(3)
-  def apply (i:Int) = new Num (i)
+  def apply (i:Int) = new Num (i)  // this lets you do Num(3) instead of new Num(3)
   def valueOf (s:String) = new Num (s.toInt)
 }
 
 implicit def toNum (i:Int) = Num (i) // this makes the conversion implicit
 
-def add (i:Num*) = { // varargs
-  val ss = "12344"
+def add (i:Num*) = { // variable argument list
+  val ss = "12344"   // type inferred as String
   var ii = Num(0)
   for (k <- i) ii = ii + k                  // boo hoo - the way of the java...
   assert (ii == i.foldLeft (Num(0)) (_+_))  // woo hoo - the way of the lambda ...

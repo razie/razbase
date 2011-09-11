@@ -16,7 +16,7 @@ import razie._
  */
 class XpBeanTest extends MustMatchersForJUnit {
 
-  @Test def test1 = expect(List(jroot)) { xpl("/") }
+  @Test def test1 = expect(List(root)) { xpl("/") }
   @Test def test2 = expect("s") { xpa("/@s") }
   @Test def test3 = expect("s") { xpe("s") }
   @Test def test4 = expect("t") { xpa("@t") }
@@ -37,6 +37,6 @@ class XpBeanTest extends MustMatchersForJUnit {
   def xpla(path: String) = XP[Any](path).xpla(BeanXpSolver, root)
   def xpa(path: String) = XP[Any](path).xpa(BeanXpSolver, root)
 
-  val jroot = new ScalaB("root")
-  val root = BeanXpSolver.WrapO(jroot)
+  val root = new ScalaB("root")
+//  val root = BeanXpSolver.WrapO(jroot)
 }

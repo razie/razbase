@@ -9,10 +9,10 @@ class Project(info: ProjectInfo) extends ParentProject(info) {
       "Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/"
   Credentials(Path.userHome / ".ivy2.credentials", log)
 
-  val SCALAVER = "2.9.0-1"
+  val SCALAVER = "2.9.1"
     
   // need to use defs for dependencies - thejy're used in sub-projects
-  def scalatest = "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
+  def scalatest = "org.scalatest" % "scalatest_2.9.1" % "1.6.1"
   def junit = "junit" % "junit" % "4.5"
   def json = "org.json" % "json" % "20090211"
 
