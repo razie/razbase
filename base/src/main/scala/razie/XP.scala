@@ -254,7 +254,7 @@ trait XpSolver[+A, +B] {
     xe.cond match {
       case null => curr.asInstanceOf[List[(T, U)]]
       case _ => curr.asInstanceOf[List[(T, U)]].filter(x => xe.cond.passes(x._1, this))
-    } 
+    }
 }
 
 /** an element in the path */
@@ -321,8 +321,8 @@ object ScalaDomXpSolver extends XpSolver[scala.xml.Elem, List[scala.xml.Elem]] {
 
   // return node values as well, if proper atribute not found...
   override def getAttr[T >: scala.xml.Elem](o: T, attr: String): String = {
-    val ns = (o.asInstanceOf[scala.xml.Elem] \ ("@" + attr)) 
-    if (! ns.isEmpty) ns.text
+    val ns = (o.asInstanceOf[scala.xml.Elem] \ ("@" + attr))
+    if (!ns.isEmpty) ns.text
     else (o.asInstanceOf[scala.xml.Elem] \ attr) text
   }
 
@@ -338,11 +338,12 @@ object ScalaDomXpSolver extends XpSolver[scala.xml.Elem, List[scala.xml.Elem]] {
  */
 object BeanXpSolver extends MyBeanXpSolver
 
-/** reflection implementation
- * 
+/**
+ * reflection implementation
+ *
  * @param excludeMatches - custom exclusion rules: nodes and attributes with these names won't be browsed
  */
-class MyBeanXpSolver (val excludeMatches:List[String=>Boolean]=Nil) extends XpSolver[AnyRef, () => List[AnyRef]] {
+class MyBeanXpSolver(val excludeMatches: List[String => Boolean] = Nil) extends XpSolver[AnyRef, (String, String) => List[AnyRef]] {
   trait LazyB { def eval: Any }
   abstract class BeanWrapper(val j: Any, val label: String = "root") extends LazyB {
     override def equals(other: Any) =
@@ -351,32 +352,36 @@ class MyBeanXpSolver (val excludeMatches:List[String=>Boolean]=Nil) extends XpSo
   }
   case class RootWrapper(override val j: Any, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = j }
   case class FieldWrapper(override val j: Any, val f: Field, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = f.get(j) }
-  case class MethodWrapper(override val j: Any, val m: Method, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = { razie.Debug(3, "invoke: " + m); m.invoke(j)} }
+  case class MethodWrapper(override val j: Any, val m: Method, override val label: String = "root") extends BeanWrapper(j, label) with LazyB {
+    override def eval: Any = { if (debug) razie.Debug(3, "invoke: " + m); m.invoke(j) }
+  }
   def WrapO(j: Any, label: String = "root") = new RootWrapper(j, label)
   def WrapF(j: Any, f: Field, label: String) = new FieldWrapper(j, f, label)
   def WrapM(j: Any, m: Method, label: String) = new MethodWrapper(j, m, label)
 
-  var debug = false
-  
-  override def children[T >: BeanWrapper, U >: () => List[BeanWrapper]](root: T): (T, U) = {
+  var debug = true
+
+  type CONT = (String, String) => List[BeanWrapper]
+
+  override def children[T >: BeanWrapper, U >: CONT](root: T): (T, U) = {
     val r = root match {
       case r1: BeanWrapper => r1
       case _ => WrapO(root, "root")
     }
-    (r, (() => resolve(r.j.asInstanceOf[AnyRef], "*")).asInstanceOf[U])
+    (r, ((a: String, b: String) => resolve(r.j.asInstanceOf[AnyRef], a, b)).asInstanceOf[U])
   }
 
   import razie.Debug._
-  
-  override def getNext[T >: BeanWrapper, U >: () => List[BeanWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
-    if(debug) razie.Debug(3, "getNext " + tag)
-    o._2.asInstanceOf[() => List[BeanWrapper]].apply().asInstanceOf[List[Any]].asInstanceOf[List[BeanWrapper]].
+
+  override def getNext[T >: BeanWrapper, U >: CONT](o: (T, U), tag: String, assoc: String): List[(T, U)] = {
+    if (debug) razie.Debug(3, "getNext " + tag)
+    o._2.asInstanceOf[CONT].apply(tag, assoc).asInstanceOf[List[Any]].asInstanceOf[List[BeanWrapper]].
       filter(zz => XP.stareq(zz.asInstanceOf[BeanWrapper].label, tag)).teeIf(debug, 3, "before").
       flatMap(src => {
         val res = src.eval
-        if(debug) println("DDDDDDDDDDDDD-" + res)
+        if (debug) println("DDDDDDDDDDDDD-" + res)
         for (y <- razie.MOLD(res))
-          yield (WrapO(y.asInstanceOf[T], src.label), (() => resolve(y.asInstanceOf[AnyRef], "*")).asInstanceOf[U])
+          yield (WrapO(y.asInstanceOf[T], src.label), ((a: String, b: String) => resolve(y.asInstanceOf[AnyRef], a, b)).asInstanceOf[U])
       }).teeIf(debug, 3, "after").toList
   }
 
@@ -385,7 +390,7 @@ class MyBeanXpSolver (val excludeMatches:List[String=>Boolean]=Nil) extends XpSo
     resolve(oo.asInstanceOf[BeanWrapper].eval.asInstanceOf[AnyRef], attr).head.eval.toString
   }
 
-  override def reduce[T >: BeanWrapper, U >: () => List[BeanWrapper]](curr: Iterable[(T, U)], xe: XpElement): Iterable[(T, U)] =
+  override def reduce[T >: BeanWrapper, U >: CONT](curr: Iterable[(T, U)], xe: XpElement): Iterable[(T, U)] =
     (xe.cond match {
       case null => curr.asInstanceOf[List[(T, U)]]
       case _ => curr.asInstanceOf[List[(T, U)]].filter(x => xe.cond.passes(x._1, this))
@@ -395,49 +400,52 @@ class MyBeanXpSolver (val excludeMatches:List[String=>Boolean]=Nil) extends XpSo
     (root map (_.asInstanceOf[BeanWrapper].j)).asInstanceOf[List[T]]
 
   // exclude all methods from Object and some others
-  lazy val meth = resolve(new Object(), "*", false).map(x => (x.label, x.label)).toMap ++
-    List("productArity","productElements","productPrefix","productIterator").map(x => (x, x)).toMap
+  lazy val meth = resolve(new Object(), "*", "", false).map(x => (x.label, x.label)).toMap ++
+    List("productArity", "productElements", "productPrefix", "productIterator").map(x => (x, x)).toMap
 
   // some exclusion rules
-  val nomatch : List[String=>Boolean] = 
-      {x:String=>x.endsWith ("$outer")} ::
-      {x:String=>x.equals ("hashCode")} ::
+  val nomatch: List[String => Boolean] =
+    { x: String => x.endsWith("$outer") } ::
+      { x: String => x.equals("hashCode") } ::
       Nil
 
   // completely skip these classes
   val nogo: List[Any] = List(
     classOf[String], classOf[Int], classOf[Boolean], classOf[Float],
-    classOf[Integer]
-    )
+    classOf[Integer])
 
   // attr can be: field name, method name (with no args) or property name */
-  private def resolve(o: AnyRef, attr: String, check: Boolean = true): List[BeanWrapper] = {
-    if(debug) razie.Debug(3, "Resolving: " + attr + " from root: " + o)
+  private def resolve(o: AnyRef, attr: String, assoc: String = "", check: Boolean = true): List[BeanWrapper] = {
+    if (debug) razie.Debug(3, "Resolving: " + attr + " from root: " + o)
+
+    // introspection 
+    def fields(crit: Field => Boolean) = o.getClass.getFields.filter(crit(_)).map(f => WrapO(f.get(o), f.getName()))
+    def getters(crit: Method => Boolean) = o.getClass.getDeclaredMethods.filter(m =>
+      m.getName.startsWith("get") &&
+        m.getName != "getClass" &&
+        m.getParameterTypes.isEmpty).filter(crit(_)).map(f => WrapM(o, f, fromZ(f.getName)))
+    def scalas(crit: Method => Boolean) = o.getClass.getDeclaredMethods.filter(m =>
+      m.getParameterTypes.size == 0 &&
+        m.getReturnType.getName != "void" &&
+        !m.getName.startsWith("get") &&
+        m.getDeclaringClass() == o.getClass()).filter(crit(_)).map(f => WrapM(o, f, f.getName))
+
+    def ALL[T](x: T) = true // filter all
+
     val result = if ("*" == attr) {
       // TODO restrict them by type or patter over type
       if (nogo.contains(o.getClass())) Nil
       else {
-        val fields = o.getClass.getFields.map(f => WrapO(f.get(o), f.getName()))
-        val getters = o.getClass.getDeclaredMethods.filter(m =>
-          m.getName.startsWith("get") &&
-            m.getName != "getClass" &&
-            m.getParameterTypes.isEmpty).map(f => WrapM(o, f, fromZ(f.getName)))
-        val scalas = o.getClass.getDeclaredMethods.filter(m =>
-          m.getParameterTypes.size == 0 &&
-            m.getReturnType.getName != "void" &&
-            !m.getName.startsWith("get") &&
-            m.getDeclaringClass() == o.getClass()
-            ).map(f => WrapM(o, f, f.getName))
         // java getX scala x or member x while dropping duplicates
-        (scalas ++ fields ++ getters).map(
-          p => (p.label, p)).toMap.filterKeys(name=>
-              check && 
+        (scalas(ALL) ++ fields(ALL) ++ getters(ALL)).map(
+          p => (p.label, p)).toMap.filterKeys(name =>
+            check &&
               !meth.contains(name) &&
-              !nomatch.foldLeft(false)((x,f)=>x || f(name)) &&
-              !excludeMatches.foldLeft(false)((x,f)=>x || f(name))).values.toList
+              !nomatch.foldLeft(false)((x, f) => x || f(name)) &&
+              !excludeMatches.foldLeft(false)((x, f) => x || f(name))).values.toList
       }
     } else {
-      // java getX scala x or member x
+      // java getX scala x or member x by name
       val m: java.lang.reflect.Method = try {
         o.getClass.getMethod("get" + toZ(attr))
       } catch {
@@ -448,8 +456,8 @@ class MyBeanXpSolver (val excludeMatches:List[String=>Boolean]=Nil) extends XpSo
         }
       }
 
-      val result = try {
-        if (m != null) WrapM(o, m, attr)
+      val result2 = try {
+        if (m != null) List(WrapM(o, m, attr))
         //      if (m != null) m.invoke(o)
         else {
           val f = try {
@@ -458,16 +466,46 @@ class MyBeanXpSolver (val excludeMatches:List[String=>Boolean]=Nil) extends XpSo
             case _ => null
           }
 
-          if (f != null) WrapO(f.get(o), attr)
-          else null // TODO should probably log or debug?
+          if (f != null) List(WrapO(f.get(o), attr))
+          else Nil // TODO should probably log or debug?
         }
       } catch {
-        case _ => null
+        case _ => Nil
       }
 
-      List(result)
+      if (result2.isEmpty) {
+        // ===================== last chance - try by type
+        def also(s: String) = (assoc == null || assoc.length <= 0 || assoc.equals(s))
+        val s = scalas(m => m.getReturnType().getSimpleName() == attr && also(m.getName()))
+        val m = getters(m => m.getReturnType().getSimpleName() == attr && also(m.getName()))
+        val f = fields(f => f.getType().getSimpleName() == attr /*&& also(f.getName())*/ )
+
+        if (debug) {
+    println ("FFFFFields: " + o.getClass.getFields.map(f => (f.getName(), f.getType)).mkString("-"))
+    println ("FFFFMethods: " + o.getClass.getDeclaredMethods.filter(m =>
+      m.getName.startsWith("get") &&
+        m.getName != "getClass" &&
+        m.getParameterTypes.isEmpty).map(f => (fromZ(f.getName), f.getReturnType)).mkString("-")
+        )
+    println ("FFFFFScalas: " + o.getClass.getDeclaredMethods.filter(m =>
+      m.getParameterTypes.size == 0 &&
+        m.getReturnType.getName != "void" &&
+        !m.getName.startsWith("get") &&
+        m.getDeclaringClass() == o.getClass()).map(f => (f.getName, f.getReturnType)).mkString("-"))
+        }
+        
+        def opt[T <: BeanWrapper](x1: => Seq[T]): Option[Seq[BeanWrapper]] = { val x = x1; if (x.isEmpty) None else Some(x) }
+
+        opt(s).getOrElse(opt(m).getOrElse(opt(f).getOrElse(Nil))).collect(
+          {
+            case x1 @ RootWrapper(j, label) => RootWrapper(j, attr) // i'm using RootWrapper instead of FieldWrapper
+            case FieldWrapper(j, f, l) => FieldWrapper(j, f, attr)
+            case MethodWrapper(j, m, l) => MethodWrapper(j, m, attr)
+          }).toList
+      } else result2
     }
-    if(debug) razie.Debug("resolved: " + result.mkString(","))
+
+    if (debug) razie.Debug("resolved: " + result.mkString(","))
     result
   }
 

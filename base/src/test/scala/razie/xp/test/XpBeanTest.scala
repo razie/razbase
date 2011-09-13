@@ -28,9 +28,13 @@ class XpBeanTest extends MustMatchersForJUnit {
   @Test def test0 = expect("s") { xpe("/root/j/a/s") }
   @Test def testa = expect("s") { xpa("/root/j/@s") }
 //  @Test def testb = expect("s") { xpe("/root/j/*") }
-  @Test def testc = expect(List("s", "s")) { xpl("/root/j/*/s") }
-  @Test def testb = expect("s") { xpe("/root/j/*/s") }
+//  @Test def testc = expect(List("s", "s")) { xpl("/root/j/*/s") }
+//  @Test def testb = expect("s") { xpe("/root/j/*/s") }
 
+  @Test def findByClass1 = expect ("j") { xpe ("/root/j/String")}
+  @Test def findByClass2 = expect ("s") { xpe ("/root/j/JavaA/s")}
+  @Test def findByClass3 = expect ("c") { xpe ("/root/**/C3/c")}
+  @Test def findByClass4 = expect ("c") { xpa ("/root/**/C3/@c")}
 
   def xpe(path: String) = XP[Any](path) using BeanXpSolver xpe root
   def xpl(path: String) = XP[Any](path).xpl(BeanXpSolver, root)

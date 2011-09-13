@@ -2,7 +2,10 @@
 class Num (val i:Int) {
            def + (other:Num)      = new Num (this.i + other.i) // operators
   override def toString : String  = "Numero " + i.toString     // inherit Java methods
-  override def equals (other:Any) = other.asInstanceOf[Num].i == i
+  override def equals (other:Any) = other match {              // or override them
+    case n:Num => n.i == i
+    case _ => false                             // wildcard serves like a default case
+    }
 }
 
 object Num { // companion object contains statics for Num
