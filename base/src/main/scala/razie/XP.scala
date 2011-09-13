@@ -406,7 +406,12 @@ class MyBeanXpSolver(val excludeMatches: List[String => Boolean] = Nil) extends 
   // some exclusion rules
   val nomatch: List[String => Boolean] =
     { x: String => x.endsWith("$outer") } ::
+      { x: String => x.equals("MODULE$") } ::
       { x: String => x.equals("hashCode") } ::
+      // these is because the REPL, in Scripster, adds this to any case class: apply,class $line4.$read$$iw$$iw$C1
+      // and generates Malformed class name
+      //      { x: String => x.equals("apply") } :: 
+      { x: String => x.equals("readResolve") } ::
       Nil
 
   // completely skip these classes
@@ -419,18 +424,27 @@ class MyBeanXpSolver(val excludeMatches: List[String => Boolean] = Nil) extends 
     if (debug) razie.Debug(3, "Resolving: " + attr + " from root: " + o)
 
     // introspection 
-    def fields(crit: Field => Boolean) = o.getClass.getFields.filter(crit(_)).map(f => WrapO(f.get(o), f.getName()))
+    def fields(crit: Field => Boolean) = o.getClass.getFields.filter(f => FILTER(f.getName)).filter(crit(_)).map(f => WrapO(f.get(o), f.getName()))
     def getters(crit: Method => Boolean) = o.getClass.getDeclaredMethods.filter(m =>
       m.getName.startsWith("get") &&
         m.getName != "getClass" &&
+        FILTER(m.getName) &&
         m.getParameterTypes.isEmpty).filter(crit(_)).map(f => WrapM(o, f, fromZ(f.getName)))
     def scalas(crit: Method => Boolean) = o.getClass.getDeclaredMethods.filter(m =>
       m.getParameterTypes.size == 0 &&
         m.getReturnType.getName != "void" &&
         !m.getName.startsWith("get") &&
+        FILTER(m.getName) &&
         m.getDeclaringClass() == o.getClass()).filter(crit(_)).map(f => WrapM(o, f, f.getName))
 
     def ALL[T](x: T) = true // filter all
+
+    def FILTER(name: String) = {
+      check &&
+        !meth.contains(name) &&
+        !nomatch.foldLeft(false)((x, f) => x || f(name)) &&
+        !excludeMatches.foldLeft(false)((x, f) => x || f(name))
+    }
 
     val result = if ("*" == attr) {
       // TODO restrict them by type or patter over type
@@ -438,11 +452,7 @@ class MyBeanXpSolver(val excludeMatches: List[String => Boolean] = Nil) extends 
       else {
         // java getX scala x or member x while dropping duplicates
         (scalas(ALL) ++ fields(ALL) ++ getters(ALL)).map(
-          p => (p.label, p)).toMap.filterKeys(name =>
-            check &&
-              !meth.contains(name) &&
-              !nomatch.foldLeft(false)((x, f) => x || f(name)) &&
-              !excludeMatches.foldLeft(false)((x, f) => x || f(name))).values.toList
+          p => (p.label, p)).toMap.values.toList
       }
     } else {
       // java getX scala x or member x by name
@@ -476,24 +486,23 @@ class MyBeanXpSolver(val excludeMatches: List[String => Boolean] = Nil) extends 
       if (result2.isEmpty) {
         // ===================== last chance - try by type
         def also(s: String) = (assoc == null || assoc.length <= 0 || assoc.equals(s))
-        val s = scalas(m => m.getReturnType().getSimpleName() == attr && also(m.getName()))
-        val m = getters(m => m.getReturnType().getSimpleName() == attr && also(m.getName()))
-        val f = fields(f => f.getType().getSimpleName() == attr /*&& also(f.getName())*/ )
+        val s = scalas(m => attr == getSimpleName(m.getReturnType()) && also(m.getName()))
+        val m = getters(m => attr == getSimpleName(m.getReturnType()) && also(m.getName()))
+        val f = fields(f => attr == getSimpleName(f.getType()) && also(f.getName()))
 
         if (debug) {
-    println ("FFFFFields: " + o.getClass.getFields.map(f => (f.getName(), f.getType)).mkString("-"))
-    println ("FFFFMethods: " + o.getClass.getDeclaredMethods.filter(m =>
-      m.getName.startsWith("get") &&
-        m.getName != "getClass" &&
-        m.getParameterTypes.isEmpty).map(f => (fromZ(f.getName), f.getReturnType)).mkString("-")
-        )
-    println ("FFFFFScalas: " + o.getClass.getDeclaredMethods.filter(m =>
-      m.getParameterTypes.size == 0 &&
-        m.getReturnType.getName != "void" &&
-        !m.getName.startsWith("get") &&
-        m.getDeclaringClass() == o.getClass()).map(f => (f.getName, f.getReturnType)).mkString("-"))
+          println("FFFFFields: " + o.getClass.getFields.map(f => (f.getName(), f.getType)).mkString("-"))
+          println("FFFFMethods: " + o.getClass.getDeclaredMethods.filter(m =>
+            m.getName.startsWith("get") &&
+              m.getName != "getClass" &&
+              m.getParameterTypes.isEmpty).map(f => (fromZ(f.getName), f.getReturnType)).mkString("-"))
+          println("FFFFFScalas: " + o.getClass.getDeclaredMethods.filter(m =>
+            m.getParameterTypes.size == 0 &&
+              m.getReturnType.getName != "void" &&
+              !m.getName.startsWith("get") &&
+              m.getDeclaringClass() == o.getClass()).map(f => (f.getName, f.getReturnType)).mkString("-"))
         }
-        
+
         def opt[T <: BeanWrapper](x1: => Seq[T]): Option[Seq[BeanWrapper]] = { val x = x1; if (x.isEmpty) None else Some(x) }
 
         opt(s).getOrElse(opt(m).getOrElse(opt(f).getOrElse(Nil))).collect(
@@ -511,6 +520,51 @@ class MyBeanXpSolver(val excludeMatches: List[String => Boolean] = Nil) extends 
 
   private[this] def toZ(attr: String) = attr.substring(0, 1).toUpperCase + (if (attr.length > 1) attr.substring(1, attr.length - 1) else "")
   private[this] def fromZ(getter: String) = if (getter.length > 3) getter.substring(3).substring(0, 1).toLowerCase + (if (getter.length > 4) getter.substring(4, getter.length - 1) else "") else getter
+
+  /** protect against scala interpreter screwy names, must hack this Class.getSimpleName method */
+  private[this] def getSimpleName(c: java.lang.Class[_]): String = {
+    var n = getSimpleClassName(c)
+    // this is specifically for the interpreter - it adds this to some ofthe types can can't do beans by type in Scripster
+    val REPL_PREFIX = "$read$$iw$$iw$"
+    if (n.isEmpty()) n = c.getName.substring(c.getName.lastIndexOf(".") + 1); // strip the package name
+    if (n.startsWith(REPL_PREFIX))
+      n.substring(REPL_PREFIX.length())
+    else n
+  }
+  /** protect against scala interpreter screwy names, must hack this Class.getSimpleName method */
+  private[this] def getSimpleClassName(c: java.lang.Class[_]): String = {
+    if (c.isArray())
+      return getSimpleName(c.getComponentType()) + "[]";
+
+    var simpleName = getSimpleBinaryName(c);
+    if (simpleName == null) { // top level class
+      simpleName = c.getName();
+      return simpleName.substring(simpleName.lastIndexOf(".") + 1); // strip the package name
+    }
+    val length = simpleName.length();
+    if (length < 1) // || simpleName.charAt(0) != '$')
+      throw new InternalError("Malformed class name");
+    var index = 1;
+    while (index < length && isAsciiDigit(simpleName.charAt(index)))
+      index = index + 1;
+    // Eventually, this is the empty string iff this is an anonymous class
+    return simpleName.substring(index);
+  }
+
+  private def getSimpleBinaryName(c: Class[_]): String = {
+    val enclosingClass = c.getEnclosingClass();
+    if (enclosingClass == null) // top level class
+      return null;
+    // Otherwise, strip the enclosing class' name
+    try {
+      return c.getName().substring(enclosingClass.getName().length());
+    } catch {
+      case ex: IndexOutOfBoundsException => throw new InternalError("Malformed class name");
+    }
+  }
+  private def isAsciiDigit(c: Char) = {
+    '0' <= c && c <= '9';
+  }
 }
 
 // TODO 2-2 build a hierarchical context/solver structure - to rule the world. It would include registration

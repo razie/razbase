@@ -24,4 +24,5 @@ class ScalaB (value:String)extends ScalaLeaf (value){
 
 case class C1 { val c = C2() }
 case class C2 { val c = C3() }
-case class C3 { val c = "c" }
+case class C3 { val c = C4() }
+case class C4 { val c = "c" }
