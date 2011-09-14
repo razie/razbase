@@ -4,12 +4,12 @@
  */
 package razie.xp.test
 
+import org.json.JSONObject
 import org.junit.Test
 import org.scalatest.junit.MustMatchersForJUnit
-import razie.XP
-import razie.xp.XpJsonSolver
 
-import org.json._
+import razie.xp.JsonSolver
+import razie.XP
 
 /**
  * junit tests for the XP stuff
@@ -43,11 +43,11 @@ class XpJsonTest extends MustMatchersForJUnit {
    @Test def test3  = expect ("b1") { xpa("/root/a/b/@value")}
    @Test def test4  = expect ("b1") { xpa("/root/*/b/@value")}
  
-   def xpe(path:String) = XP[Any] (path) using XpJsonSolver xpe root
-   def xpl (path:String) = XP[Any] (path).xpl(XpJsonSolver, root) 
-   def xpla(path:String) = XP[Any] (path).xpla(XpJsonSolver, root) 
-   def xpa(path:String) = XP[Any] (path).xpa(XpJsonSolver, root) 
+   def xpe(path:String) = XP.forJson(path) xpe root
+   def xpl (path:String) = XP.forJson(path) xpl root
+   def xpla(path:String) = XP.forJson(path) xpla root
+   def xpa(path:String) = XP.forJson(path) xpa root
 
-   val root = XpJsonSolver.WrapO(new JSONObject(json))
+   val root = JsonSolver.WrapO(new JSONObject(json))
 }
 

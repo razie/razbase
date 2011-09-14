@@ -9,13 +9,14 @@ import org.junit.Test
 import org.scalatest.junit.MustMatchersForJUnit
 import razie.{ XP, DomXpSolver }
 import razie.base.data.RazElement._
+import org.scalatest.matchers.MustMatchers
 
 /**
  * junit tests for the XP stuff
  * 
  * @author razvanc99
  */
-class TestXpScalaXml extends MustMatchersForJUnit {
+class TestXpScalaXml extends MustMatchers {
 
   @Test def test40 = expect(List("a")) { xpl("/").map(_.label) }
   @Test def test41 = expect(List("a")) { xpl("/a").map(_.label) }

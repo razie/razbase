@@ -6,15 +6,17 @@
 package razie.xp.test
 
 import org.junit.Test
-import org.scalatest.junit.MustMatchersForJUnit
-import razie._
+import org.scalatest.matchers.MustMatchers
+
+import razie.xp.BeanSolver
+import razie.XP
 
 /**
  * junit tests for the XP stuff
  * 
  * @author razvanc99
  */
-class XpBeanTest extends MustMatchersForJUnit {
+class XpBeanTest extends MustMatchers {
 
   @Test def test1 = expect(List(root)) { xpl("/") }
   @Test def test2 = expect("s") { xpa("/@s") }
@@ -37,10 +39,10 @@ class XpBeanTest extends MustMatchersForJUnit {
   @Test def findByClass4 = expect ("c") { xpa ("/root/**/C4/@c")}
   @Test def findByClass5 = expect (1) { xpl ("/root/**/C4").size}
 
-  def xpe(path: String) = XP[Any](path) using BeanXpSolver xpe root
-  def xpl(path: String) = XP[Any](path).xpl(BeanXpSolver, root)
-  def xpla(path: String) = XP[Any](path).xpla(BeanXpSolver, root)
-  def xpa(path: String) = XP[Any](path).xpa(BeanXpSolver, root)
+  def xpe(path: String) = XP[Any](path) using BeanSolver xpe root
+  def xpl(path: String) = XP[Any](path).xpl(BeanSolver, root)
+  def xpla(path: String) = XP[Any](path).xpla(BeanSolver, root)
+  def xpa(path: String) = XP[Any](path).xpa(BeanSolver, root)
 
   val root = new ScalaB("root")
 //  val root = BeanXpSolver.WrapO(jroot)

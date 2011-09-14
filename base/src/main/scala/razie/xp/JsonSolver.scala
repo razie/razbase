@@ -1,3 +1,9 @@
+/**
+ * ____    __    ____  ____  ____,,___     ____  __  __  ____
+ *  (  _ \  /__\  (_   )(_  _)( ___)/ __)   (  _ \(  )(  )(  _ \           Read
+ *   )   / /(__)\  / /_  _)(_  )__) \__ \    )___/ )(__)(  ) _ <     README.txt
+ *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
+ */
 package razie.xp
 
 import razie._
@@ -19,13 +25,18 @@ case class JsonAWrapper(override val j: JSONArray, override val label: String = 
  *
  * In Eclipse, pick up this library from lib_managed/
  */
-object XpJsonSolver extends XpSolver[JsonWrapper, List[JsonWrapper]] {
+object JsonSolver extends XpSolver[JsonWrapper] {
+
+  type T=JsonWrapper
+  type CONT=List[JsonWrapper]
+  type U=CONT
+  
   def WrapO(j: JSONObject, label: String = "root") = new JsonOWrapper(j, label)
   def WrapA(j: JSONArray, label: String = "root") = new JsonAWrapper(j, label)
 
   import razie.Debug._
   
-  override def children[T >: JsonWrapper, U >: List[JsonWrapper]](root: T): (T, U) =
+  override def children(root: T): (T, U) =
     root match {
       case x: JsonOWrapper => (x, children2(x, "*").toList.tee(3, "C").asInstanceOf[U])
       case _ => throw new IllegalArgumentException()
@@ -33,7 +44,7 @@ object XpJsonSolver extends XpSolver[JsonWrapper, List[JsonWrapper]] {
     
   // TODO 2-2 need to simplify - this is just mean...
   /** browsing json is different since only the parent konws the name of the child... a JSON Object doesn't know its own name/label/tag */
-  override def getNext[T >: JsonWrapper, U >: List[JsonWrapper]](o: (T, U), tag: String, assoc: String): List[(T, U)] =
+  override def getNext(o: (T, U), tag: String, assoc: String): List[(T, U)] =
     o._2.asInstanceOf[List[JsonWrapper]].filter(zz => XP.stareq(zz.asInstanceOf[JsonWrapper].label, tag)).tee(3, "D").flatMap (_ match {
       case x: JsonOWrapper => (x, children2(x, "*").toList.asInstanceOf[U]) :: Nil
       case x: JsonAWrapper => wrapElements(x.j, x.label) map (t=>(t, children2(t, "*").toList.asInstanceOf[U]))
@@ -59,7 +70,7 @@ object XpJsonSolver extends XpSolver[JsonWrapper, List[JsonWrapper]] {
       case a: JSONArray => WrapA(a, tag)
     }
 
-  override def getAttr[T >: JsonWrapper](o: T, attr: String): String = {
+  override def getAttr(o: T, attr: String): String = {
     val ret = o match {
       case o: JsonOWrapper => o.j.get(attr)
       case o: JSONObject => o.get(attr)
@@ -68,7 +79,7 @@ object XpJsonSolver extends XpSolver[JsonWrapper, List[JsonWrapper]] {
     ret.toString
   }
   
-  override def reduce[T >: JsonWrapper, U >: List[JsonWrapper]](curr: Iterable[(T, U)], xe: XpElement): Iterable[(T, U)] =
+  override def reduce(curr: Iterable[(T, U)], xe: XpElement): Iterable[(T, U)] =
     (xe.cond match {
       case null => curr.asInstanceOf[List[(T, U)]]
       case _ => curr.asInstanceOf[List[(T, U)]].filter(x => xe.cond.passes(x._1, this))
