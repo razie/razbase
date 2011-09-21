@@ -102,7 +102,7 @@ public class Log {
       }
 
 //      String msg = program + "-" + component + "-" + category + ": " + m;
-      String msg = component + "-" + category + cat + ": " + m;
+      String msg = Thread.currentThread().getName() + "-"+ component + "-" + category + cat + ": " + m;
       System.out.println(msg);
    }
 

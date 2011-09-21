@@ -163,7 +163,7 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
   }
 
   def hasAttrType(name: String): Boolean = {
-    this._types != null && this._types.get(name) != null;
+    this._types != null && this._types.contains(name)
   }
 
   def getAttrType(name: String): AttrType = {
