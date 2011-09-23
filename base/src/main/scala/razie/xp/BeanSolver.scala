@@ -10,11 +10,11 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.InternalError
 import java.lang.Object
-
 import razie.Debug.toTee
 import razie.XpSolver
 import razie.XP
 import razie.XpElement
+import razie.Logging
 
 /**
  * reflection resolved for java/scala objects
@@ -26,7 +26,7 @@ object BeanSolver extends MyBeanSolver
  *
  * @param excludeMatches - custom exclusion rules: nodes and attributes with these names won't be browsed
  */
-class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends XpSolver[Any] {
+class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends XpSolver[Any] with Logging {
   type T=Any
   type CONT = (String, String) => List[BeanWrapper]
   type U=CONT
@@ -41,7 +41,7 @@ class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends Xp
   case class RootWrapper(override val j: Any, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = j }
   case class FieldWrapper(override val j: Any, val f: Field, override val label: String = "root") extends BeanWrapper(j, label) with LazyB { override def eval: Any = f.get(j) }
   case class MethodWrapper(override val j: Any, val m: Method, override val label: String = "root") extends BeanWrapper(j, label) with LazyB {
-    override def eval: Any = { if (debug) razie.Debug(3, "invoke: " + m); m.invoke(j) }
+    override def eval: Any = { trace("invoke: " + m); m.invoke(j) }
   }
   
   def WrapO(j: Any, label: String = "root") = new RootWrapper(j, label)
@@ -62,15 +62,15 @@ class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends Xp
   import razie.Debug._
 
   override def getNext(o: (T, U), tag: String, assoc: String): List[(T, U)] = {
-    if (debug) razie.Debug(3, "getNext " + tag)
+    debug("getNext " + tag)
     o._2.asInstanceOf[CONT].apply(tag, assoc).asInstanceOf[List[Any]].asInstanceOf[List[BeanWrapper]].
-      filter(zz => XP.stareq(zz.asInstanceOf[BeanWrapper].label, tag)).teeIf(debug, 3, "before").
+      filter(zz => XP.stareq(zz.asInstanceOf[BeanWrapper].label, tag)).teeIf(debug, "before").
       flatMap(src => {
         val res = src.eval
         if (debug) println("DDDDDDDDDDDDD-" + res)
         for (y <- razie.MOLD(res))
           yield (WrapO(y.asInstanceOf[T], src.label), ((a: String, b: String) => resolve(y.asInstanceOf[AnyRef], a, b)).asInstanceOf[U])
-      }).teeIf(debug, 3, "after").toList
+      }).teeIf(debug, "after").toList
   }
 
   override def getAttr(o: T, attr: String): String = {
@@ -109,7 +109,7 @@ class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends Xp
 
   // attr can be: field name, method name (with no args) or property name */
   private def resolve(o: AnyRef, attr: String, assoc: String = "", check: Boolean = true): List[BeanWrapper] = {
-    if (debug) razie.Debug(3, "Resolving: " + attr + " from root: " + o)
+    trace("Resolving: " + attr + " from root: " + o)
 
     // introspection 
     def fields(crit: Field => Boolean) = o.getClass.getFields.filter(f => FILTER(f.getName)).filter(crit(_)).map(f => WrapO(f.get(o), f.getName()))
@@ -179,12 +179,12 @@ class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends Xp
         val f = fields(f => attr == getSimpleName(f.getType()) && also(f.getName()))
 
         if (debug) {
-          println("FFFFFields: " + o.getClass.getFields.map(f => (f.getName(), f.getType)).mkString("-"))
-          println("FFFFMethods: " + o.getClass.getDeclaredMethods.filter(m =>
+          trace("FFFFFields: " + o.getClass.getFields.map(f => (f.getName(), f.getType)).mkString("-"))
+          trace("FFFFMethods: " + o.getClass.getDeclaredMethods.filter(m =>
             m.getName.startsWith("get") &&
               m.getName != "getClass" &&
               m.getParameterTypes.isEmpty).map(f => (fromZ(f.getName), f.getReturnType)).mkString("-"))
-          println("FFFFFScalas: " + o.getClass.getDeclaredMethods.filter(m =>
+          trace("FFFFFScalas: " + o.getClass.getDeclaredMethods.filter(m =>
             m.getParameterTypes.size == 0 &&
               m.getReturnType.getName != "void" &&
               !m.getName.startsWith("get") &&
@@ -202,7 +202,7 @@ class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends Xp
       } else result2
     }
 
-    if (debug) razie.Debug("resolved: " + result.mkString(","))
+    debug("resolved: " + result.mkString(","))
     result
   }
 

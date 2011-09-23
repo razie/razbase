@@ -66,6 +66,6 @@ public interface SocketCmdHandler {
 
         public abstract String[] getSupportedActions();
 
-        static final Log logger = Log.create("", Impl.class.getName());
+        static final Log logger = Log.factory.create("", Impl.class.getName());
     }
 }

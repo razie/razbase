@@ -98,7 +98,7 @@ object GRef {
     /**
      * just a simple UID implementation, to fake IDs for objects that don't have them.
      */
-    def uid() =  "Uid-" + {seqNum+=1; seqNum} + "-" + String.valueOf(System.currentTimeMillis());
+    def uid() = synchronized { "Uid-" + {seqNum+=1; seqNum} } // + "-" + String.valueOf(System.currentTimeMillis());
 }
 
 /** strait-forward unique Id of a single entity */
@@ -192,13 +192,13 @@ trait GAssocResolver [From, To] {
 }
 
 object GUid {
-   /** to allocate next UID...this should be done better */
-   private var seqNum : Int = 1;
+   /** TODO allocate next UID...this should be done better */
+   private var seqNum : Long = 1;
 
    /**
     * just a simple UID implementation, to fake IDs for objects that don't have them.
     */
-   def apply () =  "Uid-" + {seqNum+=1; seqNum} + "-" + String.valueOf(System.currentTimeMillis());
+   def apply () = synchronized { "Uid-" + {seqNum+=1; seqNum} } // + "-" + String.valueOf(System.currentTimeMillis());
 }
 
 // TODO handling exception scenarios

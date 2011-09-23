@@ -85,7 +85,7 @@ class LightContentServer (var dflt:SocketCmdHandler = null) extends ContentServe
             } catch {
                case e:Throwable=> {
                   // TODO 3-2 security breach showing stack trace to user
-                  razie.Log("ERR_HTTP_RECEIVER_EXCEPTION: ", e);
+                  razie.Log.error("ERR_HTTP_RECEIVER_EXCEPTION: ", e);
                   reply = HtmlRenderUtils.textToHtml(Log.getStackTraceAsString(e));
                }
             }

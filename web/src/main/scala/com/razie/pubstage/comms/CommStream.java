@@ -66,5 +66,5 @@ public class CommStream {
         return Comms.readStream(is);
     }
 
-    static Log logger = Log.create(CommStream.class.getName());
+    static Log logger = Log.factory.create(CommStream.class.getName());
 }

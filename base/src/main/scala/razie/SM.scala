@@ -8,8 +8,7 @@ package razie
 import scala.util.matching.Regex
 
 /** state machines have states, transitions and consume events */
-object SM {
-  val logger = razie.Log
+object SM extends razie.Logging {
 
   type Cback = (StateMachine, Transition, Event) => Unit
 
@@ -133,9 +132,9 @@ object SM {
 
       newState match {
         case NullState =>
-          logger trace "ERR-event not matched from \"" + currState + "\" on event \"" + e + "\""
+          logger warn "ERR-event not matched from \"" + currState + "\" on event \"" + e + "\""
         case _ => {
-          logger trace "SM Moving from \"" + currState + "\" to \"" + newState + "\" on event \"" + e + "\""
+          logger debug "SM Moving from \"" + currState + "\" to \"" + newState + "\" on event \"" + e + "\""
           // TODO keep history
           currState = newState
           o match {
@@ -170,7 +169,7 @@ object SM {
     // ---------------- callbacks
 
     def echo(s: String)(sm: StateMachine, t: Transition, e: Event) =
-      logger log "SM_LOG: event=" + e + " message=\"" + s + "\""
+      logger info "SM_LOG: event=" + e + " message=\"" + s + "\""
 
     val stack = razie.Listi[Event]()
     def push(sm: StateMachine, t: Transition, e: Event) { e +=: stack }

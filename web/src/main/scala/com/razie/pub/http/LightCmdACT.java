@@ -54,5 +54,5 @@ public class LightCmdACT extends LightCmdGET {
     }
 
     static final String[] COMMANDS = { "ACT" };
-    static final Log      logger   = Log.create("", LightCmdACT.class.getName());
+    static final Log      logger   = Log.factory.create("", LightCmdACT.class.getName());
 }

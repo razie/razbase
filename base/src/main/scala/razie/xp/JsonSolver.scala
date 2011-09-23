@@ -38,17 +38,17 @@ object JsonSolver extends XpSolver[JsonWrapper] {
   
   override def children(root: T): (T, U) =
     root match {
-      case x: JsonOWrapper => (x, children2(x, "*").toList.tee(3, "C").asInstanceOf[U])
+      case x: JsonOWrapper => (x, children2(x, "*").toList.tee("C").asInstanceOf[U])
       case _ => throw new IllegalArgumentException()
     }
     
   // TODO 2-2 need to simplify - this is just mean...
   /** browsing json is different since only the parent konws the name of the child... a JSON Object doesn't know its own name/label/tag */
   override def getNext(o: (T, U), tag: String, assoc: String): List[(T, U)] =
-    o._2.asInstanceOf[List[JsonWrapper]].filter(zz => XP.stareq(zz.asInstanceOf[JsonWrapper].label, tag)).tee(3, "D").flatMap (_ match {
+    o._2.asInstanceOf[List[JsonWrapper]].filter(zz => XP.stareq(zz.asInstanceOf[JsonWrapper].label, tag)).tee("D").flatMap (_ match {
       case x: JsonOWrapper => (x, children2(x, "*").toList.asInstanceOf[U]) :: Nil
       case x: JsonAWrapper => wrapElements(x.j, x.label) map (t=>(t, children2(t, "*").toList.asInstanceOf[U]))
-    }).tee(3,"E").toList
+    }).tee("E").toList
 
   private def children2(node: JsonWrapper, tag: String): Seq[JsonWrapper] = {
     val x = node match {

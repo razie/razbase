@@ -265,5 +265,5 @@ public class Comms {
     return null;
   }
 
-  static Log logger = Log.create(Comms.class.getName());
+  static Log logger = Log.factory.create(Comms.class.getName());
 }

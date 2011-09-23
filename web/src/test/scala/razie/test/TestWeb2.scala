@@ -34,14 +34,14 @@ object TestWeb2 {
 }
 
 /** a demo content assist implementation */
-class CSDemo extends LightContentServer {
+class CSDemo extends LightContentServer with razie.Logging {
    
    override def options (s:String, sessionId:String) : Seq[ActionItem] = {
       val ret = 
          if (s endsWith "a") razie.AI("b") :: razie.AI("c") :: Nil
          else if (s endsWith "b") razie.AI("c") :: Nil
          else Nil
-   S.logger trace "options for: \'"+s+"\' are: " +ret
+   this trace "options for: \'"+s+"\' are: " +ret
    ret
    }
 }

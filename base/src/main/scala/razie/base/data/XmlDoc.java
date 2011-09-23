@@ -19,6 +19,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.razie.pub.base.log.Log;
+
 /**
  * represents an xml document - generally for configuration. For dynamic data, use the XmlDb class.
  * 
@@ -99,14 +101,14 @@ public class XmlDoc {
             File f = fileFromUrl(this.myUrl);
             long ft = f != null ? f.lastModified() : -1;
             if (ft != this.fileLastModified) {
-                razie.Log$.MODULE$.logThis ("RELOAD_UPDATED_XMLDB name="+name);
+                Log.logThis ("RELOAD_UPDATED_XMLDB name="+name);
                 load(name, myUrl);
             }
         }
     }
 
     public XmlDoc load(String name, URL url) {
-       razie.Log$.MODULE$.logThis("XmlDoc:loading from URL=" + url);
+       Log.logThis("XmlDoc:loading from URL=" + url);
         this.myUrl = url;
         this.name = name;
         this.document = RiXmlUtils.readXml(url);
@@ -120,7 +122,7 @@ public class XmlDoc {
             fileLastModified = f != null ? f.lastModified() : -1;
             this.lastChecked = System.currentTimeMillis();
         } catch (Exception e) {
-           razie.Log$.MODULE$.logThis("XMLDOC won't be refreshed automatically: Can't get datetime for file URL=" + url);
+           Log.logThis("XMLDOC won't be refreshed automatically: Can't get datetime for file URL=" + url);
             this.reloadMilis = 0;
         }
 

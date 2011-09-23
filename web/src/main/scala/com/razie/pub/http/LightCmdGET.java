@@ -305,6 +305,6 @@ public class LightCmdGET extends SocketCmdHandler.Impl {
     public static final List<SedFilter> MPRES = new ArrayList<SedFilter>();
     
     static final String[]        COMMANDS = { "GET"}; // TODO 2-2 FUNC implement "PUT", "DELETE"
-    static final Log             logger   = Log.create("", LightCmdGET.class.getName());
+    static final Log             logger   = Log.factory.create("", LightCmdGET.class.getName());
     private Map<String, HttpSoaBinding> bindings = new HashMap<String,HttpSoaBinding>();
 }

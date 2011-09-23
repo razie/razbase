@@ -70,5 +70,5 @@ public class LightCmdPOST extends LightCmdGET {
    }
 
    static final String[] COMMANDS = { "POST" };
-   static final Log      logger   = Log.create("", LightCmdPOST.class.getName());
+   static final Log      logger   = Log.factory.create("", LightCmdPOST.class.getName());
 }

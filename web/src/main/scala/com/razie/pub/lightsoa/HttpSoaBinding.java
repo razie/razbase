@@ -253,5 +253,5 @@ public Object execServer(String actionName, String protocol, String cmdargs, Pro
             + (this.service == null ? "NULL SERVICE - probably the asset service?" : this.service.getClass().getName());
    }
 
-   private static final Log logger = Log.create("http", HttpSoaBinding.class.getName());
+   private static final Log logger = Log.factory.create("http", HttpSoaBinding.class.getName());
 }

@@ -48,7 +48,7 @@ object T {
 }
 
 /** the generic telnet state machine */
-abstract class TelnetSM extends SM.StateMachine {
+abstract class TelnetSM extends SM.StateMachine with razie.Logging {
   import SM._
    
    val SB = 250
@@ -105,7 +105,7 @@ abstract class TelnetSM extends SM.StateMachine {
 
 /** the useful part: content assist etc */
 class MyTelnetSM (val p:Puffer, val session:SessionControl, val socket:MyServerSocket, val cs:ContentServer) 
-extends TelnetSM {
+extends TelnetSM with razie.Logging {
    import SM._
 
    val useMultiple = true
@@ -167,7 +167,7 @@ extends TelnetSM {
    
    /** find actual content assisst options */
    def cassist (c:Char) : Boolean = {
-      S.logger trace "char: " + c + "   code: " + c.toInt
+      logger trace "char: " + c + "   code: " + c.toInt
       if (c == '\t') {
          val opt = cs.options(p.acc, session.sessionId)
          if (opt.size == 1) {
@@ -201,7 +201,7 @@ extends TelnetSM {
    }
    
    def eatLine (line:String) = {
-      S.logger trace "line: " + line
+      logger trace "line: " + line
       session print "\r\n"
       
       if (line == "exit" || line == "quit") {
