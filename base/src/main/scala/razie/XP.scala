@@ -47,7 +47,7 @@ import java.lang.reflect.Field
  * 3) extensiblity: you can easily plugin resolvers.
  */
 case class XP[T](val gp: GPath) {
-  razie.Debug("building XP with GPath: " + gp.elements.mkString("/"))
+  XP.debug("building XP with GPath: " + gp.elements.mkString("/"))
 
   /** return the matching list - solve this path starting with the root and the given solving strategy */
   def xpl(ctx: XpSolver[T], root: T): List[T] = {
@@ -118,7 +118,7 @@ case class XP[T](val gp: GPath) {
 }
 
 /** Example of creating a dedicated solver */
-object XP {
+object XP extends Logging {
   def forScala(xpath: String) = XP[scala.xml.Elem](xpath) using ScalaDomXpSolver
   def forString(xpath: String) = XP[String](xpath) using StringXpSolver
   def forBean(xpath: String) = XP[Any](xpath) using razie.xp.BeanSolver
@@ -130,6 +130,11 @@ object XP {
   def stareq(what: String, tag: String) =
     if ("*" == tag || "**" == tag) true
     else what == tag
+    
+  var debugging = false
+  
+  override def debug (s: => String) = if(debugging) debug(s)
+  override def trace (s: => String) = if(debugging) trace(s)
 }
 
 /**

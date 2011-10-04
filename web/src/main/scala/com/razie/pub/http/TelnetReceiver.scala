@@ -257,7 +257,7 @@ class TelnetReceiver (val socket:MyServerSocket, cs:ContentServer) extends Socke
    override def print   (s:String) = out print s
    override def println (s:String) = out print s + "\r\n"
    override def stop = keepReading = false
-   val sessionId : String = cs.mkSession("scala")
+   lazy val sessionId : String = cs.mkSession("scala")
    // TODO scripting support for other languages: switch language
 
    var keepReading = true

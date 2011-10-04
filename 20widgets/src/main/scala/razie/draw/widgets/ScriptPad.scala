@@ -92,6 +92,7 @@ class SimpleScriptPad (
  * 
  * @param run - factory, creates the ATI to invoke to run the script. Will receive two args: "language" and "script"
  */
+@deprecated ("use ScriptPad2 instead")
 class ScriptPad (
       lang:String,
       val run : () => ActionToInvoke, 
@@ -142,9 +143,9 @@ class ScriptPad (
 //        Draw html "<script type=\"text/javascript\" charset=\"UTF-8\" >setup2();</script>",
         {
            val l = Draw list (
-              Draw button (razie.AI("F9 - Run Line"), "javascript:runLine()"),
+              Draw button (razie.AI("F9 - Run Line"), "javascript:runLine('/scripster/run?')"),
               Draw text "|",
-              Draw button (razie.AI("Ctrl+F9 - Run Selection"),  "javascript:runSelection()"),
+              Draw button (razie.AI("Ctrl+F9 - Run Selection"),  "javascript:runSelection('/scripster/run?')"),
               Draw text "|",
               Draw button (razie.AI("Reset"), "javascript:razInvoke('/scripster/reset?sessionId="+ati.getAttr("sessionId")+"')"),
               Draw text "|",

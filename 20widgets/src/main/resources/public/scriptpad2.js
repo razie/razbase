@@ -7,9 +7,11 @@
 //var Scripster = (function() {
 
 var editor = 0;
-var razParserFile= ["../contrib/scala/js/tokenizescala.js", "../contrib/scala/js/parsescala.js"];
-var razStyleSheet= "contrib/scala/css/scalacolors-dark.css"
+var canon = 0;
+
 var razieCss="dark";
+var razMode="ace/mode/scala";
+var razTheme="ace/theme/twilight";
 
 var SCRIP_RUN='/scripster/run?'
 
@@ -21,80 +23,58 @@ function darklight (css, dcss, lcss) {
 function configIt (css,lang) {
   razieCss=css;
 
-//  def langs = "scala,java,javascript,xml,html,css,ognl,sparql,lua,php,plsql,python,sql,whatever" 
-  
-  if (lang == 'scala') {
-    razParserFile= ["../contrib/scala/js/tokenizescala.js", "../contrib/scala/js/parsescala.js"];
-    razStyleSheet= darklight(css,"contrib/scala/css/scalacolors-dark.css", "contrib/scala/css/scalacolors-light.css")
-    }
-  else if (lang == 'java') {
-    razParserFile= ["tokenizejavascript.js", "parsejavascript.js"];
-    razStyleSheet= "css/jscolors.css"
-    }
-  else if (lang == 'javascript') {
-    razParserFile= ["tokenizejavascript.js", "parsejavascript.js"];
-    razStyleSheet= "css/jscolors.css"
-    }
-  else if (lang == 'xml') {
-    razParserFile= ["tokenize.js", "parsexml.js"];
-    razStyleSheet= "css/xmlcolors.css"
-    }
-  else if (lang == 'html') {
-    razParserFile= ["tokenize.js", "parsehtmlmixed.js"];
-    razStyleSheet= "css/xmlcolors.css"
-    }
-  else if (lang == 'css') {
-    razParserFile= ["tokenize.js", "parsecss.js"];
-    razStyleSheet= "css/csscolors.css"
-    }
-  else if (lang == 'sqarql') {
-    razParserFile= ["tokenize.js", "parsesparql.js"];
-    razStyleSheet= "css/sparqlcolors.css"
-    }
-  else if (lang == 'lua') {
-    razParserFile= ["tokenize.js", "../contrib/lua/js/parselua.js"];
-    razStyleSheet= "contrib/lua/css/luacolors.css"
-    }
-  else if (lang == 'php') {
-    razParserFile= ["tokenize.js", "../contrib/lua/js/parsephp.js"];
-    razStyleSheet= "contrib/php/css/phpcolors.css"
-    }
-  else if (lang == 'python') {
-    razParserFile= ["tokenize.js", "../contrib/lua/js/parsepython.js"];
-    razStyleSheet= "contrib/python/css/pythoncolors.css"
-    }
-  else if (lang == 'sql') {
-    razParserFile= ["tokenize.js", "../contrib/lua/js/parsesql.js"];
-    razStyleSheet= "contrib/sql/css/sqlcolors.css"
-    }
-  else if (lang == 'plsql') {
-    razParserFile= ["tokenize.js", "../contrib/lua/js/parsesql.js"];
-    razStyleSheet= "contrib/plsql/css/plsqlcolors.css"
-    }
-  else if (lang == 'whatever') {
-    razParserFile= ["tokenizejavascript.js", "parsejavascript.js"];
-    razStyleSheet= "css/jscolors.css"
-    }
+  if (lang == 'scala') { var razMode="ace/mode/scala"; }
+  else if (lang == 'whatever') { }
 }
 
 // this will invoke the config above with the right css/language combination
 razSetup();
 
-//function fromTextArea(cd) {
+function fromTextArea() {
 
-editor = CodeMirror.fromTextArea('code', {
-    parserfile: razParserFile,
-    stylesheet: "/public/CodeMirror/"+razStyleSheet,
-    path: "/public/CodeMirror/js/",
-    continuousScanning: 200,
-    lineNumbers: false,
-    initCallback: setup2
-  });
+editor = ace.edit("code");
+editor.setTheme("ace/theme/twilight"); 
+var ScalaScriptMode = require("ace/mode/scala").Mode;
+editor.getSession().setMode(new ScalaScriptMode());
+editor.renderer.setHScrollBarAlwaysVisible(false)
+editor.renderer.setShowGutter(false)
 
-//}
+canon = require('pilot/canon')
+
+canon.addCommand({
+    name: 'F9-run',
+    bindKey: { win: 'F9', mac: 'F9', sender: 'editor' },
+    exec: function(env, args, request) {
+            runLine(SCRIP_RUN)
+    }
+})
+
+canon.addCommand({
+    name: 'CF9-run',
+    bindKey: { win: 'Ctrl-F9', mac: 'Command-F9', sender: 'editor' },
+    exec: function(env, args, request) {
+            runSelection(SCRIP_RUN)
+    }
+})
+
+canon.addCommand({
+    name: 'assist',
+    bindKey: { win: 'Ctrl-Space', mac: 'Command-Space', sender: 'editor' },
+    exec: function(env, args, request) {
+            contentAssist("")
+    }
+})
+
+}
+
+fromTextArea();
+
+    window.onload = function() {
+        setup2();
+    };
 
 function setup2 () {
-  editor.setUserKeyHandler (razspkey);
+//  editor.setUserKeyHandler (razspkey);
   mclose();
   statusx = document.getElementById('status');
   showStatus ("ready")
@@ -109,8 +89,8 @@ function razspkey (event) {
 }
 
 function runLine (url) {
-   var s1 = editor.cursorPosition(true)
-   var scr = editor.lineContent(s1.line)
+   var s1 = editor.getCursorPosition()
+   var scr = editor.getSession().doc.getAllLines()[s1.row];
 
   showStatus ("sending line...")
    if (scr != null && scr.length > 0) 
@@ -120,7 +100,7 @@ function runLine (url) {
 }
 
 function runSelection (url) {
-   var scr = editor.selection()
+   var scr = editor.getSession().doc.getTextRange(editor.getSelectionRange());
 
    if (scr == null || scr.length == 0) scr = editor.getCode()
    
@@ -133,6 +113,7 @@ function runSelection (url) {
 function showStatus (msg) {
    try {
 //  statusx.value=htmlBody("Status: " + msg);
+  statusx = document.getElementById('status');
 var ss = statusx;
   ss.firstChild.nodeValue=("Status: " + msg);
    } catch(e) {}
@@ -178,8 +159,8 @@ var currRequestCount = 0
 function contentAssist (e) {
   mclose();
   
-  var s1 = editor.cursorPosition(true)
-  var scr = editor.lineContent(s1.line)
+   var s1 = editor.getCursorPosition()
+   var scr = editor.getSession().doc.getAllLines()[s1.row];
   currRequestCount += 1
   showStatus ("asking for content assist...")
   try {
@@ -207,15 +188,17 @@ function openWhenOptionsArrive (reqCount, e, ret) {
       
       showStatus ("got content assist: " + allitems.length + " options");
       
-      var s1 = editor.cursorPosition(true)
-      var scr = editor.lineContent(s1.line)
+   var s1 = editor.getCursorPosition()
+   var scr = editor.getSession().doc.getAllLines()[s1.row];
      
       try { 
         mclose(); 
-        var currLine = editor.currentLine() ;
+        //var currLine = editor.currentLine() ;
+        var currLine = editor.getCursorPosition().row;
+        var coll = editor.getCursorPosition().column;
    
         if(items != null && items[0] != undefined) {
-          showMenu (currLine, scr, s1.character);
+          showMenu (currLine, scr, coll);
         } else {
           mclose();
         }
@@ -256,7 +239,7 @@ var items = []
 var currSelected=0
 var statusx = 0;
 
-function buildMenu (currLine, line, column, current_word) {
+function buildMenu (currLine, line, column) {
    ddmenu = document.getElementById('m1');
    
    for (var k = 0; k < items.length; k++){
@@ -271,10 +254,10 @@ function buildMenu (currLine, line, column, current_word) {
          
       li.onclick = li.doitman = function () {
         var cc = completion(line, this.text);
-        editor.insertIntoLine (currLine, column, cc);
+        editor.insert(cc);
         
-        var pos = editor.cursorPosition(true), text = editor.lineContent(pos.line);
-        editor.selectLines(pos.line, text.length+1);
+//        var pos = editor.cursorPosition(true), text = editor.lineContent(pos.line);
+ //       editor.selectLines(pos.line, text.length+1);
 
         // TODO problem: if you do content assist twice in a row, second time doesn't move to the end
       };
@@ -298,6 +281,11 @@ function mopen() {
 
 // close showed layer
 function mclose() {
+  try {
+   ungrabKeys()
+    } catch(e) {
+    }
+
    if(ddmenu) {
      ddmenu.style.visibility = 'hidden';
      
@@ -307,7 +295,6 @@ function mclose() {
    }
   
    currSelected=0
-   editor.ungrabKeys ();
 }
 
 // go close timer
@@ -317,7 +304,7 @@ function mclosetime() {
 
 // cancel close timer
 function mcancelclosetime() {
-   if(closetimer) {
+   if (closetimer) {
       window.clearTimeout(closetimer);
       closetimer = null;
    }
@@ -325,22 +312,108 @@ function mcancelclosetime() {
 
 // close layer when click-out
 document.onclick = mclose; 
+var commandNames = ['backspace','left','up','right','down','return']
+var oldCommands = []
 
+function grabKeys() {
+if (! oldCommands['Backspace']) {
+  var env = {editor: editor};
+
+  commandNames.forEach (function(i) {
+    oldCommands[i] = canon.findKeyCommand (env, "editor", 0, i)
+  }, this)
+  //oldCommands['left'] = canon.findKeyCommand (env, "editor", 0, 'left')
+  //oldCommands['up'] = canon.findKeyCommand (env, "editor", 0, 'up')
+  //oldCommands['right'] = canon.findKeyCommand (env, "editor", 0, 'right')
+  //oldCommands['down'] = canon.findKeyCommand (env, "editor", 0, 'down')
+  //oldCommands['return'] = canon.findKeyCommand (env, "editor", 0, 'return')
+}
+
+canon.addCommand({
+    name: '27',
+    bindKey: { win: 'Esc', mac: 'Esc', sender: 'editor' },
+    exec: function(env, args, request) {
+            autoCompleteGrabkeys(27)
+    }
+})
+canon.addCommand({
+    name: '37',
+    bindKey: { win: 'Left', mac: 'Left', sender: 'editor' },
+    exec: function(env, args, request) {
+            autoCompleteGrabkeys(37)
+    }
+})
+canon.addCommand({
+    name: '38',
+    bindKey: { win: 'Up', mac: 'Up', sender: 'editor' },
+    exec: function(env, args, request) {
+            autoCompleteGrabkeys(38)
+    }
+})
+canon.addCommand({
+    name: '39',
+    bindKey: { win: 'Right', mac: 'Right', sender: 'editor' },
+    exec: function(env, args, request) {
+            autoCompleteGrabkeys(39)
+    }
+})
+canon.addCommand({
+    name: '8',
+    bindKey: { win: 'Backspace', mac: 'Backspace', sender: 'editor' },
+    exec: function(env, args, request) {
+            autoCompleteGrabkeys(8)
+    }
+})
+canon.addCommand({
+    name: '40',
+    bindKey: { win: 'Down', mac: 'Down', sender: 'editor' },
+    exec: function(env, args, request) {
+            autoCompleteGrabkeys(40)
+    }
+})
+canon.addCommand({
+    name: '13',
+    bindKey: { win: 'Return', mac: 'Return', sender: 'editor' },
+    exec: function(env, args, request) {
+            autoCompleteGrabkeys(13)
+    }
+})
+
+}
+
+function ungrabKeys () {
+canon.removeCommand ('27')
+canon.removeCommand ('37')
+canon.removeCommand ('38')
+canon.removeCommand ('39')
+canon.removeCommand ('40')
+canon.removeCommand ('8')
+canon.removeCommand ('13')
+
+commandNames.forEach(function(i) {
+  if (oldCommands[i]) canon.addCommand (oldCommands[i])
+    }, this);
+
+}
 
 //------------------------- inspired from ... TODO get url
 
-function showMenu (currLine, line, column, current_word) {
-  editor.grabKeys (autoCompleteGrabkeys, keyEventFilter);
+function showMenu (currLine, line, column) {
+  grabKeys ()
    
-  buildMenu (currLine, line, column, current_word)
+  buildMenu (currLine, line, column)
 
   // position it   
+  var x=0
+  var y=0
   var x = (column - line.length) *  9.25 + 45;
-  x -= editor.frame.contentDocument.body.scrollLeft;
+//  x -= editor.frame.contentDocument.body.scrollLeft;
+  x -= editor.container.offsetLeft;
   var y = currLine * 16 + 8;
-  y -= editor.frame.contentDocument.body.scrollTop;
-  x +=  editor.frame.offsetParent.offsetLeft
-  y += editor.frame.offsetParent.offsetTop
+  //y -= editor.frame.contentDocument.body.scrollTop;
+  y -= editor.container.offsetTop;
+  x +=  editor.container.offsetParent.offsetLeft
+  y += editor.container.offsetParent.offsetTop
 
   ddmenu.style.left = x + "px";
   ddmenu.style.top = y + "px";
@@ -359,12 +432,12 @@ function keyEventFilter(keycode){
    return false;
 }
  
-function autoCompleteGrabkeys(e){
-   if (e.keyCode === 27 || e.keyCode === 37 ||  e.keyCode === 39 || e.keyCode === 8) {
+function autoCompleteGrabkeys(e_keyCode){
+   if (e_keyCode === 27 || e_keyCode === 37 ||  e_keyCode === 39 || e_keyCode === 8) {
     // ESC || LEFT_ARROW || RIGHT_LEFT_ARROW || BACK SPACE 
       mclose(); 
    }
-   else if (e.keyCode === 40) // DOWN_ARROW
+   else if (e_keyCode === 40) // DOWN_ARROW
    {  
       if (currSelected && currSelected.nextSibling) {
          currSelected.className = "a";
@@ -372,7 +445,7 @@ function autoCompleteGrabkeys(e){
          currSelected.className = "razsel";
       }
    }
-   else if (e.keyCode === 38) // UP_ARROW
+   else if (e_keyCode === 38) // UP_ARROW
    { 
       if (currSelected && currSelected.previousSibling){
          currSelected.className = "a";
@@ -380,7 +453,7 @@ function autoCompleteGrabkeys(e){
          currSelected.className = "razsel";   
       }
    }
-   else if (e.keyCode === 13) // ENTER
+   else if (e_keyCode === 13) // ENTER
    {
       try {
       if (currSelected) currSelected.doitman()

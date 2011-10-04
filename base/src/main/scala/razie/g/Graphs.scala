@@ -1,4 +1,4 @@
-/**  ____    __    ____  ____  ____,,___     ____  __  __  ____
+/** ____    __    ____  ____  ____,,___     ____  __  __  ____
  *  (  _ \  /__\  (_   )(_  _)( ___)/ __)   (  _ \(  )(  )(  _ \           Read
  *   )   / /(__)\  / /_  _)(_  )__) \__ \    )___/ )(__)(  ) _ <     README.txt
  *  (_)\_)(__)(__)(____)(____)(____)(___/   (__)  (______)(____/    LICENSE.txt
@@ -7,8 +7,8 @@ package razie.g
 
 //-------------------------- simple (set) graphs, with structure induced on an existing set
 
-/** a graph is a set of nodes and links between these nodes. It's better though to forget this 
- * and see each node as a (sub) graph. Most of the code here will do that 
+/** a graph is a set of nodes and links between these nodes. It's better though to forget this
+ *  and see each node as a (sub) graph. Most of the code here will do that
  */
 trait SGraph[N <: GSNode[_], L <: GLink[N]] {
   def gnodes: Seq[N]
@@ -145,8 +145,8 @@ trait GraphLike[N <: GNode[N, L], L <: GLink[N]] {
 }
 
 /** DAG - avoids cycles, if any...then I can traverse each node AND LINK just once */
-class IndexedGraphLike[N <: GNode[N, L], L <: GLink[N]] (target: GraphLike[N, L]) 
-extends NoCyclesGraphLike[N, L] (target) {
+class IndexedGraphLike[N <: GNode[N, L], L <: GLink[N]](target: GraphLike[N, L])
+  extends NoCyclesGraphLike[N, L](target) {
 
   // index it
   // TODO should warn if the graph is too big...how the heck do i find that out?
@@ -165,7 +165,12 @@ extends NoCyclesGraphLike[N, L] (target) {
   }
 }
 
-/** then I can traverse each node just once */
+/** Wraps a graph so then I can traverse each node just once, even if the original graph had cycles
+ *
+ *  it will index the nodes as it traverses them, to avoid walking the same path twice.
+ *
+ *  This is excellent for example for printing graphs or doing any operation where you just want to visit the nodes and not worry about cycles and stack overflows...
+ */
 class NoCyclesGraphLike[N <: GNode[N, L], L <: GLink[N]](target: GraphLike[N, L]) extends GraphLike[N, L] {
   import scala.collection.mutable
 
@@ -195,10 +200,10 @@ class NoCyclesGraphLike[N <: GNode[N, L], L <: GLink[N]](target: GraphLike[N, L]
       if (!isNodeCollected(n))
         fn(n, level)
       collect (n, from)
-      n.glinks.filter(x => !isCollected(n,Option(x))).foreach(l => { 
+      n.glinks.filter(x => !isCollected(n, Option(x))).foreach(l => {
         fl(l, level)
-        iforeach(l.z, Option(l), fn, fl, level + 1) 
-        })
+        iforeach(l.z, Option(l), fn, fl, level + 1)
+      })
     }
   }
 
@@ -240,12 +245,15 @@ object Graphs {
   def filterNodes[N <: GNode[N, L], L <: GLink[N]](n: N)(f: N => Boolean): Seq[N] =
     entire[N, L] (n) filterNodes (f)
 
+  /** colored graph where you inject the color as a function of node colored: N => Boolean */
   class CGL[N <: GNode[N, L], L <: GLink[N]](val root: N, val colored: N => Boolean)
     extends GraphLike[N, L]
 
+  /** wrap a node and turn it into a colored graph with the given coloring function */
   def colored[N <: GNode[N, L], L <: GLink[N]](n: N)(color: N => Boolean) =
     new CGL[N, L](n, color)
 
+  /** wrap a node and turn it into a graph with no color (all nodes traversed) */
   def entire[N <: GNode[N, L], L <: GLink[N]](n: N) = new CGL[N, L](n, { x: N => true })
 }
 
