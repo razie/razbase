@@ -56,6 +56,12 @@ Here's how to build it:
   cd ${w}/20widgets/src/public
   git clone git@github.com:razie/CodeMirror.git
 
+3.2. hack a bit - have to checkout my fork of ACE in this specific location
+
+  git clone git@github.com:razie/ace.git
+  cp -r ${w}/ace/build ${w}/20widgets/src/public
+  cd ${w}/20widgets/src/public
+
 4. edit ${w}/razbase/razie.properties and set the w property to the workspace
 
 7. Eclipse setup

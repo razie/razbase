@@ -12,7 +12,9 @@ div.ScriptPad {
    margin: 0;
    padding: 0;
    background: #000000;
-   border: 1px solid #5970B2}
+   border: 1px solid #5970B2;
+   z-index:3;
+ }
 
    #m1 a
    {  position: relative;
@@ -25,11 +27,13 @@ div.ScriptPad {
       text-decoration: none;
       background: #00EAEBD8;
       color: red;
-      font: 11px arial}
+      font: 11px arial;
+    }
 
    #m1 a:hover
    {  background: yellow;
-      color: blue}
+      color: blue;
+    }
 
 .razsel
    {  background: yellow;

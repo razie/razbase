@@ -38,8 +38,10 @@ var ScalaScriptMode = require("ace/mode/scala").Mode;
 editor.getSession().setMode(new ScalaScriptMode());
 editor.renderer.setHScrollBarAlwaysVisible(false)
 editor.renderer.setShowGutter(false)
-
 canon = require('pilot/canon')
+
+var mmm = document.getElementById("m1");
+
 
 canon.addCommand({
     name: 'F9-run',
@@ -193,7 +195,6 @@ function openWhenOptionsArrive (reqCount, e, ret) {
      
       try { 
         mclose(); 
-        //var currLine = editor.currentLine() ;
         var currLine = editor.getCursorPosition().row;
         var coll = editor.getCursorPosition().column;
    
@@ -410,8 +411,8 @@ function showMenu (currLine, line, column) {
 //  x -= editor.frame.contentDocument.body.scrollLeft;
   x -= editor.container.offsetLeft;
   var y = currLine * 16 + 8;
-  //y -= editor.frame.contentDocument.body.scrollTop;
   y -= editor.container.offsetTop;
+  y -= editor.renderer.scrollTop;
   x +=  editor.container.offsetParent.offsetLeft
   y += editor.container.offsetParent.offsetTop
 

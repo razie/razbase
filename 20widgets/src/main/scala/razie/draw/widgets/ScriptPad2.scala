@@ -69,12 +69,6 @@ class ScriptPad2(
         Draw html "<script type=\"text/javascript\" charset=\"UTF-8\" >var razSpSession = '" + ati.getAttr("sessionId") + "';</script>",
         Draw html "<script type=\"text/javascript\" src=\"/public/scriptpad2.js\" charset=\"UTF-8\"></script>",
         Draw html "<script type=\"text/javascript\" charset=\"UTF-8\" >setup2();</script>",
-        Draw html """
-        <script type=\"text/javascript\" charset=\"UTF-8\" >
-    window.onload = function() {
-        setup2();
-    };
-        		</script>""",
         {
           val l = Draw list (
             Draw button (razie.AI("F9 - Run Line"), "javascript:runLine('/scripster/run?')"),
