@@ -49,7 +49,8 @@ class ScriptPad2(
     } else if (Technology.HTML == t) {
       if (out.isInstanceOf[HttpDrawStream]) {
         val s = out.asInstanceOf[HttpDrawStream]
-        s.addMeta("<script type=\"text/javascript\" src=\"/public/build/src/ace-uncompressed.js\" charset=\"UTF-8\"></script>")
+        s.addMeta("<script type=\"text/javascript\" src=\"/public/build/src/ace.js\" charset=\"UTF-8\"></script>")
+//        s.addMeta("<script type=\"text/javascript\" src=\"/public/build/src/ace-uncompressed.js\" charset=\"UTF-8\"></script>")
         s.addMeta("<script type=\"text/javascript\" src=\"/public/build/src/theme-twilight.js\" charset=\"UTF-8\"></script>")
         s.addMeta("<script type=\"text/javascript\" src=\"/public/build/src/mode-scala.js\" charset=\"UTF-8\"></script>")
         if (css == "dark")
