@@ -104,7 +104,7 @@ function runLine (url) {
 function runSelection (url) {
    var scr = editor.getSession().doc.getTextRange(editor.getSelectionRange());
 
-   if (scr == null || scr.length == 0) scr = editor.getCode()
+   if (scr == null || scr.length == 0) scr = editor.getSession().getValue();
    
   showStatus ("sending selection...");
    try {
@@ -470,8 +470,8 @@ function autoCompleteGrabkeys(e_keyCode){
 function scripsterJump (url,lang, ok, k, ak) {
    var scr = editor.selection()
 
-   if (scr == null || scr.length == 0) scr = editor.getCode()
-   
+   if (scr == null || scr.length == 0) scr = editor.getSession().getValue();
+
   showStatus ("jumping with selection...");
    try {
      window.location = url+'&lang='+lang+'&api_key='+ak+'&k='+k+'&ok='+ok+'&css='+razieCss+'&script='+urlescape(scr)
