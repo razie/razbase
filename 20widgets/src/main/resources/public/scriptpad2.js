@@ -468,9 +468,9 @@ function autoCompleteGrabkeys(e_keyCode){
 //------------------------ quote
 
 function scripsterJump (url,lang, ok, k, ak) {
-   var scr = editor.selection()
+  var scr = editor.getSession().doc.getTextRange(editor.getSelectionRange());
 
-   if (scr == null || scr.length == 0) scr = editor.getSession().getValue();
+  if (scr == null || scr.length == 0) scr = editor.getSession().getValue();
 
   showStatus ("jumping with selection...");
    try {
