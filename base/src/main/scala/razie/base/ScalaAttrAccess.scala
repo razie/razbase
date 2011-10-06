@@ -30,6 +30,9 @@ trait ScalaAttrAccess extends JavaAttrAccess {
    /** @return the value of the named attribute or null */
    def getAttr(name:String) : AnyRef
 
+   /** @return the value of the named attribute or null, coerced into an option of the given type */
+   def get[T](name:String) : Option[T]
+
    /** @return the value of the named attribute or null */
    def getOrElse(name:String, dflt:AnyRef ) : AnyRef
    

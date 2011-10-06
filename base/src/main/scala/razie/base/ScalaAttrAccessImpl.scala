@@ -126,6 +126,11 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
     this._attrs.get(name).getOrElse(null).asInstanceOf[AnyRef]
   }
 
+   /** @return the value of the named attribute or null, coerced into an option of the given type */
+   def get[T](name:String) : Option[T] = {
+    this._attrs.get(name).map(_.asInstanceOf[T])
+  }
+
   def size(): Int = {
     if (this._attrs == null) 0 else this._attrs.size
   }
