@@ -78,7 +78,7 @@ object Threads {
    }
 
    /** fork a bunch of threads, then join them and return the results */
-   def forkjoin[A,B>:Null<:AnyRef] (as:Iterable[A]) (f:A =>B) : Iterable[Option[B]] = {
+   def forkjoin[A,B <: Any] (as:Iterable[A]) (f:A =>B) : Iterable[Option[B]] = {
       val threads = (for (a <- as) yield new FuncValThread (a, f)).toList
       threads.foreach (_.start())
       threads.foreach (_.join)
@@ -106,7 +106,7 @@ object Threads {
       threads.map (_.res).toList  // use toList since the iterable may not be strict
       }
 
-   class FuncValThread[A, B>:Null<:AnyRef] (val a:A, val f:A=>B) extends java.lang.Thread {
+   class FuncValThread[A, B<:Any] (val a:A, val f:A=>B) extends java.lang.Thread {
       var res:Option[B] = None
       
       override def run() = res = Option(f(a))

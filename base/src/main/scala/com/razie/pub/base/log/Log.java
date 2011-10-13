@@ -155,7 +155,8 @@ public class Log {
   }
 
   public boolean isTraceLevel(int l) {
-    return DEBUGGING && !SILENT && slf4j.isDebugEnabled();
+    if (l == 3) return DEBUGGING && !SILENT && slf4j.isTraceEnabled();
+    else return DEBUGGING && !SILENT && slf4j.isDebugEnabled();
   }
 
   public boolean isTraceOn() {

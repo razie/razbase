@@ -126,10 +126,8 @@ public class SoaBinding {
         try {
             res = toinvoke.invoke(target, args.toArray());
         } catch (Exception e) {
-           Log.alarmThisAndThrow("ERR_INVOKING_SOA " + mdesc.toString() + "\n ARGS: "
-                    + inparms.toString(), e);
-//            throw new RuntimeException("ERR_INVOKING_SOA " + mdesc.toString() + "\n ARGS: "
-//                    + inparms.toString(), e);
+           Log.alarmThisAndThrow("ERR_INVOKING_SOA name={" +toinvoke.toString()+"} desc:"+ mdesc.toString() + "\n ARGS: "
+                    + inparms.toString()+"\n", e);
         }
         // so void methods don't need to do anything...
         return res;

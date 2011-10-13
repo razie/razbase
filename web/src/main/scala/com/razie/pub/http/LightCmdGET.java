@@ -140,7 +140,12 @@ public class LightCmdGET extends SocketCmdHandler.Impl {
                     try {
                         reply = c.execServer(cmd, p, cmdargs, parms, socket);
                     } catch (Throwable e) {
+                      Throwable r = rootc(e);
+                      if (r instanceof java.net.SocketException && r.getMessage().contains ("Connection reset by peer"))
+                        logger.log("HTTP_ERR_INVOKING_SOA: " + r.getMessage());
+                      else                        
                         logger.log("HTTP_ERR_INVOKING_SOA: ", e);
+                      
                         reply = new DrawError(e);
                     }
 
@@ -152,6 +157,11 @@ public class LightCmdGET extends SocketCmdHandler.Impl {
         return reply;
     }
 
+    private Throwable rootc (Throwable t) {
+      if (t.getCause() != null) return rootc(t.getCause());
+      return t;
+    }
+    
     /** main entry point, called from the Server's Receiver, when cmd is GET */
     public Object execServer(String cmdName, String protocol, String args, Properties parms,
             MyServerSocket socket) throws AuthException {
