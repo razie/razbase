@@ -169,7 +169,7 @@ class MyTelnetSM(val p: Puffer, val session: SessionControl, val socket: MyServe
   def cassist(c: Char): Boolean = {
     logger trace "char: " + c + "   code: " + c.toInt
     if (c == '\t') {
-      val opt = cs.options(p.acc, session.sessionId)
+      val opt = cs.options(p.acc, p.acc.length()-1, session.sessionId)
       if (opt.size == 1) {
         val x = opt.head
         S.logger log "option: " + x;

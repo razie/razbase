@@ -41,7 +41,7 @@ trait ContentServer {
    def exec(cmdLine:String, protocol:String, parms:Properties, socket:MyServerSocket, httpattrs:AttrAccess) : AnyRef
   
    /** content assist for interactive sessions */
-   def options (currLine:String, sessionId:String) : Seq[ActionItem]
+   def options (currLine:String, pos:Int, sessionId:String) : Seq[ActionItem]
    
    def mkSession (lang:String): String
 }
@@ -97,7 +97,7 @@ class LightContentServer (var dflt:SocketCmdHandler = null) extends ContentServe
     reply
    }
    
-   override def options (s:String, sessionId:String) : Seq[ActionItem] = EMPTY
+   override def options (s:String, pos:Int, sessionId:String) : Seq[ActionItem] = EMPTY
    val EMPTY = razie.Listi[ActionItem]()
    
    override def mkSession (lang:String): String = ""

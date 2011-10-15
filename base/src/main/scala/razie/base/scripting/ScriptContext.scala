@@ -41,8 +41,11 @@ trait ScriptContext extends AttrAccess {
   /** make execution verbose or not */
   def verbose(v:Boolean )
 
-  /** content assist options */
-  def options (script:String ) : java.util.List[String]
+ /** content assist options
+  * @param script - the line that needs assist
+  * @param pos - the position it needs assist - normally script.length-1
+  */
+  def options (script:String, pos:Int) : java.util.List[String]
   
   /** 
    * Reset this context. Normally a context would cache a parser/interpreter instance. 

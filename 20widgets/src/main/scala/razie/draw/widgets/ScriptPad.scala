@@ -96,18 +96,20 @@ class SimpleScriptPad (
 class ScriptPad (
       lang:String,
       val run : () => ActionToInvoke, 
-      val options : String=>Seq[String], 
+      val options : (String, Int)=>Seq[String], 
       val reset : () => ActionToInvoke, 
       val simple:Boolean=false, 
       val css:String="dark", // it's dark/light for now
       val applet:Boolean=false, 
       val initial:String = ScriptPad.INITIAL,
-      var moreButtons : List[NavLink] = Nil) extends Drawable {
+      var moreButtons : List[NavLink] = Nil,
+      val makeButtons : () => Seq[NavLink] = ()=>Nil) extends Drawable {
    val ilang:String = Option(lang).getOrElse("scala")
    var rows = 15
    var cols = 80
    
    override def render (t:Technology, out:DrawStream) : AnyRef = {
+           val atis = makeButtons()
       val ati = run()
       
       if (Technology.HTMLNOJS == t || simple) {
@@ -141,22 +143,28 @@ class ScriptPad (
         Draw html "<script type=\"text/javascript\" charset=\"UTF-8\" >var razSpSession = '"+ati.getAttr("sessionId")+"';</script>",
         Draw html "<script type=\"text/javascript\" src=\"/public/scriptpad.js\" charset=\"UTF-8\"></script>",
 //        Draw html "<script type=\"text/javascript\" charset=\"UTF-8\" >setup2();</script>",
+        if (atis.isEmpty)
         {
-           val l = Draw list (
-              Draw button (razie.AI("F9 - Run Line"), "javascript:runLine('/scripster/run?')"),
-              Draw text "|",
-              Draw button (razie.AI("Ctrl+F9 - Run Selection"),  "javascript:runSelection('/scripster/run?')"),
-              Draw text "|",
-              Draw button (razie.AI("Reset"), "javascript:razInvoke('/scripster/reset?sessionId="+ati.getAttr("sessionId")+"')"),
-              Draw text "|",
-              Draw button (razie.AI("Simple style"), "/scripster/simpleSession")
-              )
+          val l = Draw list (
+            Draw button (razie.AI("F9 - Run Line"), "javascript:runLine('/scripster/run?')"),
+            Draw text "|",
+            Draw button (razie.AI("Ctrl+F9 - Run Selection"), "javascript:runSelection('/scripster/run?')"),
+            Draw text "|",
+            Draw button (razie.AI("Reset"), "javascript:razInvoke('/scripster/reset?sessionId=" + ati.getAttr("sessionId") + "')"),
+            Draw text "|",
+            Draw button (razie.AI("Simple style"), "/scripster/simpleSession"))
+          
            moreButtons.map (b => l.w(Draw text "|").w(b))
-           l
-        },
-        Draw html "<textarea id=\"result\" cols=\""+cols+"\" rows=\"5\"></textarea>",
-        Draw html "<br><div id=\"status\" style=\"color:orange\">Status is updated here...</div>"
-        )
+          Draw seq (
+              l,
+             Draw html "<textarea id=\"result\" cols=\""+cols+"\" rows=\"5\"></textarea>",
+             Draw html "<br><div id=\"status\" style=\"color:orange\">Status is updated here...</div>"
+             )
+        } else {
+          val l = Draw list ()
+           atis.map (b => l.w(Draw text "|").w(b))
+          l
+        })
       } else {         "?"
       }
    }

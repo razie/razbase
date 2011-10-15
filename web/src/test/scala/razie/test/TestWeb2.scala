@@ -36,7 +36,7 @@ object TestWeb2 {
 /** a demo content assist implementation */
 class CSDemo extends LightContentServer with razie.Logging {
    
-   override def options (s:String, sessionId:String) : Seq[ActionItem] = {
+   override def options (s:String, pos:Int, sessionId:String) : Seq[ActionItem] = {
       val ret = 
          if (s endsWith "a") razie.AI("b") :: razie.AI("c") :: Nil
          else if (s endsWith "b") razie.AI("c") :: Nil

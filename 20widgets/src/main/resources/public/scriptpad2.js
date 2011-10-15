@@ -1,11 +1,5 @@
 
 
-//----------------- setting up code mirror
-
-//var sc = Scripster.fromTextArea ('code');
-
-//var Scripster = (function() {
-
 var editor = 0;
 var canon = 0;
 
@@ -23,7 +17,9 @@ function darklight (css, dcss, lcss) {
 function configIt (css,lang) {
   razieCss=css;
 
-  if (lang == 'scala') { var razMode="ace/mode/scala"; }
+  razTheme=darklight (css, "ace/theme/twilight", "ace/theme/dawn")
+
+  if (lang == 'scala') { razMode="ace/mode/scala"; }
   else if (lang == 'whatever') { }
 }
 
@@ -31,41 +27,39 @@ function configIt (css,lang) {
 razSetup();
 
 function fromTextArea() {
+  editor = ace.edit("code");
+  editor.setTheme(razTheme); 
+  var ScalaScriptMode = require("ace/mode/scala").Mode;
+  editor.getSession().setMode(new ScalaScriptMode());
+  editor.renderer.setHScrollBarAlwaysVisible(false)
+  editor.renderer.setShowGutter(false)
+  canon = require('pilot/canon')
 
-editor = ace.edit("code");
-editor.setTheme("ace/theme/twilight"); 
-var ScalaScriptMode = require("ace/mode/scala").Mode;
-editor.getSession().setMode(new ScalaScriptMode());
-editor.renderer.setHScrollBarAlwaysVisible(false)
-editor.renderer.setShowGutter(false)
-canon = require('pilot/canon')
+  var mmm = document.getElementById("m1");
 
-var mmm = document.getElementById("m1");
-
-
-canon.addCommand({
+  canon.addCommand({
     name: 'F9-run',
     bindKey: { win: 'F9', mac: 'F9', sender: 'editor' },
     exec: function(env, args, request) {
             runLine(SCRIP_RUN)
     }
-})
+  })
 
-canon.addCommand({
+  canon.addCommand({
     name: 'CF9-run',
     bindKey: { win: 'Ctrl-F9', mac: 'Command-F9', sender: 'editor' },
     exec: function(env, args, request) {
             runSelection(SCRIP_RUN)
     }
-})
+  })
 
-canon.addCommand({
+  canon.addCommand({
     name: 'assist',
     bindKey: { win: 'Ctrl-Space', mac: 'Command-Space', sender: 'editor' },
     exec: function(env, args, request) {
             contentAssist("")
     }
-})
+  })
 
 }
 
@@ -166,7 +160,7 @@ function contentAssist (e) {
   currRequestCount += 1
   showStatus ("asking for content assist...")
   try {
-    sendRequest('/scripster/options?sessionId='+razSpSession+'&line='+urlescape(scr), 
+    sendRequest('/scripster/options?sessionId='+razSpSession+'&pos='+s1.column+'&line='+urlescape(scr), 
                 function (ret) {openWhenOptionsArrive(currRequestCount, e, ret)})
   } catch(e) {}
 }

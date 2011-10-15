@@ -183,7 +183,7 @@ function contentAssist (e) {
   currRequestCount += 1
   showStatus ("asking for content assist...")
   try {
-    sendRequest('/scripster/options?sessionId='+razSpSession+'&line='+urlescape(scr), 
+    sendRequest('/scripster/options?sessionId='+razSpSession+'&pos='+s1.column+'&line='+urlescape(scr), 
                 function (ret) {openWhenOptionsArrive(currRequestCount, e, ret)})
   } catch(e) {}
 }

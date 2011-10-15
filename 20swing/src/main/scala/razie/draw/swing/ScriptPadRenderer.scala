@@ -112,7 +112,7 @@ class RazieCompletionAction extends DefaultSyntaxAction ("RAZIE_COMPLETION") {
 
         sDoc.readLock();
 //^^ copy
-        val matches = SPRaz.sp.f.options(line)
+        val matches = SPRaz.sp.f.options(line, line.length-1) // TODO use current cursor pos
         val buf = new scala.collection.mutable.ListBuffer[String] ()
          matches foreach (buf append _)
 

@@ -18,8 +18,8 @@ public class SealedContext extends ScalaAttrAccessImpl implements ScriptContext 
    private ScriptContext wrapped;
 
    /** content assist options */
-   public java.util.List<String> options(String script) {
-      return this.wrapped.options(script);
+   public java.util.List<String> options(String script, int pos) {
+      return this.wrapped.options(script, pos);
    }
 
    public SealedContext(ScriptContext wraped) {

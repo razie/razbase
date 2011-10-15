@@ -67,12 +67,21 @@ public class HttpDrawStream extends SimpleDrawStream {
                 writeBytes(HttpHelper.httpHeader(HttpHelper.OK,
                         "application/json").getBytes());
             } else if (this.technology.equals(Technology.HTML)) {
-                writeBytes(HttpHelper.httpHeader(HttpHelper.OK).getBytes());
+                writeBytes((HttpHelper.httpHeader(HttpHelper.OK)).getBytes());
+
+                String temp = "";
+                
                 if (this.metas == null)
-                    writeBytes(HtmlRenderUtils.htmlHeader().getBytes());
+                    temp = (HtmlRenderUtils.htmlHeader());
                 else
-                    writeBytes(HtmlRenderUtils.htmlHeader(
-                            this.metas.toArray(new String[0])).getBytes());
+                    temp = (HtmlRenderUtils.htmlHeader(
+                            this.metas.toArray(new String[0])));
+
+                if (this.httptags != null)
+                  for (String tag : this.httptags)
+                    temp = temp.replaceFirst("<html>", "<html>\n"+tag); // DAMN, I'm lazy!!!
+
+                writeBytes(temp.getBytes());
             }
         }
     }

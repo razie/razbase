@@ -91,8 +91,11 @@ public class ScriptContextImpl extends razie.WrapAttrAccess implements ScriptCon
       this.verbose = v;
    }
 
-   /** content assist options */
-   public java.util.List<String> options(String script) {
+   /** content assist options
+    * @param script - the line that needs assist
+    * @param pos - the position it needs assist - normally script.length-1
+    */
+   public java.util.List<String> options(String script, int pos) {
       return new java.util.ArrayList<String>();
    }
 
