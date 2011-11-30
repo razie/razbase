@@ -29,6 +29,20 @@ we'll see - I could co-op some volunteers.
 I will add more code as I need it/write it for all kinds of reasons.
 
 
+How to use
+---------------------
+
+The sbt/maven artifact is:  
+
+    def razBase = "com.razie" %% "razbase"         % "0.6-SNAPSHOT"
+
+Make sure that, if you use a SNAPSHOT version, the snapshots repository is added to sbt 0.11:
+
+    resolvers += ScalaToolsSnapshots,
+
+For an example, see usage in my snakked project. Good luck!
+
+
 Developing & Building
 ---------------------
 
@@ -46,7 +60,7 @@ Note: if you don't have a github ssh key setup, use the anonymous checkout:
 
     git clone http://github.com/razie/razbase.git
 
-4. Setup sbt 0.7.7 (simple build tool) and scala 2.9.1 distribution
+4. Setup sbt 0.11 (simple build tool) and scala 2.9.1 distribution
 
 ... 
 

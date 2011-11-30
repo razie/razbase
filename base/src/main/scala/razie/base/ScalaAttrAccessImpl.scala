@@ -25,7 +25,7 @@ abstract class ScalaAttrAccessImpl extends AttrAccess {
   /**
    * build from sequence of parm/value pairs or other stuff
    * 
-   * @parm pairs are pais of name/value, i.e. "car", "lexus" OR a Properties, OR another
+   * @param pairs are pais of name/value, i.e. "car", "lexus" OR a Properties, OR another
    *       AttrAccess OR a Map<String,String>. Note the parm names can contain type:
    *       "name:string"
    */
