@@ -15,10 +15,10 @@
 	<classpathentry kind="lib" path="web/lib/mime-util.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="20swing/lib/jsyntaxpane-0.9.5-b29.jar"/>
-	<classpathentry kind="lib" path="base/lib_managed/scala_2.9.1/compile/json-20090211.jar"/>
-	<classpathentry kind="lib" path="base/lib_managed/scala_2.9.1/compile/scalatest_2.9.1-1.6.1.jar"/>
-	<classpathentry kind="lib" path="base/lib_managed/scala_2.9.1/compile/logback-classic-0.9.28.jar"/>
-	<classpathentry kind="lib" path="base/lib_managed/scala_2.9.1/compile/logback-core-0.9.28.jar"/>
-	<classpathentry kind="lib" path="base/lib_managed/scala_2.9.1/compile/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib_managed/jars/org.json/json/json-20090211.jar"/>
+	<classpathentry kind="lib" path="lib_managed/jars/ch.qos.logback/logback-classic/logback-classic-0.9.28.jar"/>
+	<classpathentry kind="lib" path="lib_managed/jars/ch.qos.logback/logback-core/logback-core-0.9.28.jar"/>
+	<classpathentry kind="lib" path="lib_managed/jars/org.scalatest/scalatest_2.9.1/scalatest_2.9.1-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib_managed/jars/org.slf4j/slf4j-api/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
