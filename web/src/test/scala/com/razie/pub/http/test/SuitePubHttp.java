@@ -16,7 +16,7 @@ public class SuitePubHttp extends TestSuite {
     public static Test suite() {
         TestSuite result = new TestSuite(SuitePubHttp.class.getName());
 
-        result.addTestSuite(LightServerTest.class);
+//        result.addTestSuite(LightServerTest.class);
 
         return result;
     }

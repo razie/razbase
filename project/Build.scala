@@ -33,7 +33,7 @@ object MyBuild extends Build {
                           Seq(libraryDependencies ++= Seq(scalatest, junit))
                   ) dependsOn (pbase)
 
-  lazy val w20s = Project(id="20widgets-swing", base=file("20widgets-swing"),
+  lazy val w20s = Project(id="20swing", base=file("20swing"),
                           settings = defaultSettings ++ 
                           Seq(libraryDependencies ++= Seq(scalatest, junit, scalaSwing))
                   ) dependsOn (pbase, w20)
@@ -48,17 +48,17 @@ object MyBuild extends Build {
 
   def defaultSettings = baseSettings ++ Seq()
   def baseSettings = Defaults.defaultSettings ++ Seq (
-    scalaVersion := V.scalaVersion,
-    version      := V.version,
-    organization := V.organization,
-    organizationName := "Razie's Pub",
+    scalaVersion         := V.scalaVersion,
+    version              := V.version,
+    organization         := V.organization,
+    organizationName     := "Razie's Pub",
     organizationHomepage := Some(url("http://www.razie.com")),
-    credentials += Credentials((Path.userHome / ".ivy2.credentials").asFile),
+
     publishTo <<= version { (v: String) =>
       if(v endsWith "-SNAPSHOT")
-        Some ("Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/snapshots/")
+        Some ("Sonatype" at "https://oss.sonatype.org/content/repositories/snapshots/")
       else
-        Some ("Scala Tools Nexus" at "http://nexus.scala-tools.org/content/repositories/releases/")
+        Some ("Sonatype" at "https://oss.sonatype.org/content/repositories/releases/")
     }  )
 
 }

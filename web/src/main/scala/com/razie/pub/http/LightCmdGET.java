@@ -28,7 +28,7 @@ import com.razie.pub.comms.HttpHelper;
 import com.razie.pub.comms.LightAuthBase;
 import com.razie.pub.comms.MyServerSocket;
 import com.razie.pub.comms.SedFilter;
-import com.razie.pub.lightsoa.HttpSoaBinding;
+import com.razie.pub.lightsoa.ISoaBinding;
 import com.razie.pub.util.Files;
 
 /**
@@ -73,7 +73,7 @@ public class LightCmdGET extends SocketCmdHandler.Impl {
        if (path.startsWith(".text/") || path.startsWith(".json/")) 
          newpath = path.replaceAll("[^/]*/", "");
 
-       for (HttpSoaBinding c : getBindings()) {
+       for (ISoaBinding c : getBindings()) {
          if (newpath.startsWith(c.getServiceName())) {
            return newpath;
          }
@@ -119,7 +119,7 @@ public class LightCmdGET extends SocketCmdHandler.Impl {
         Object reply = "";
 
         // try the new soa bridges
-        for (HttpSoaBinding c : getBindings()) {
+        for (ISoaBinding c : getBindings()) {
             if (c.getServiceName().equals(svc)) {
                 boolean callThisOne = false;
                 
@@ -292,19 +292,19 @@ public class LightCmdGET extends SocketCmdHandler.Impl {
     }
 
     /** PUT (i.e. not ADD) an http binding to be called when the method/service matches a url */
-    public void registerSoa(HttpSoaBinding c) {
+    public void registerSoa(ISoaBinding c) {
         bindings.put(c.getServiceName(), c);
         Log.logThis("HTTP_INIT_LISTENER " + c.getClass().getName() + " : " + c.toString());
     }
 
     /** remove an existing soa binding */
-    public void removeSoa(HttpSoaBinding c) {
+    public void removeSoa(ISoaBinding c) {
         bindings.remove(c.getServiceName());
         Log.logThis("HTTP_REMOVE_LISTENER " + c.getClass().getName() + " : " + c.toString());
     }
 
     /** @return the soa bindings in use */
-    public Iterable<HttpSoaBinding> getBindings() {
+    public Iterable<ISoaBinding> getBindings() {
         return bindings.values();
     }
 
@@ -316,5 +316,5 @@ public class LightCmdGET extends SocketCmdHandler.Impl {
     
     static final String[]        COMMANDS = { "GET"}; // TODO 2-2 FUNC implement "PUT", "DELETE"
     static final Log             logger   = Log.factory.create("", LightCmdGET.class.getName());
-    private Map<String, HttpSoaBinding> bindings = new HashMap<String,HttpSoaBinding>();
+    private Map<String, ISoaBinding> bindings = new HashMap<String,ISoaBinding>();
 }
