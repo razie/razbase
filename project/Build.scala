@@ -3,7 +3,7 @@ import Keys._
 import java.io.File
 
 object V {
-  val version      = "0.6.2-SNAPSHOT"
+  val version      = "0.6.3-SNAPSHOT"
   val scalaVersion = "2.9.1"
   val organization = "com.razie"
 

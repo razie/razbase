@@ -34,7 +34,7 @@ How to use
 
 The sbt/maven artifact is:  
 
-    def razBase = "com.razie" %% "razbase"         % "0.6.2-SNAPSHOT"
+    def razBase = "com.razie" %% "razbase"         % "0.6.3-SNAPSHOT"
 
 Make sure that, if you use a SNAPSHOT version, the snapshots repository is added to sbt 0.11:
 
