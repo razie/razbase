@@ -20,7 +20,8 @@ public class Factory {
       return new Log("?", categoryName);
    }
 
-   public Log create(Class c) {
+   @SuppressWarnings("rawtypes")
+  public Log create(Class c) {
       return new Log(c);
    }
 }

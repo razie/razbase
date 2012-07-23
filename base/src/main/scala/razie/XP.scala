@@ -167,6 +167,8 @@ case class GPath(val expr: String) {
 
   lazy val startsFromRoot = expr.startsWith("/")
 
+  def isAttr = (elements.size > 0 && elements.last.attr == "@")
+
   def requireAttr =
     if (elements.last.attr != "@")
       throw new IllegalArgumentException("ERR_XP result should be attribute but it's an entity...")

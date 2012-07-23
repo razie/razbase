@@ -5,6 +5,8 @@ import scala.util.matching.Regex.Match
 /** sed like filter using Java regexp
  *
  *  example: from US to normal: Sed ("""(\d\d)/(\d\d)/(\d\d)""", """\2/\1/\3""", "01/31/12")
+ *  
+ *  Essentially useless since plain "sss".replaceAll(..., "$1 $2...") works almost the same way..
  */
 object Sed {
   def apply(pat: String, rep: String, input: String): String = apply(pat, rep, identity, input)

@@ -40,6 +40,7 @@ public class Log {
   /** use this to access the underlying slf4j directly and use their formatting etc */
   public Logger          slf4j;
 
+  @SuppressWarnings("rawtypes")
   public Log(Class c) {
     this.category = "?";
     this.component = c.getName();

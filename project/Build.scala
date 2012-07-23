@@ -3,7 +3,7 @@ import Keys._
 import java.io.File
 
 object V {
-  val version      = "0.6-SNAPSHOT"
+  val version      = "0.6.2-SNAPSHOT"
   val scalaVersion = "2.9.1"
   val organization = "com.razie"
 
@@ -16,30 +16,30 @@ object MyBuild extends Build {
   def junit      = "junit"          % "junit"           % "4.5" //     % "test->default"
   def json       = "org.json"       % "json"            % "20090211"
   def slf4jApi   = "org.slf4j"      % "slf4j-api"       % "1.6.1"
-  def logback    = "ch.qos.logback" % "logback-classic" % "0.9.28"
+  def logback    = "ch.qos.logback" % "logback-classic" % "1.0.0"
   def scalaSwing = "org.scala-lang" % "scala-swing"     % V.scalaVersion
-  
+
   lazy val root = Project(id="razbase",    base=file("."),
                           settings = defaultSettings ++ Seq()
                   ) aggregate (pbase, w20, w20s, web) dependsOn (pbase, w20, w20s, web)
 
   lazy val pbase = Project(id="base", base=file("base"),
-                          settings = defaultSettings ++ 
+                          settings = defaultSettings ++
                           Seq(libraryDependencies ++= Seq(scalatest, junit, json, slf4jApi, logback))
                   )
 
   lazy val w20  = Project(id="20widgets", base=file("20widgets"),
-                          settings = defaultSettings ++ 
+                          settings = defaultSettings ++
                           Seq(libraryDependencies ++= Seq(scalatest, junit))
                   ) dependsOn (pbase)
 
   lazy val w20s = Project(id="20swing", base=file("20swing"),
-                          settings = defaultSettings ++ 
+                          settings = defaultSettings ++
                           Seq(libraryDependencies ++= Seq(scalatest, junit, scalaSwing))
                   ) dependsOn (pbase, w20)
 
   lazy val web = Project(id="razweb", base=file("web"),
-                          settings = defaultSettings ++ 
+                          settings = defaultSettings ++
                           Seq(
                                libraryDependencies ++= Seq(scalatest, junit)
                               )
@@ -62,5 +62,4 @@ object MyBuild extends Build {
     }  )
 
 }
-
-
+ 

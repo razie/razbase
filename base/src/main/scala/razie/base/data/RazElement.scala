@@ -134,7 +134,7 @@ class RazElementScala (val e:scala.xml.Elem) extends RazElement {
   
    /** TODO implement full xpath - for now use XP instead */
    def xpl (path:String) : List[RazElement] =
-      e.elements.filter(_.label==(path.replaceFirst("/",""))).map(x =>
+      e.iterator.filter(_.label==(path.replaceFirst("/",""))).map(x =>
          new RazElementScala(x.asInstanceOf[scala.xml.Elem])).toList
   
    def name : String = e label

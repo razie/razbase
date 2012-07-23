@@ -59,7 +59,7 @@ class WorkerTP(val maxThreads: Int = 5, val ec: ExecutionContext = ExecutionCont
         } catch {
           case t: ThreadDeath => {
             // replenish the threads since I'm dying
-            threads(threads.findIndexOf(_ == this)) = mkRunner
+            threads(threads.indexWhere(_ == this)) = mkRunner
             throw t
           }
           case _ =>
@@ -75,7 +75,7 @@ class WorkerTP(val maxThreads: Int = 5, val ec: ExecutionContext = ExecutionCont
 
   /** find the thread processing that worker and unsafely stop() it */
   def kill(w: Worker) {
-    val i = threads.findIndexOf(tt => tt.currW.map(_ == w) getOrElse false)
+    val i = threads.indexWhere(tt => tt.currW.map(_ == w) getOrElse false)
     if (i > -1) {
       razie.Log(">>>>>>>>>>>>>>killing........" + threads(i))
       threads(i).stop()

@@ -46,9 +46,12 @@ public class Comms {
       // see http://www.exampledepot.com/egs/java.net/Post.html
       uc.setDoOutput(true);
 
+      String data = httpArgs.addToUrl(null);
+          
       OutputStreamWriter wr = new OutputStreamWriter(uc.getOutputStream());
-      wr.write(content);
+      wr.write(data);
       wr.flush();
+System.out.println("POSTING:"+data);
 
       logger.trace(3, "hdr: ", uc.getHeaderFields());
       String resCode = uc.getHeaderField(0);

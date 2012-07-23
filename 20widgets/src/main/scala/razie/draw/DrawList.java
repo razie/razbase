@@ -53,6 +53,7 @@ public class DrawList extends StreamableContainer.Impl implements Drawable3, Str
         return Renderer.Helper.draw(this, t, stream);
     }
 
+    @SuppressWarnings("rawtypes")
     public Renderer getRenderer(Technology technology) {
         return new MyRenderer();
     }
@@ -60,6 +61,7 @@ public class DrawList extends StreamableContainer.Impl implements Drawable3, Str
     /**
      * @param list the list to set
      */
+    @SuppressWarnings("rawtypes")
     public void setList(List list) {
         this.list = list;
     }
@@ -67,6 +69,7 @@ public class DrawList extends StreamableContainer.Impl implements Drawable3, Str
     /**
      * @return the list
      */
+    @SuppressWarnings("rawtypes")
     public List getList() {
         return list;
     }

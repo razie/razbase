@@ -22,6 +22,8 @@ trait Logging {
    */
   protected def slf4j: org.slf4j.Logger = logger.log
 
+  @inline protected def tee(message: => String): String = { val m = message; logger.trace(m); m}
+  
   @inline protected def error(message: => String): Unit = logger.error(message)
   @inline protected def error(message: => String, e: Throwable): Unit = logger.error(e, message)
 

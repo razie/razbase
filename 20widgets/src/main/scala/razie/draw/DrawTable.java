@@ -57,6 +57,7 @@ public class DrawTable extends StreamableContainer.Impl implements Drawable3, St
         return Renderer.Helper.draw(this, t, stream);
     }
 
+    @SuppressWarnings("rawtypes")
     public Renderer getRenderer(Technology technology) {
         return new MyRenderer();
     }
@@ -64,6 +65,7 @@ public class DrawTable extends StreamableContainer.Impl implements Drawable3, St
     /**
      * @param list the list to set
      */
+    @SuppressWarnings("rawtypes")
     public void setRows(List list) {
         this.rows = list;
     }
@@ -71,11 +73,13 @@ public class DrawTable extends StreamableContainer.Impl implements Drawable3, St
     /**
      * @return the list
      */
+    @SuppressWarnings("rawtypes")
     public List getRows() {
         return rows;
     }
 
     /** add an object - table is arranged as objects are added based on prefRows/prefCols */
+    @SuppressWarnings("rawtypes")
     public void writeAll(List l) {
         for (Object o : l) {
             write(o);

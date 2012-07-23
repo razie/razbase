@@ -109,7 +109,7 @@ object M {
    implicit def apply[A] (l:ju.List[A]) : M[A] = apply (JavaConversions.asScalaBuffer(l))
    implicit def apply[A] (l:ju.Iterator[A]) : M[A] = apply (JavaConversions.asScalaIterator(l))
    implicit def apply[A] (l:jl.Iterable[A]) : M[A] = apply (JavaConversions.asScalaIterable(l))
-   implicit def apply[A] (l:ju.Map[_,A]) : M[A] = apply (JavaConversions.asScalaIterable(l.values))
+   implicit def apply[A] (l:ju.Map[_,A]) : M[A] = apply (JavaConversions.collectionAsScalaIterable(l.values))
    
   
    // ------------------- common monad stuff

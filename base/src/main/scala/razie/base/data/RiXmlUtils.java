@@ -137,7 +137,7 @@ public class RiXmlUtils {
          return prefixes.get(prefix);
       }
 
-      public String getNamespaceForPrefix(String prefix, @SuppressWarnings("unused") Node context) {
+      public String getNamespaceForPrefix(String prefix, Node context) {
          return getNamespaceForPrefix(prefix);
       }
 

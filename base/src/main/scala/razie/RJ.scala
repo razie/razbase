@@ -16,7 +16,7 @@ import java.{ lang => jl, util => ju }
  * OR for (x <- RJS.apply(whatever-java-threw-at-you))...
  */
 object RJS {
-  def apply[A](ij:java.lang.Iterable[A]) : scala.collection.Iterable[A] = JavaConversions.asScalaIterable(ij)
+  def apply[A](ij:java.lang.Iterable[A]) : scala.collection.Iterable[A] = JavaConversions.iterableAsScalaIterable(ij)
   
   def apply[A](ij:java.util.Iterator[A]) : scala.collection.Iterator[A] = JavaConversions.asScalaIterator(ij)
 
@@ -24,7 +24,7 @@ object RJS {
   
   def list[A](ij:java.util.List[A]) : scala.List[A] = JavaConversions.asScalaBuffer(ij).toList
   
-  def apply[A, B](ij : java.util.Map[A, B]) : scala.collection.mutable.Map[A,B] = JavaConversions.asScalaMap(ij)
+  def apply[A, B](ij : java.util.Map[A, B]) : scala.collection.mutable.Map[A,B] = JavaConversions.mapAsScalaMap(ij)
 }
 
 /** conversions from scala to java collections. TRY NOT TO do this, unless you absolutely have to :)
@@ -36,10 +36,10 @@ object RJS {
 object RSJ {
    def apply[A](ij:scala.collection.Iterable[A]) : java.lang.Iterable[A] = JavaConversions.asJavaIterable(ij)
    
-   def apply[A](ij:scala.collection.mutable.Buffer[A]) : java.util.List[A] = JavaConversions.asJavaList(ij)
+   def apply[A](ij:scala.collection.mutable.Buffer[A]) : java.util.List[A] = JavaConversions.bufferAsJavaList(ij)
    
    def list[A](ij:scala.List[A]) : java.util.List[A] = 
-      JavaConversions.asJavaList({val b=new scala.collection.mutable.ListBuffer[A](); b.appendAll(ij); b} )
+      JavaConversions.bufferAsJavaList({val b=new scala.collection.mutable.ListBuffer[A](); b.appendAll(ij); b} )
    
 //   def apply[A, B](ij : scala.collection.mutable.Map[A, B]) : java.util.Map[A,B] = JavaConversions.asMap(ij)
 }
