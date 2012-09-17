@@ -21,6 +21,12 @@ Details
 The code is generally self-documented. Keep your eyes out for package.html and similar stuff.
 
 
+Uses and articles
+==============
+
+Razbase is used in http://www.tryscala.org and http://www.racerkidz.com
+
+
 Roadmap
 -------
 I will only maintain this as I need to. If there's some large user community developing (doubt that, really), 
