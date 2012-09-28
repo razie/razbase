@@ -61,6 +61,14 @@ function fromTextArea() {
     }
   })
 
+  canon.addCommand({
+    name: 'assist2',
+    bindKey: { win: 'F8', mac: 'F8', sender: 'editor' },
+    exec: function(env, args, request) {
+            contentAssist("")
+    }
+  })
+
 }
 
 fromTextArea();

@@ -104,6 +104,8 @@ function razspkey (event) {
   if (event.keyCode == 120) { // F9
     if (event.ctrlKey) runSelection (SCRIP_RUN)
     else runLine(SCRIP_RUN)
+  } else if (event.keyCode == 119) { // F8 - alternate assist
+     contentAssist(event)
   } else if (event.keyCode == 32 && event.ctrlKey)
      contentAssist(event)
 }
