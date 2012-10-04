@@ -55,7 +55,7 @@ function fromTextArea() {
 
   canon.addCommand({
     name: 'assist',
-    bindKey: { win: 'Ctrl-Space', mac: 'Command-Space', sender: 'editor' },
+    bindKey: { win: 'Ctrl-Space', mac: 'Ctrl-Space', sender: 'editor' },
     exec: function(env, args, request) {
             contentAssist("")
     }
