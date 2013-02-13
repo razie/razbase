@@ -43,13 +43,16 @@ public interface Renderer<T> {
    /** simple renderer utils */
    @SuppressWarnings("unchecked")
    public static class Helper {
-      private static IndexedMemDb<Class, Technology, Renderer> renderers = new IndexedMemDb<Class, Technology, Renderer>();
+    @SuppressWarnings("rawtypes")
+	private static IndexedMemDb<Class, Technology, Renderer> renderers = new IndexedMemDb<Class, Technology, Renderer>();
 
       /** overwrite or define a new renderer for a drawable class and technology combination */
+    @SuppressWarnings("rawtypes")
       public static void register(Class<? extends Drawable> c, Technology t, Renderer r) {
          renderers.put(c, t, r);
       }
 
+    @SuppressWarnings("rawtypes")
       private static Renderer findRenderer(Drawable d, Technology technology) {
          Renderer r = renderers.get(d.getClass(), technology);
          if (r == null) {

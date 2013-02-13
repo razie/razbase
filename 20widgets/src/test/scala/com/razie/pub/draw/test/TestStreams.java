@@ -28,5 +28,5 @@ public class TestStreams extends TestCase {
         assertTrue (bytes.toString().contains("/json"));
     }
 
-    static final Log logger = Log.factory.create(TestStreams.class.getName());
+    static final Log logger = Log.factory.create(TestStreams.class);
 }

@@ -103,7 +103,8 @@ object M1 {
 }
 
 object RunMe2 extends App {
-   val l = new ju.ArrayList[String](); l.add("a"); l 
+   val l = new ju.ArrayList[String](); 
+   l.add("a")
    val stu = new Stupid()
    val sl = List(1,2,3)
 

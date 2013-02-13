@@ -3,8 +3,8 @@ import Keys._
 import java.io.File
 
 object V {
-  val version      = "0.6.3-SNAPSHOT"
-  val scalaVersion = "2.9.1"
+  val version      = "0.6.4-SNAPSHOT"
+  val scalaVersion = "2.10.0" // "2.9.1"
   val organization = "com.razie"
 
   def snap = (if (V.version endsWith "-SNAPSHOT") "-SNAPSHOT" else "")
@@ -12,7 +12,7 @@ object V {
 
 object MyBuild extends Build {
 
-  def scalatest  = "org.scalatest"  % "scalatest_2.9.1" % "1.6.1"
+  def scalatest  = "org.scalatest"  % "scalatest_2.10.0" % "1.8"
   def junit      = "junit"          % "junit"           % "4.5" //     % "test->default"
   def json       = "org.json"       % "json"            % "20090211"
   def slf4jApi   = "org.slf4j"      % "slf4j-api"       % "1.6.1"
@@ -28,12 +28,12 @@ object MyBuild extends Build {
                           Seq(libraryDependencies ++= Seq(scalatest, junit, json, slf4jApi, logback))
                   )
 
-  lazy val w20  = Project(id="20widgets", base=file("20widgets"),
+  lazy val w20  = Project(id="s20widgets", base=file("20widgets"),
                           settings = defaultSettings ++
                           Seq(libraryDependencies ++= Seq(scalatest, junit))
                   ) dependsOn (pbase)
 
-  lazy val w20s = Project(id="20swing", base=file("20swing"),
+  lazy val w20s = Project(id="s20swing", base=file("20swing"),
                           settings = defaultSettings ++
                           Seq(libraryDependencies ++= Seq(scalatest, junit, scalaSwing))
                   ) dependsOn (pbase, w20)

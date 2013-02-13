@@ -80,7 +80,11 @@ object DslCollectorIfElseSimple {
   }
 
   // the last else clause
-  case class TElse(body: () => Unit) extends Token("ELSE ") {
+  object TElse {
+    def apply (body: () => Unit) = new TElse (body)
+  }
+  
+  class TElse(body: () => Unit) extends Token("ELSE ") {
     override def kids: Seq[Any] = TScope(body) :: Nil
     def lastif: TIf = throw new IllegalStateException("this is a final else - no more else")
   }

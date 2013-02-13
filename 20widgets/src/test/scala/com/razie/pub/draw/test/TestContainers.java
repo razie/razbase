@@ -88,5 +88,5 @@ public class TestContainers extends TestCase {
         assertTrue(s.contains("33"));
     }
 
-    static final Log logger = Log.factory.create(TestContainers.class.getName());
+    static final Log logger = Log.factory.create(TestContainers.class);
 }

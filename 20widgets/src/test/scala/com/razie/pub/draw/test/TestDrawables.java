@@ -36,5 +36,5 @@ public class TestDrawables extends TestCase {
         assertTrue(false);
     }
 
-    static final Log logger = Log.factory.create(TestDrawables.class.getName());
+    static final Log logger = Log.factory.create(TestDrawables.class);
 }

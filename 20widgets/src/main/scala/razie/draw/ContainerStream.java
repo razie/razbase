@@ -50,8 +50,9 @@ public class ContainerStream extends DrawStream {
         // nothing to do - that element container has already been forwarded to my target
     }
 
-        // TODO DrawList is streamable but if you used it as below it doesn't close containerd containers
-    private void fixme () {
+    // TODO DrawList is streamable but if you used it as below it doesn't close containerd containers
+    @SuppressWarnings("unused")
+	private void fixme () {
         DrawList c=new DrawList();
         ContainerStream s=new ContainerStream(new DrawList());
         s.open (c);

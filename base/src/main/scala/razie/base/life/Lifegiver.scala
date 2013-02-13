@@ -67,7 +67,7 @@ object Lifegiver {
     try {
       Thread.sleep(ms);
     } catch {
-      case e =>
+      case e:Throwable =>
         // ignore
         e.printStackTrace();
     }

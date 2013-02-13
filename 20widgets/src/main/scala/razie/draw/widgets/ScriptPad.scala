@@ -37,8 +37,8 @@ class SimpleScriptPad (
    var irows = 15
    var icols = 80
 
-   def rows (i:Int) { irows = i; this}
-   def cols (i:Int) { icols = i; this}
+   def rows (i:Int) { irows = i}
+   def cols (i:Int) { icols = i}
    
    override def render (t:Technology, out:DrawStream) : AnyRef = {
       val atis = makeButtons()

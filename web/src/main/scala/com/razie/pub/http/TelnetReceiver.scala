@@ -295,7 +295,7 @@ class TelnetReceiver(val socket: MyServerSocket, cs: ContentServer) extends Sock
 
     } catch {
       case s: java.net.SocketException => S.logger log ("ERR_TELNET_RECEIVER " + s.getMessage())
-      case t @ _                       => S.logger log ("ERR_TELNET_RECEIVER " + t)
+      case t: Throwable                => S.logger log ("ERR_TELNET_RECEIVER " + t)
     } finally {
       socket.close();
     }

@@ -268,5 +268,5 @@ System.out.println("POSTING:"+data);
     return null;
   }
 
-  static Log logger = Log.factory.create(Comms.class.getName());
+  static Log logger = Log.factory.create(Comms.class);
 }

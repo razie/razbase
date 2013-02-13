@@ -142,10 +142,10 @@ class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends Xp
       val m: java.lang.reflect.Method = try {
         o.getClass.getMethod("get" + toZ(attr))
       } catch {
-        case _ => try {
+        case _:Throwable => try {
           o.getClass.getMethod(attr)
         } catch {
-          case _ => null
+          case _:Throwable => null
         }
       }
 
@@ -156,14 +156,14 @@ class MyBeanSolver(val excludeMatches: List[String => Boolean] = Nil) extends Xp
           val f = try {
             o.getClass.getField(attr)
           } catch {
-            case _ => null
+            case _:Throwable => null
           }
 
           if (f != null) List(WrapO(f.get(o), attr))
           else Nil // TODO should probably log or debug?
         }
       } catch {
-        case _ => Nil
+        case _:Throwable => Nil
       }
 
       if (result2.isEmpty) {

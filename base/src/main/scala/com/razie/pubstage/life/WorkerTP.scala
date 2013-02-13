@@ -62,7 +62,7 @@ class WorkerTP(val maxThreads: Int = 5, val ec: ExecutionContext = ExecutionCont
             threads(threads.indexWhere(_ == this)) = mkRunner
             throw t
           }
-          case _ =>
+          case _:Throwable =>
         }
       }
     }
@@ -88,7 +88,7 @@ class WorkerTP(val maxThreads: Int = 5, val ec: ExecutionContext = ExecutionCont
     try {
       Thread.sleep(ms);
     } catch {
-      case e =>
+      case e:Throwable =>
         // ignore
         e.printStackTrace();
     }

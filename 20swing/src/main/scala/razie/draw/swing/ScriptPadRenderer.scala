@@ -55,7 +55,7 @@ class ScriptPadRendererState (val f:ScriptPad) {
     
     val b3 = razie.Draw.button(razie.AI(name="Reset", tooltip="Reset when in trouble")) { 
       val r = f.reset().act(null)
-      if (r==null) "<null>" else r.toString
+//      if (r==null) "<null>" else r.toString
       }
     
     def runline { ed2.text = runit (ed1.line, f) }

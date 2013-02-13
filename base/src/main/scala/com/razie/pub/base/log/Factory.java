@@ -1,6 +1,5 @@
 package com.razie.pub.base.log;
 
-import org.slf4j.LoggerFactory;
 
 /**
  * This is how you can use any underlying logging package: simply overwrite this with your own
@@ -16,6 +15,7 @@ public class Factory {
       return new Log(component, categoryName);
    }
 
+  /** @deprecated use by class */
    public Log create(String categoryName) {
       return new Log("?", categoryName);
    }

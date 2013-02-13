@@ -11,6 +11,7 @@ import org.scalatest.matchers._
 import razie.{G}
 import razie.g._
 import org.junit.Test
+import scala.util.Try
 
 class MyL (val a:MyN, val z:MyN) extends razie.g.GLink[MyN]
 class MyLV (aaa:MyN, zzz:MyN, val selector:Any) extends MyL (aaa,zzz)                                            
@@ -93,7 +94,7 @@ class GraphTest extends MustMatchersForJUnit with ShouldMatchers {
       println (Graphs.entire[MyN, MyL] (g3).mkString)
       true
     } catch {
-      case _ => false
+      case _:Throwable => false
     } 
   }
   @Test def testrec3 = expect (true) {
@@ -101,26 +102,24 @@ class GraphTest extends MustMatchersForJUnit with ShouldMatchers {
       println ("RECURSIVE MAMA" + Graphs.entire[MyN, MyL] (g3).dag.mkString)
       true
     } catch {
-      case _ => false
+      case _:Throwable => false
     }
   }
   
   val glarge1 = x --: x --: x --: x --: y
+  
   @Test def testglarge1 = expect (false) {
-    try {
+    Try {
       println (Graphs.entire[MyN, MyL] (glarge1).depth(3).mkString)
       true
-    } catch {
-      case _ => false
-    } 
+    } getOrElse (false)
   }
+  
   @Test def testglarge2 = expect (true) {
-    try {
+    Try {
       println ("LARGE MAMA" + Graphs.entire[MyN, MyL] (glarge1).depth(10).mkString)
       true
-    } catch {
-      case _ => false
-    }
+    } getOrElse (false)
   }
   
 

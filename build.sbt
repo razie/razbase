@@ -7,6 +7,8 @@ publishMavenStyle := true
 
 publishArtifact in Test := false
 
+publishArtifact in (Compile, packageDoc) := false
+
 pomIncludeRepository := { x => false }
 
 pomExtra := (

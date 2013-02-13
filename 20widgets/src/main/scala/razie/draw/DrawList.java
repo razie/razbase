@@ -43,7 +43,8 @@ public class DrawList extends StreamableContainer.Impl implements Drawable3, Str
     }
     
     /** pre-populate: set the attributes before rendering, eh? */
-    public DrawList(Collection arr) {
+    @SuppressWarnings("rawtypes")
+	public DrawList(Collection arr) {
        for (Object o : arr)
           write (o);
     }

@@ -163,5 +163,5 @@ class LightReceiver implements SocketReceiver, Runnable {
             }
         }
 
-    static final Log logger = Log.factory.create (LightReceiver.class.getSimpleName());
+    static final Log logger = Log.factory.create (LightReceiver.class);
 }
