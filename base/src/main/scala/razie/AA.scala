@@ -25,6 +25,7 @@ object AA {
   final val EMPTY = AA()
    
   def apply (s:Any*):AA = {val x = new AA(); x.setAttr(s.asInstanceOf[Seq[AnyRef]]:_*); x }
+  def map (s:Map[String,AnyRef]):AA = {val x = new AA(); s.map(t=>x.setAttr(t._1,t._2)); x }
   def apply ():AA = new AA()
 
   def wrap (a:AttrAccess, s:AnyRef*) = new WrapAttrAccess (a,s:_*)
