@@ -13,7 +13,7 @@ import com.razie.pub.base.{ log => pblog }
  * @deprecated use the Logging trait
  */
 object Log extends razie.Logging {
-  override val logger = newlog ("?")  // default log
+  override val logger = newlog ("razie")  // default log
 
   def silent (b:Boolean) = {} // TODO
   
