@@ -46,12 +46,18 @@ public class Comms {
       // see http://www.exampledepot.com/egs/java.net/Post.html
       uc.setDoOutput(true);
 
-      String data = httpArgs.addToUrl(null);
-          
+      for (String a : httpArgs.getPopulatedAttr()) {
+    	uc.setRequestProperty(a, httpArgs.sa(a));
+      }
+
       OutputStreamWriter wr = new OutputStreamWriter(uc.getOutputStream());
-      wr.write(data);
+      String dataToWrite = "";
+      if (content != null && content.length() > 0) {
+    	 dataToWrite = content;
+      }
+      System.out.println("POSTING:"+dataToWrite);
+      wr.write(dataToWrite);
       wr.flush();
-System.out.println("POSTING:"+data);
 
       logger.trace(3, "hdr: ", uc.getHeaderFields());
       String resCode = uc.getHeaderField(0);
