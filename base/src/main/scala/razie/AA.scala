@@ -84,7 +84,8 @@ class AA extends AttrAccessImpl {
    
    def ++  (other:AA) = new WrapAttrAccess (this, other)
    def ++= (other:AA) = { setAttr(other); this }
-   
+
+   def toMap = { (for (a <- this.sgetPopulatedAttr) yield (a -> this.sa(a))).toMap }
 }
 
 /** hierarchical implementation - this one adds stuff to a parent's */
