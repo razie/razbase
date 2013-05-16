@@ -42,9 +42,10 @@ The sbt/maven artifact is:
 
     def razBase = "com.razie" %% "razbase"         % "0.6.3-SNAPSHOT"
 
-Make sure that, if you use a SNAPSHOT version, the snapshots repository is added to sbt 0.11:
+Make sure that, if you use a SNAPSHOT version, the snapshots repository is added to sbt, as in https://github.com/razie/scripster/blob/master/project/Build.scala :
 
-    resolvers += ScalaToolsSnapshots,
+    resolvers ++= Seq("snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+                      "releases"  at "http://oss.sonatype.org/content/repositories/releases")
 
 For an example, see usage in my snakked project. Good luck!
 
