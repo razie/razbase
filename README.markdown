@@ -50,11 +50,9 @@ Make sure that, if you use a SNAPSHOT version, the snapshots repository is added
 For an example, see usage in my snakked project. Good luck!
 
 Versions
---------
 
-0.6.3-SNAPSHOT is the last 2.9.1 build
-
-0.6.4-SNAPSHOT is the 2.10.0 build, no other code changes
+- 0.6.4-SNAPSHOT is the 2.10.0 build, no other code changes
+- 0.6.3-SNAPSHOT is the last 2.9.1 build
 
 
 Developing & Building
