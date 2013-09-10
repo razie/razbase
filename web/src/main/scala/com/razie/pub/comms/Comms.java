@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -61,10 +62,9 @@ public class Comms {
 
       logger.trace(3, "hdr: ", uc.getHeaderFields());
       String resCode = uc.getHeaderField(0);
-      in = uc.getInputStream();
 
       if (!resCode.endsWith("200 OK")) {
-        String msg = "Could not fetch data from url " + url + ", resCode=" + resCode;
+        String msg = "Could not fetch data from url " + url + ", resCode=" + resCode + ", content="+ readStream(((HttpURLConnection)uc).getErrorStream());
         logger.trace(3, msg);
         RuntimeException rte = new RuntimeException(msg);
         // if (uc.getContentType().endsWith("xml")) {
@@ -81,6 +81,7 @@ public class Comms {
         // }
         throw rte;
       }
+      in = uc.getInputStream();
       return in;
     } catch (MalformedURLException e) {
       RuntimeException iex = new IllegalArgumentException();
