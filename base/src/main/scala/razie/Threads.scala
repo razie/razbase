@@ -72,6 +72,23 @@ object Threads {
 	   threads
 	   }
 
+   /** same as forkForeach, but use the given number of threads and slice the iterable */
+   def sliceForeach[A] (t:Int, as:List[A]) (f:A =>Unit) : List[java.lang.Thread] = {
+       val slice = as.size / t
+	   val threads = (for (i <- 0 until t) yield
+	      new java.lang.Thread(new java.lang.Runnable() {
+	         override def run() = {
+	           for (j <- i*slice until (i+1)*slice) 
+	             f(as(j))
+	           if (i == t-1) // last loop does all
+	             for (j <- (i+1)*slice until as.size) 
+                   f(as(j))
+	         }
+	      })).toList // use toList since the iterable may not be strict
+	   threads.foreach (_.start())
+	   threads
+	   }
+
    /** join a bunch of thread - this is more to have a symmetry for fork */
    def join (threads:Iterable[java.lang.Thread]) = {
       threads.foreach (_.join)
