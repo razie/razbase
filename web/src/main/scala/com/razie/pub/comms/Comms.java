@@ -63,7 +63,7 @@ public class Comms {
       logger.trace(3, "hdr: ", uc.getHeaderFields());
       String resCode = uc.getHeaderField(0);
 
-      if (!resCode.endsWith("200 OK")) {
+      if (resCode == null || !resCode.endsWith("200 OK")) {
         String msg = "Could not fetch data from url " + url + ", resCode=" + resCode + ", content="+ readStream(((HttpURLConnection)uc).getErrorStream());
         logger.trace(3, msg);
         RuntimeException rte = new RuntimeException(msg);
