@@ -40,7 +40,6 @@ class MyN (val color:String) extends razie.g.GNode[MyN, MyL] with razie.g.WRGrap
   }
  
   override def toString = color
-
 }
 
 /**

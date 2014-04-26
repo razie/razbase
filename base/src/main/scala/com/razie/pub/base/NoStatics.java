@@ -115,6 +115,19 @@ public class NoStatics {
 	}
 
 	/**
+	 * remove a static for the current thread for the given class
+	 * 
+	 * @param c
+	 *            the class of the static
+	 * @param o
+	 *            the instance to use in this and related threads
+	 * @return the same object you put in
+	 */
+	public static void remove(Class<?> c) {
+		instance().statics.remove(c);
+	}
+
+	/**
 	 * get the instance/static for this thread of the given class on this thread
 	 */
 	public static Object get(Class<?> c) {

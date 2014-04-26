@@ -83,6 +83,17 @@ object NoStatic {
 /** TODO 1-1 copy NoStatics docs here and ditch old one? */
 object NoStaticS {
   /**
+   * remove any static of type
+   *
+   * @param o
+   *            the instance to use in this and related threads
+   * @return the same object you put in
+   */
+  def remove[A](implicit m: scala.reflect.Manifest[A]) {
+    NoStatics.remove(m.erasure)
+  }
+  
+  /**
    * create a static for the current thread for the given class
    *
    * @param o

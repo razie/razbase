@@ -3,8 +3,8 @@ import Keys._
 import java.io.File
 
 object V {
-  val version      = "0.6.4-SNAPSHOT"
-  val scalaVersion = "2.10.0" // "2.9.1"
+  val version      = "0.6.6-SNAPSHOT"
+  val scalaVersion = "2.10.3" 
   val organization = "com.razie"
 
   def snap = (if (V.version endsWith "-SNAPSHOT") "-SNAPSHOT" else "")
@@ -12,12 +12,12 @@ object V {
 
 object MyBuild extends Build {
 
-  def scalatest  = "org.scalatest"  % "scalatest_2.10.0" % "1.8"
-  def junit      = "junit"          % "junit"           % "4.5" //     % "test->default"
-  def json       = "org.json"       % "json"            % "20090211"
-  def slf4jApi   = "org.slf4j"      % "slf4j-api"       % "1.6.1"
-  def logback    = "ch.qos.logback" % "logback-classic" % "1.0.0"
-  def scalaSwing = "org.scala-lang" % "scala-swing"     % V.scalaVersion
+  def scalatest  = "org.scalatest"  %% "scalatest"       % "1.9.2"
+  def junit      = "junit"           % "junit"           % "4.5" //     % "test->default"
+  def json       = "org.json"        % "json"            % "20090211"
+  def slf4jApi   = "org.slf4j"       % "slf4j-api"       % "1.6.1"
+  def logback    = "ch.qos.logback"  % "logback-classic" % "1.0.0"
+  def scalaSwing = "org.scala-lang"  % "scala-swing"     % V.scalaVersion
 
   lazy val root = Project(id="razbase",    base=file("."),
                           settings = defaultSettings ++ Seq()
