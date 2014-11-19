@@ -198,7 +198,7 @@ public class LightAuthBase {
 
       Log.traceThis("AUTH_RECON: LightAuthBase- " + clientip + " / me=" + Agents.me() + " / " + debug1);
 
-      if (Comms.isLocalhost(clientip)) {
+      if (Comms2.isLocalhost(clientip)) {
          return LightAuthType.INHOUSE;
          // TODO is this correct in linux?
       } else if (clientip.startsWith(Agents.getHomeNetPrefix())

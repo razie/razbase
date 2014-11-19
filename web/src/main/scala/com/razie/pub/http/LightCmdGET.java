@@ -23,7 +23,7 @@ import com.razie.pub.base.data.HttpUtils;
 import com.razie.pub.base.data.MimeUtils;
 import com.razie.pub.base.log.Log;
 import com.razie.pub.comms.AuthException;
-import com.razie.pub.comms.Comms;
+import com.razie.pub.comms.Comms2;
 import com.razie.pub.comms.HttpHelper;
 import com.razie.pub.comms.LightAuthBase;
 import com.razie.pub.comms.MyServerSocket;
@@ -271,7 +271,7 @@ public class LightCmdGET extends SocketCmdHandler.Impl {
         if (HttpHelper.isImage(filenm)) {
             out.print(HttpHelper.httpWrapPic(filenm, len));
         } else if (filenm.endsWith(".html")) {
-            Comms.copyStreamSED(in, out, MPRES);
+            Comms2.copyStreamSED(in, out, MPRES);
         } else if (HttpHelper.isOtherFile(filenm)) {
             out.print(HttpHelper.httpWrapOtherFile(filenm, len));
         } else {

@@ -87,7 +87,7 @@ public class SimpleActionToInvoke extends BaseActionToInvoke implements Cloneabl
    public Object act(ActionContext ctx) {
       try {
          URL url = new URL(this.makeActionUrl());
-         return Comms.readUrl(url.toExternalForm(), LightAuthBase.instance().httpSecParms(url));
+         return Comms2.readUrl(url.toExternalForm(), LightAuthBase.instance().httpSecParms(url));
       } catch (MalformedURLException e) {
          throw new RuntimeException("while getting the command url: " + this.makeActionUrl(), e);
       }

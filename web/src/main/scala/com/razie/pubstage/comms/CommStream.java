@@ -9,7 +9,7 @@ import java.net.URL;
 
 import com.razie.pub.base.log.Log;
 import com.razie.pub.comms.CommChannel;
-import com.razie.pub.comms.Comms;
+import com.razie.pub.comms.Comms2;
 
 /**
  * a two way communication stream. a stream serves one logical purpose, such as making a soa call or
@@ -39,13 +39,13 @@ public class CommStream {
     /** creates a comm channel with the remote URL */
     public CommStream(URL url) {
         this((CommChannel)null);
-        this.is = Comms.streamUrl(url.toExternalForm());
+        this.is = Comms2.streamUrl(url.toExternalForm());
     }
 
     /** creates a comm channel with the remote URL */
     public CommStream(String url) {
         this((CommChannel)null);
-        this.is = Comms.streamUrl(url);
+        this.is = Comms2.streamUrl(url);
     }
 
     /** if you already got the stream and want to wrap it for some reason ;) */
@@ -63,7 +63,7 @@ public class CommStream {
     }
 
     protected String readStreamImpl() {
-        return Comms.readStream(is);
+        return Comms2.readStream(is);
     }
 
     static Log logger = Log.factory.create(CommStream.class);

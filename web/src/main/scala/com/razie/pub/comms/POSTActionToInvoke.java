@@ -84,7 +84,7 @@ public class POSTActionToInvoke extends BaseActionToInvoke implements Cloneable,
       try {
          URL url = new URL(this.makeActionUrl());
          // TODO implement the POST
-         return Comms.readUrl(url.toExternalForm());
+         return Comms2.readUrl(url.toExternalForm());
       } catch (MalformedURLException e) {
          throw new RuntimeException("while getting the command url: " + this.makeActionUrl(), e);
       }

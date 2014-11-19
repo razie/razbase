@@ -7,7 +7,7 @@ package com.razie.pubstage.comms;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.razie.pub.comms.Comms;
+import com.razie.pub.comms.Comms2;
 
 /**
  * a two way STRING communication channel. Adds filtering functionality
@@ -26,7 +26,7 @@ public class StrCommProxy extends StrCommStream {
 
     /** will read all incoming until the channel is empty */
     public String readAll() {
-        String s = Comms.readStream(is);
+        String s = Comms2.readStream(is);
         if (filters != null)
             for (IStrFilter f : filters)
                 s = f.filter(s);

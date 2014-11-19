@@ -218,30 +218,6 @@ public class Comms {
     return readStream(s);
   }
 
-  /** copy a stream using a simple SED like filter */
-  public static void copyStreamSED(InputStream is, OutputStream fos, List<SedFilter> filters) {
-    try {
-      String line;
-      fos.write(HttpHelper.httpHeader(HttpHelper.OK).getBytes());
-
-      BufferedReader input = new BufferedReader(new InputStreamReader(is));
-      while ((line = input.readLine()) != null) {
-        for (SedFilter filter : filters) {
-          line = filter.filter(line);
-        }
-
-        fos.write(line.getBytes());
-        fos.write('\n');
-      }
-      fos.flush();
-      fos.close();
-      input.close();
-      is.close();
-    } catch (IOException e1) {
-      throw new CommRtException("Copystream failed: ", e1);
-    }
-  }
-
   /**
    * is this the localhost? x can be either hostname or IP, ipv4, ipv6 etc
    * 
