@@ -3,7 +3,7 @@ import Keys._
 import java.io.File
 
 object V {
-  val version      = "0.6.7-SNAPSHOT"
+  val version      = "0.6.7"
   val scalaVersion = "2.10.4" 
   val organization = "com.razie"
 
@@ -58,7 +58,8 @@ object MyBuild extends Build {
       if(v endsWith "-SNAPSHOT")
         Some ("Sonatype" at "https://oss.sonatype.org/content/repositories/snapshots/")
       else
-        Some ("Sonatype" at "https://oss.sonatype.org/content/repositories/releases/")
+//        Some ("Sonatype" at "https://oss.sonatype.org/content/repositories/releases/")
+        Some ("Sonatype" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
     }  )
 
 }
