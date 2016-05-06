@@ -98,7 +98,8 @@ object Draw {
    /** make sure the first item has all the attributes - it will dictate the columns */
    def attrTable (o:Iterable[AttrAccess]) : DrawTable = {
       // the headings are the name of the attributes
-      val whatamess:Iterable[String]= scala.collection.JavaConversions.asScalaIterable(o.head.getPopulatedAttr)
+     import scala.collection.JavaConverters._
+      val whatamess:Iterable[String]= /*scala.collection.JavaConverters.iterableAsScalaIterable(*/o.head.getPopulatedAttr
       val t = table(whatamess.size) ()
       t.headers = whatamess
 

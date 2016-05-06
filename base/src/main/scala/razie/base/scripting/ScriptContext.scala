@@ -30,7 +30,7 @@ trait ScriptContext extends AttrAccess {
    * DO NOT forget to seal a context before passing it to untrusted plugins
    */
   def define(fun:String , expr:String )    /** remove a function */
-  def undefine(macro:String )
+  def undefine(m:String )
 
   /** TODO 3 FUNC use guards, document */
   def guard(name:String , condition:String , expr:String )
