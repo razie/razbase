@@ -17,7 +17,7 @@ object MyBuild extends Build {
   def json       = "org.json"        % "json"            % "20090211"
   def slf4jApi   = "org.slf4j"       % "slf4j-api"       % "1.6.1"
   def logback    = "ch.qos.logback"  % "logback-classic" % "1.0.0"
-  //def scalaSwing = "org.scala-lang"  % "scala-swing"     % V.scalaVersion
+//  def scalaSwing = "org.scala-lang.modules" %% "scala-swing"    % "2.0.0-M2"
 
   lazy val root = Project(id="razbase",    base=file("."),
                           settings = defaultSettings ++ Seq()
@@ -34,8 +34,8 @@ object MyBuild extends Build {
                   ) dependsOn (pbase)
 
 //  lazy val w20s = Project(id="s20swing", base=file("20swing"),
-//                          settings = defaultSettings ++
-//                          Seq(libraryDependencies ++= Seq(scalatest, junit/*, scalaSwing*/))
+//                         settings = defaultSettings ++
+//                          Seq(libraryDependencies ++= Seq(scalatest, junit, scalaSwing))
 //                  ) dependsOn (pbase, w20)
 
   lazy val web = Project(id="razweb", base=file("web"),

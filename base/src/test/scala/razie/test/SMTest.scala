@@ -5,7 +5,7 @@
 package razie.test
 
 import org.scalatest.junit._
-import org.scalatest.SuperSuite
+//import org.scalatest.SuperSuite
 import razie.SM
 import org.junit.Test
 

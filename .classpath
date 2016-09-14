@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="base/src/main/scala"/>
-	<classpathentry kind="src" path="base/src/main/resources"/>
 	<classpathentry kind="src" path="base/src/test/scala"/>
 	<classpathentry kind="src" path="20widgets/src/main/resources"/>
-	<classpathentry kind="src" path="20widgets/src/main/scala"/>
 	<classpathentry kind="src" path="20widgets/src/test/scala"/>
+	<classpathentry kind="src" path="20widgets/src/main/scala"/>
 	<classpathentry kind="src" path="web/src/main/scala"/>
 	<classpathentry kind="src" path="web/src/test/scala"/>
-	<classpathentry kind="src" path="20swing/src/main/scala"/>
-	<classpathentry kind="src" path="20swing/src/test/scala"/>
-	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="base/src/main/resources"/>
 	<classpathentry kind="lib" path="web/lib/mime-util.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="20swing/lib/jsyntaxpane-0.9.5-b29.jar"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry kind="lib" path="lib_managed/jars/org.scalatest/scalatest_2.11/scalatest_2.11-2.1.3.jar"/>
+	<classpathentry kind="lib" path="lib_managed/jars/junit/junit/junit-4.5.jar"/>
 	<classpathentry kind="lib" path="lib_managed/jars/org.json/json/json-20090211.jar"/>
 	<classpathentry kind="lib" path="lib_managed/jars/ch.qos.logback/logback-classic/logback-classic-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib_managed/jars/ch.qos.logback/logback-core/logback-core-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib_managed/jars/org.slf4j/slf4j-api/slf4j-api-1.6.4.jar"/>
-	<classpathentry kind="lib" path="lib_managed/jars/org.scalatest/scalatest_2.10/scalatest_2.10-1.9.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

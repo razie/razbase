@@ -8,7 +8,7 @@ package com.razie.pub.base.test
 import org.junit.Test
 import org.scalatest.junit._
 import razie.base._
-import org.scalatest.SuperSuite
+//import org.scalatest.SuperSuite
 import razie.AA
 
 /**
