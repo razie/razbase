@@ -9,7 +9,7 @@
 
 Status: **not actively maintained**.
 
-A very simple and light, multi-threaded and **embedded http server** which can support any socket protocol.
+A very simple and light, multi-threaded and **embedded http server** which can support any socket protocol. Supports asynchronous and streaming programming, filters etc
 
 Socket, web, telnet etc servers: light, embedable, using annotations etc.
 
@@ -17,7 +17,5 @@ The main server is in https://github.com/razie/razbase/tree/master/web/src/main/
 
 You will find sample there as well.
 
-Simple agent support, to join distributed agents is in https://github.com/razie/razbase/tree/master/web/src/main/scala/com/razie/pub/comms
-
-Full agent as well as asset management and more has moved to https://github.com/razie/razmutant
+Full distributed agent as well as asset management and more has moved to https://github.com/razie/razmutant
 
