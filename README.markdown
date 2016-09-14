@@ -8,28 +8,34 @@
 
 What's this?
 ------------
-Some code I dind't want to have to write...
+Some code I dind't want to have to write... just like i wish I didn't have to write it, there's no point in making others write it. 
 
+The original aim was to support a grid/fabric like framework for smart assets.
 
-Why?
-----
-Well, just like i wish I didn't have to write it, there's no point in making others write it, should they need it. 
+There's a very simple and light, multi-threaded and **embedded http server** which can support any socket protocol, see https://github.com/razie/razbase/tree/master/web - this server supports streaming etc.
 
+Distributed infrastructure, managing assets and other agent logic moved to https://github.com/razie/razmutant see http://homecloud.wikidot.com/agents
 
-Details
--------
-The code is generally self-documented. Keep your eyes out for package.html and similar stuff.
+There's a simple **Light SOA framework**, which allows you to easily create "services": 
+just have a Java class, annotate the methods you want available over http and register it with the server.
+While the servlet thing is great, it's not that easy to use and most services/methods are really simple 
+and this way you can test them either directly by Java calls or via the http server.
 
+Two things I was investigating were drawing and streaming.
 
-Uses and articles
-==============
+**Drawing** - basically any code anywhere will draw something. Even if it doesn't, the objects it uses could be seen by 
+someone somewhere, be it a web page, AJAX, SVG, Eclipse, SWING ... god knows what. So, here's a simple and 
+generic drawing framework. 
 
-Razbase is used in http://www.tryscala.org and http://www.racerkidz.com
+**Streaming** - instead of hard-coding the communication protocols throughout the code, I'm trying to abstract the basics
+of a communications framework, with callbacks all the way into the browser - by streaming say result sets in parallel.
+
+Razbase is used in http://www.tryscala.org and http://www.effectiveskiing.com
 
 
 Roadmap
 -------
-None
+I only maintain this as I need to - some parts of it are still used in other projects. Most of the ideas pursued originally are now available in much better form in projects like reactive streams etc.
 
 
 How to use
