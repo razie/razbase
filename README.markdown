@@ -29,10 +29,7 @@ Razbase is used in http://www.tryscala.org and http://www.racerkidz.com
 
 Roadmap
 -------
-I will only maintain this as I need to. If there's some large user community developing (doubt that, really), 
-we'll see - I could co-op some volunteers.
-
-I will add more code as I need it/write it for all kinds of reasons.
+None
 
 
 How to use
@@ -51,6 +48,7 @@ For an example, see usage in my snakked project. Good luck!
 
 Versions
 
+- 0.9.1-SNAPSHOT is the 2.11.8 build
 - 0.6.4-SNAPSHOT is the 2.10.0 build, no other code changes
 - 0.6.3-SNAPSHOT is the last 2.9.1 build
 
@@ -78,7 +76,7 @@ Note: if you don't have a github ssh key setup, use the anonymous checkout:
 
 7. Eclipse setup
 
-   * install the scala 2.9.1 plugin 
+   * install the scala plugin 
    * use sbt and run the command "update" to get all the libraries downloaded
    
 7.1. create the projects
