@@ -8,9 +8,7 @@
 
 What's this?
 ------------
-Some code I dind't want to have to write... just like i wish I didn't have to write it, there's no point in making others write it. 
-
-The original aim was to support a grid/fabric like framework for smart assets.
+Some code I dind't want to have to write...
 
 There's a very simple and light, multi-threaded and **embedded http server** which can support any socket protocol, see https://github.com/razie/razbase/tree/master/web - this server supports streaming etc.
 
