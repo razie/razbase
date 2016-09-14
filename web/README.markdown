@@ -19,3 +19,4 @@ You will find sample there as well.
 
 Full distributed agent as well as asset management and more has moved to https://github.com/razie/razmutant
 
+You can annotate method responses with @SoaStreamable and other interesting annotations.
