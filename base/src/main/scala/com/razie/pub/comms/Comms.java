@@ -35,12 +35,12 @@ public class Comms {
 
   /**
    * Stream the response of a URL.
-   * 
+   *
    * @param url can be local or remote
    * @return a string containing the text read from the URL. can be the result of a servlet, a web
    *         page or the contents of a local file. It's null if i couldn't read the file.
    */
-  public static InputStream xpoststreamUrl2(String url, AttrAccess httpArgs, String content) {
+  public static URLConnection xpoststreamUrl2A(String url, AttrAccess httpArgs, String content) {
     try {
       InputStream in = null;
       URLConnection uc = (new URL(url)).openConnection();
@@ -48,13 +48,13 @@ public class Comms {
       uc.setDoOutput(true);
 
       for (String a : httpArgs.getPopulatedAttr()) {
-    	uc.setRequestProperty(a, httpArgs.sa(a));
+        uc.setRequestProperty(a, httpArgs.sa(a));
       }
 
       OutputStreamWriter wr = new OutputStreamWriter(uc.getOutputStream());
       String dataToWrite = "";
       if (content != null && content.length() > 0) {
-    	 dataToWrite = content;
+        dataToWrite = content;
       }
       System.out.println("POSTING:"+dataToWrite);
       wr.write(dataToWrite);
@@ -81,8 +81,7 @@ public class Comms {
         // }
         throw rte;
       }
-      in = uc.getInputStream();
-      return in;
+      return uc;
     } catch (MalformedURLException e) {
       RuntimeException iex = new IllegalArgumentException();
       iex.initCause(e);
@@ -90,6 +89,74 @@ public class Comms {
     } catch (IOException e1) {
       // server/node down
       throw new RuntimeException("Connection exception for url=" + url, e1);
+    }
+  }
+
+  /**
+   * Stream the response of a URL.
+   * 
+   * @param url can be local or remote
+   * @return a string containing the text read from the URL. can be the result of a servlet, a web
+   *         page or the contents of a local file. It's null if i couldn't read the file.
+   */
+  public static InputStream xpoststreamUrl2(String url, AttrAccess httpArgs, String content) {
+      InputStream in = null;
+      URLConnection uc = xpoststreamUrl2A(url, httpArgs, content);
+    try {
+      in = uc.getInputStream();
+      return in;
+    } catch (IOException e1) {
+      // server/node down
+      throw new RuntimeException("Connection exception for url=" + url, e1);
+    }
+  }
+
+  /**
+   * Stream the response of a URL.
+   *
+   * @param url can be local or remote
+   * @param httpArgs are sent as HTTP request properties
+   * @return a string containing the text read from the URL. can be the result of a servlet, a web
+   *         page or the contents of a local file. It's null if i couldn't read the file.
+   */
+  public static URLConnection streamUrlA(String url, AttrAccess... httpArgs) {
+    try {
+        URLConnection uc = (new URL(url)).openConnection();
+        if (httpArgs.length > 0 && httpArgs[0] != null) {
+          for (String a : httpArgs[0].getPopulatedAttr())
+            uc.setRequestProperty(a, httpArgs[0].sa(a));
+        }
+        logger.trace(3, "hdr: ", uc.getHeaderFields());
+        String resCode = uc.getHeaderField(0);
+        if (!resCode.endsWith("200 OK")) {
+          String msg = "Could not fetch data from url " + url + ", resCode=" + resCode;
+          logger.trace(3, msg);
+          CommRtException rte = new CommRtException(msg);
+          // if (uc.getContentType().endsWith("xml")) {
+          // // TODO replace with RiXmlUtils or XmlDoc
+          // DOMParser parser = new DOMParser();
+          // try {
+          // parser.parse(new InputSource(in));
+          // } catch (SAXException e) {
+          // RuntimeException iex = new
+          // CommRtException("Error while processing document at "
+          // + url);
+          // iex.initCause(e);
+          // throw iex;
+          // }
+          // }
+          throw rte;
+        }
+      return uc;
+    } catch (MalformedURLException e) {
+      RuntimeException iex = new IllegalArgumentException();
+      iex.initCause(e);
+      throw iex;
+    } catch (IOException e1) {
+      // server/node down
+      CommRtException rte = new CommRtException("Connection exception for url=" + url);
+      rte.initCause(e1);
+      throw rte;
     }
   }
 

@@ -7,7 +7,7 @@ import org.fusesource.scalate.{ util => sfu }
  *  NOTE: IF you get an anon class name, you can override the logger:
  *  protected override val logger = newlog (classOf)
  *
- *  NOTE: the formatting uses java.lang.String.format NOT slf4j formatting by reason of clusterfuck
+ *  NOTE: the formatting uses java.lang.String.format NOT slf4j formatting by reason of clusterfuk
  */
 trait Logging {
 

@@ -95,7 +95,7 @@ class WrapAttrAccess (val parent:AttrAccess, s:AnyRef* ) extends AA {
   setAttr(s:_*); 
   
   // java compat for ScriptContext
-  def this (fucker:Boolean, parent : AttrAccess, s:AnyRef*) = this (parent, s:_*)
+  def this (something:Boolean, parent : AttrAccess, s:AnyRef*) = this (parent, s:_*)
   def this (parent : AttrAccess) = this (parent, Nil:_*)
   def this (parent : AttrAccess, aa:AttrAccess) = this (true, parent, aa)
   def this (parent : AttrAccess, aa:Array[AnyRef]) = this (true, parent, aa:_*)
