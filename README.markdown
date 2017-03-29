@@ -24,9 +24,17 @@ Two things I was investigating were drawing and streaming.
 **Drawing** - basically any code anywhere will draw something. Even if it doesn't, the objects it uses could be seen by 
 someone somewhere, be it a web page, AJAX, SVG, Eclipse, SWING ... god knows what. So, here's a simple and 
 generic drawing framework. 
+- See https://github.com/razie/razbase/blob/master/20widgets/src/main/scala/razie/Draw.scala for details or
+- https://github.com/razie/razbase/blob/master/20widgets/src/main/scala/razie/draw/samples/SimpleModel.scala for an example. 
+- The widgets are here: https://github.com/razie/razbase/tree/master/20widgets/src/main/scala/razie/draw/widgets 
+- Note: this drawing support is not mainted anymore.
 
 **Streaming** - instead of hard-coding the communication protocols throughout the code, I'm trying to abstract the basics
 of a communications framework, with callbacks all the way into the browser - by streaming say result sets in parallel.
+- for instance, you can stream elements into a table and these will be rendered to the browser when the table is complete. Alternatively, if you're streaming elements into a list, these are streamed to the browser as they become available, so the actual client sees the page as it is built.
+- design is here: https://github.com/razie/razbase/blob/master/20widgets/src/main/scala/razie/draw/package-info.java
+- see the streams and accumulators here: https://github.com/razie/razbase/tree/master/20widgets/src/main/scala/razie/draw
+- Note: this streaming support is not maintained anymore
 
 Razbase is used in http://www.tryscala.org and http://www.effectiveskiing.com
 
