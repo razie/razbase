@@ -3,7 +3,7 @@ import Keys._
 import java.io.File
 
 object V {
-  val version      = "0.9.1" //-SNAPSHOT"
+  val version      = "0.9.2-SNAPSHOT"
   val scalaVersion = "2.11.8" 
   val organization = "com.razie"
 
@@ -14,36 +14,36 @@ object MyBuild extends Build {
 
   def scalatest  = "org.scalatest"  %% "scalatest"       % "2.1.3"
   def junit      = "junit"           % "junit"           % "4.5" //     % "test->default"
-  def json       = "org.json"        % "json"            % "20090211"
-  def slf4jApi   = "org.slf4j"       % "slf4j-api"       % "1.6.1"
-  def logback    = "ch.qos.logback"  % "logback-classic" % "1.0.0"
-//  def scalaSwing = "org.scala-lang.modules" %% "scala-swing"    % "2.0.0-M2"
+  def json       = "org.json"        % "json"            % "20160810"
+  def logback    = "ch.qos.logback"  % "logback-classic" % "1.0.13"
 
   lazy val root = Project(id="razbase",    base=file("."),
                           settings = defaultSettings ++ Seq()
-                  ) aggregate (pbase, w20, web) dependsOn (pbase, w20, web)
+                  ) aggregate (pbase) dependsOn (pbase)
 
   lazy val pbase = Project(id="base", base=file("base"),
                           settings = defaultSettings ++
-                          Seq(libraryDependencies ++= Seq(scalatest, junit, json, slf4jApi, logback))
+                          Seq(libraryDependencies ++= Seq(scalatest, junit, json, logback))
                   )
 
-  lazy val w20  = Project(id="s20widgets", base=file("20widgets"),
-                          settings = defaultSettings ++
-                          Seq(libraryDependencies ++= Seq(scalatest, junit))
-                  ) dependsOn (pbase)
+//  lazy val w20  = Project(id="s20widgets", base=file("20widgets"),
+//                          settings = defaultSettings ++
+//                          Seq(libraryDependencies ++= Seq(scalatest, junit))
+//                  ) dependsOn (pbase)
 
+//  def scalaSwing = "org.scala-lang.modules" %% "scala-swing"    % "2.0.0-M2"
+//
 //  lazy val w20s = Project(id="s20swing", base=file("20swing"),
 //                         settings = defaultSettings ++
 //                          Seq(libraryDependencies ++= Seq(scalatest, junit, scalaSwing))
 //                  ) dependsOn (pbase, w20)
 
-  lazy val web = Project(id="razweb", base=file("web"),
-                          settings = defaultSettings ++
-                          Seq(
-                               libraryDependencies ++= Seq(scalatest, junit)
-                              )
-                  ) dependsOn (pbase, w20)
+//  lazy val web = Project(id="razweb", base=file("web"),
+//                          settings = defaultSettings ++
+//                          Seq(
+//                               libraryDependencies ++= Seq(scalatest, junit)
+//                              )
+//                  ) dependsOn (pbase, w20)
 
 
   def defaultSettings = Defaults.defaultSettings ++ Seq (
